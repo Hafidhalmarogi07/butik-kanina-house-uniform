@@ -1,0 +1,157 @@
+{
+    "admin":[
+        {
+            "title":"Dashboard",
+            "iconClass":"fas fa-tachometer-alt",
+            "route":{
+                "name":"dashboard"
+            }
+        }
+    ],
+    "owner":[
+        {
+            "title":"Dashboard",
+            "iconClass":"fas fa-tachometer-alt",
+            "route":{
+                "name":"dashboard"
+            }
+        },
+        {
+            "title":"Products",
+            "iconClass":"fas fa-box",
+            "route":{
+                "name":"products"
+            }
+        },
+        {
+            "title":"Categories",
+            "iconClass":"fas fa-tags",
+            "route":{
+                "name":"category"
+            }
+        },
+        {
+            "title":"Sales",
+            "iconClass":"fas fa-shopping-cart",
+            "route":{
+                "name":"sales"
+            }
+        },
+        {
+            "title":"Orders",
+            "iconClass":"fas fa-shopping-bag",
+            "route":{
+                "name":"orders"
+            }
+        },
+        {
+            "title":"Production",
+            "iconClass":"fas fa-industry",
+            "route":{
+                "name":"production"
+            }
+        },
+        {
+            "title":"Expenses",
+            "iconClass":"fas fa-money-bill-alt",
+            "route":{
+                "name":"expenses"
+            }
+        },
+        {
+            "title":"Customers",
+            "iconClass":"fas fa-users",
+            "route":{
+                "name":"customers"
+            }
+        },
+        {
+            "title":"Reports",
+            "iconClass":"fas fa-chart-bar",
+            "route":{
+                "name":"reports"
+            }
+        },
+        {
+            "title":"Users",
+            "iconClass":"fas fa-user-cog",
+            "route":{
+                "name":"users"
+            }
+        }
+    ],
+    "warehouse":[
+        {
+            "title":"Dashboard",
+            "iconClass":"fas fa-tachometer-alt",
+            "route":{
+                "name":"dashboard_gudang"
+            }
+        },
+        {
+            "title":"Products",
+            "iconClass":"fas fa-box",
+            "route":{
+                "name":"products"
+            }
+        },
+        {
+            "title":"Categories",
+            "iconClass":"fas fa-tags",
+            "route":{
+                "name":"category"
+            }
+        },
+        {
+            "title":"Production",
+            "iconClass":"fas fa-industry",
+            "route":{
+                "name":"production"
+            }
+        }
+    ],
+    "boutique":[
+        {
+            "title":"Dashboard",
+            "iconClass":"fas fa-tachometer-alt",
+            "route":{
+                "name":"dashboard_toko"
+            }
+        },
+        {
+            "title":"Sales",
+            "iconClass":"fas fa-shopping-cart",
+            "route":{
+                "name":"sales"
+            }
+        },
+        {
+            "title":"Orders",
+            "iconClass":"fas fa-shopping-bag",
+            "route":{
+                "name":"orders"
+            }
+        },
+        {
+            "title":"Customers",
+            "iconClass":"fas fa-users",
+            "route":{
+                "name":"customers"
+            }
+        },
+        {
+            "title":"Products",
+            "iconClass":"fas fa-box",
+            "route":{
+                "name":"products"
+            }
+        },
+        {
+            "title":"Categories",
+            "iconClass":"fas fa-tags",
+            "route":{
+                "name":"category"
+            }
+        }
+    ]
+}
