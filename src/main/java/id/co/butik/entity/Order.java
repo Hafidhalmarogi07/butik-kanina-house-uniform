@@ -1,6 +1,7 @@
 package id.co.butik.entity;
 
 import id.co.butik.entity.users.User;
+import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.OrderStatus;
 import id.co.butik.util.BaseEntity;
 import lombok.Data;
@@ -14,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Data
-@Table(name = "order")
+@Table(name = "order_tbl")
 public class Order extends BaseEntity {
 
     @Id
@@ -25,7 +26,7 @@ public class Order extends BaseEntity {
     private Customer customer;
 
     @ManyToOne
-    private User admin;
+    private UserProfile admin;
 
     private LocalDateTime date;
 

@@ -141,8 +141,10 @@ export default {
             }).catch(err => {
                 this.loading = false
                 this.title_submit = "Sign In"
-                if(err.response.data.error_description == "Bad credentials"){
+                if(err.response.data.error_description === "Bad credentials"){
                     this.error = "Incorrect username or password"
+                }else if(err.response.data.error_description === "User is disabled"){
+                    this.error = "Akun Anda telah dinonaktifkan"
                 }
                 console.log(this.error)
             })

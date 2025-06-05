@@ -1,5 +1,6 @@
 package id.co.butik.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import id.co.butik.util.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -18,6 +19,7 @@ public class SaleDetail extends BaseEntity {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Sale sale;
 
     @ManyToOne

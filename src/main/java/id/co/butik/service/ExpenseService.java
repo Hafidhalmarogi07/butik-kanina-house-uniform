@@ -42,21 +42,19 @@ public class ExpenseService {
     }
 
     public Expense createExpense(Expense expense, HttpServletRequest request) {
-        log.info("createExpense: {}", expense);
-        log.info("request: {}", request);
-        log.info("user: {}", request.getUserPrincipal().getName());
-        log.info("session: {}", request.getSession());
-        log.info("session id: {}", request.getSession().getId());
-        log.info("remote user: {}", request.getRemoteUser());
-        log.info("remote address: {}", request.getRemoteAddr());
         UserProfile userProfile = userProfileRepository.findFirstByEmail(request.getUserPrincipal().getName());
-       // expense.setCreatedBy(request.getUserPrincipal().getName());
-       // return repo.save(expense);
-
-        return null;
+        expense.setCreatedBy(userProfile);
+        return repo.save(expense);
     }
 
     public Expense updateExpense(Long id, Expense expense) {
-        return repo.save(expense);
+        Expense expenseToUpdate = repo.findById(id).orElseThrow(() -> new RuntimeException("Expense with id not found"));
+        expenseToUpdate.setCreatedBy(expense.getCreatedBy());
+        expenseToUpdate.setAmount(expense.getAmount());
+        expenseToUpdate.setDescription(expense.getDescription());
+        expenseToUpdate.setType(expense.getType());
+        expenseToUpdate.setPaymentMethod(expense.getPaymentMethod());
+        expenseToUpdate.setNote(expense.getNote());
+        return repo.save(expenseToUpdate);
     }
 }

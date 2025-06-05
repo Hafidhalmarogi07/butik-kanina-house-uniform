@@ -23,7 +23,9 @@ public class Expense extends BaseEntity {
     private Long id;
 
     private LocalDate date;
+
     private String description;
+
     private BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
