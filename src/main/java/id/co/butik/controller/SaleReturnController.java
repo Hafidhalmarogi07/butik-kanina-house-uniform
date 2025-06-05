@@ -4,9 +4,7 @@ import id.co.butik.entity.SaleReturn;
 import id.co.butik.service.SaleReturnService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -15,8 +13,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/sale-returns")
 public class SaleReturnController {
 
-    @Autowired
-    private SaleReturnService saleReturnService;
+    private final SaleReturnService saleReturnService;
+
+    public SaleReturnController(SaleReturnService saleReturnService) {
+        this.saleReturnService = saleReturnService;
+    }
 
     @GetMapping({"", "/"})
     public Page<SaleReturn> getAllSaleReturns(@RequestParam Map<String, String> params) {

@@ -7,8 +7,8 @@ import id.co.butik.entity.users.User;
 import id.co.butik.service.UserService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,30 +18,38 @@ import java.util.Map;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Secured({"ROLE_SUPERADMIN"})
     @GetMapping({"", "/"})
     public Page<User> getAllUsers(@RequestParam Map<String, String> params) {
         PageableSpec<User> pageableSpec = SpecificationUtils.of(params);
         return userService.getUsers(pageableSpec.getSpecification(), pageableSpec.getPageable());
     }
 
+    @Secured({"ROLE_SUPERADMIN"})
     @GetMapping({"/{id}", "/{id}/"})
     public User getUserById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
 
+    @Secured({"ROLE_SUPERADMIN"})
     @PostMapping({"", "/"})
     public UserProfile createUser(@RequestBody UserProfileDto profile) {
         return userService.createUser(profile);
     }
 
+    @Secured({"ROLE_SUPERADMIN"})
     @PutMapping({"/{id}", "/{id}/"})
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
+    @Secured({"ROLE_SUPERADMIN"})
     @DeleteMapping({"/{id}", "/{id}/"})
     public String deleteUser(@PathVariable Long id) {
         return userService.deleteUser(id);

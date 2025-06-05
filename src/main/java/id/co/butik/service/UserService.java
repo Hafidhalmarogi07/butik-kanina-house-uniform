@@ -10,7 +10,6 @@ import id.co.butik.repository.UserRepository;
 import id.co.butik.responseException.BadRequest;
 import id.co.butik.util.UsernameUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,17 +23,20 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private UserProfileRepository userProfileRepository;
+    private final UserProfileRepository userProfileRepository;
+
+    public UserService(RoleRepository roleRepository, UserProfileRepository userProfileRepository, PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        this.roleRepository = roleRepository;
+        this.userProfileRepository = userProfileRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userRepository = userRepository;
+    }
 
     public Page<User> getUsers(Specification<User> specification, Pageable pageable) {
         return userRepository.findAll(specification, pageable);
@@ -79,7 +81,7 @@ public class UserService {
     }
 
     public String deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
+        userRepository.findById(id).orElseThrow(() -> new BadRequest("User not found"));
         userRepository.deleteById(id);
         return "{\"success\":true}";
     }

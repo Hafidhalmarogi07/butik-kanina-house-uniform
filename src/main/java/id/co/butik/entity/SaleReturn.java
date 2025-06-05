@@ -32,4 +32,5 @@ public class SaleReturn extends BaseEntity {
 
     @OneToMany(mappedBy = "saleReturn", cascade = CascadeType.ALL)
     private List<ReturnDetail> details;
+
 }

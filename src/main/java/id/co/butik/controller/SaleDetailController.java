@@ -4,7 +4,6 @@ import id.co.butik.entity.SaleDetail;
 import id.co.butik.service.SaleDetailService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/sale-details")
 public class SaleDetailController {
 
-    @Autowired
-    private SaleDetailService saleDetailService;
+    private final SaleDetailService saleDetailService;
+
+    public SaleDetailController(SaleDetailService saleDetailService) {
+        this.saleDetailService = saleDetailService;
+    }
 
     @GetMapping({"", "/"})
     public Page<SaleDetail> getAllSaleDetails(@RequestParam Map<String, String> params) {

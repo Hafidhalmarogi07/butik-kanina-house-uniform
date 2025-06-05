@@ -4,7 +4,6 @@ import id.co.butik.entity.Production;
 import id.co.butik.service.ProductionService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/productions")
 public class ProductionController {
 
-    @Autowired
-    private ProductionService productionService;
+    private final ProductionService productionService;
+
+    public ProductionController(ProductionService productionService) {
+        this.productionService = productionService;
+    }
 
     @RequestMapping({"", "/"})
     public Page<Production> getAllProductions(@RequestParam Map<String, String> params) {

@@ -5,9 +5,7 @@ import id.co.butik.entity.Category;
 import id.co.butik.service.CategoryService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -16,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/category")
 public class CategoryController {
 
-    @Autowired
-    private CategoryService categoryService;
+    private final CategoryService categoryService;
+
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     @GetMapping({"", "/"})
     public PageResponse<Category> getAllCategory(@RequestParam Map<String, String> params) {

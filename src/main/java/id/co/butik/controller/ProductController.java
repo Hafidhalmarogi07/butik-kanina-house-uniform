@@ -4,7 +4,6 @@ import id.co.butik.entity.Product;
 import id.co.butik.service.ProductService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/product")
 public class ProductController {
 
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @GetMapping({"", "/"})
     public Page<Product> getAllProducts(@RequestParam Map<String, String> params) {

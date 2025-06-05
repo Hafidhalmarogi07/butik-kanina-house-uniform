@@ -4,7 +4,6 @@ import id.co.butik.entity.ReturnDetail;
 import id.co.butik.service.ReturnDetailService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +13,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/return-details")
 public class ReturnDetailController {
 
-    @Autowired
-    private ReturnDetailService returnDetailService;
+    private final ReturnDetailService returnDetailService;
+
+    public ReturnDetailController(ReturnDetailService returnDetailService) {
+        this.returnDetailService = returnDetailService;
+    }
 
     @GetMapping({"", "/"})
     public Page<ReturnDetail> getAllReturnDetails(@RequestParam Map<String, String> params) {

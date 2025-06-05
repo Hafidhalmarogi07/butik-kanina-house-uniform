@@ -4,7 +4,6 @@ import id.co.butik.entity.Expense;
 import id.co.butik.service.ExpenseService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,8 +14,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/expense")
 public class ExpenseController {
 
-    @Autowired
-    private ExpenseService expenseService;
+    private final ExpenseService expenseService;
+
+    public ExpenseController(ExpenseService expenseService) {
+        this.expenseService = expenseService;
+    }
 
     @GetMapping({"", "/"})
     public Page<Expense> getAllExpenses(@RequestParam Map<String, String> params) {

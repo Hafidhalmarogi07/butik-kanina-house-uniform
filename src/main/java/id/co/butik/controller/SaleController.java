@@ -4,9 +4,7 @@ import id.co.butik.entity.Sale;
 import id.co.butik.service.SaleService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,8 +15,11 @@ import java.util.Map;
 @RequestMapping("/api/v1/sale")
 public class SaleController {
 
-    @Autowired
-    private SaleService saleService;
+    private final SaleService saleService;
+
+    public SaleController(SaleService saleService) {
+        this.saleService = saleService;
+    }
 
     @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN_TOKO"})
     @GetMapping({"", "/"})
