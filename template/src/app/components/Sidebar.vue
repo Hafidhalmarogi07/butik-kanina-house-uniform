@@ -7,15 +7,15 @@
         </router-link>
 
         <div class="sidebar">
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="image">
-                    <img src="@assets/unknown.jpeg" v-if="!user_image" class="img-circle elevation-2" alt="User Image">
-                    <img :src="user_image" v-if="user_image" class="img-circle elevation-1" alt="User Image">
-                </div>
-                <div class="info">
-                    <router-link :to="dashboardRoute" class="d-block ellipsis capitalize">{{ user.full_name }}</router-link>
-                </div>
-            </div>
+<!--            <div class="user-panel mt-3 pb-3 mb-3 d-flex">-->
+<!--                <div class="image">-->
+<!--                    <img src="@assets/unknown.jpeg" v-if="!user_image" class="img-circle elevation-2" alt="User Image">-->
+<!--                    <img :src="user_image" v-if="user_image" class="img-circle elevation-1" alt="User Image">-->
+<!--                </div>-->
+<!--                <div class="info">-->
+<!--                    <router-link :to="dashboardRoute" class="d-block ellipsis capitalize">{{ user.full_name }}</router-link>-->
+<!--                </div>-->
+<!--            </div>-->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column nav-flat nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
                     <nav-item v-for="(item, index) in items" :key="index" :item="item" :routeName="routeName"></nav-item>

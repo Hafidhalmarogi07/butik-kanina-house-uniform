@@ -50,6 +50,10 @@ public class ProductService {
         Product oldProduct = getProductById(id);
         oldProduct.setName(product.getName());
         oldProduct.setDescription(product.getDescription());
+        oldProduct.setStock(product.getStock());
+        oldProduct.setSize(product.getSize());
+        oldProduct.setSellingPrice(product.getSellingPrice());
+
 
         Category category = categoryRepository.findById(product.getCategory().getId()).orElseThrow(() -> new BadRequest("Category with id not found"));
         oldProduct.setCategory(category);

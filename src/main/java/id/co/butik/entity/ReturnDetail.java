@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Data
@@ -23,9 +24,9 @@ public class ReturnDetail extends BaseEntity {
     @ManyToOne
     private Product product;
 
-    @Enumerated(EnumType.STRING)
-    private Size size;
+    private Integer quantity;
 
-    private int quantity;
     private String note;
+
+    private BigDecimal price;
 }

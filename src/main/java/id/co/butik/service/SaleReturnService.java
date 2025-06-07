@@ -33,7 +33,6 @@ public class SaleReturnService {
         SaleReturn oldSaleReturn = getSaleReturnById(id);
         oldSaleReturn.setSale(saleReturn.getSale());
         oldSaleReturn.setAdmin(saleReturn.getAdmin());
-        oldSaleReturn.setDate(saleReturn.getDate());
         oldSaleReturn.setReason(saleReturn.getReason());
         oldSaleReturn.setTotalRefund(saleReturn.getTotalRefund());
         oldSaleReturn.setDetails(saleReturn.getDetails());

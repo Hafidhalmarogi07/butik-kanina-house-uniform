@@ -11,7 +11,7 @@ import id.co.butik.repository.ProductRepository;
 import id.co.butik.repository.SaleRepository;
 import id.co.butik.repository.UserProfileRepository;
 import id.co.butik.responseException.BadRequest;
-import id.co.butik.util.InvoiceNumberGenerator;
+import id.co.butik.util.NumberGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Service
 @Slf4j
@@ -42,7 +41,7 @@ public class SaleService {
     private UserProfileRepository userProfileRepository;
 
     @Autowired
-    private InvoiceNumberGenerator invoiceNumberGenerator;
+    private NumberGenerator numberGenerator;
 
     public Page<Sale> getSales(Specification<Sale> var1, Pageable var2) {
         return saleRepository.findAll(var1, var2);
@@ -91,7 +90,7 @@ public class SaleService {
         sale.setItems(sale.getDetails().size());
         sale.setTotal(total);
         sale.setStatus(SaleStatus.COMPLETED);
-        sale.setInvoiceNumber(invoiceNumberGenerator.generateInvoiceNumber());
+        sale.setInvoiceNumber(numberGenerator.generateInvoiceNumber());
         sale.setDate(LocalDateTime.now());
         return saleRepository.save(sale);
     }

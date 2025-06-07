@@ -8,6 +8,7 @@ import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.OrderStatus;
 import id.co.butik.enums.PaymentStatus;
 import id.co.butik.repository.*;
+import id.co.butik.util.NumberGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,19 +28,19 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
-    private final OrderDetailRepository orderDetailRepository;
     private final OrderPaymentRepository orderPaymentRepository;
     private final UserProfileRepository userProfileRepository;
+    private NumberGenerator numberGenerator;
 
     public OrderService(OrderRepository orderRepository, CustomerRepository customerRepository,
                         ProductRepository productRepository, OrderDetailRepository orderDetailRepository,
-                        OrderPaymentRepository orderPaymentRepository, UserProfileRepository userProfileRepository) {
+                        OrderPaymentRepository orderPaymentRepository, UserProfileRepository userProfileRepository, NumberGenerator numberGenerator) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
-        this.orderDetailRepository = orderDetailRepository;
         this.orderPaymentRepository = orderPaymentRepository;
         this.userProfileRepository = userProfileRepository;
+        this.numberGenerator = numberGenerator;
     }
 
 
@@ -73,6 +74,7 @@ public class OrderService {
         order.setOrderDate(request.getOrderDate());
         order.setDueDate(request.getDueDate());
         order.setOrderStatus(OrderStatus.PENDING);
+        order.setOrderNumber(numberGenerator.generateOrderNumber());
 
         List<OrderDetail> detailList = new ArrayList<>();
         BigDecimal totalAmount = BigDecimal.ZERO;

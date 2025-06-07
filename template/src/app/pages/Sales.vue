@@ -36,9 +36,9 @@
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter">
                                     <option value="">All Statuses</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Cancelled">Cancelled</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="CANCELLED">Cancelled</option>
                                 </select>
                             </div>
                         </div>
@@ -57,10 +57,10 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="sale in filteredSales" :key="sale.id">
-                                        <td>{{ sale.invoice }}</td>
+                                        <td>{{ sale.invoice_number }}</td>
                                         <td>{{ formatDate(sale.date) }}</td>
-                                        <td>{{ sale.customer }}</td>
-                                        <td>{{ sale.items.length }}</td>
+                                        <td>{{ sale.customer ? sale.customer.nama : '' }}</td>
+                                        <td>{{ sale.details ? sale.details.length : 0 }}</td>
                                         <td>{{ formatCurrency(sale.total) }}</td>
                                         <td>
                                             <span :class="getStatusClass(sale.status)">{{ sale.status }}</span>
@@ -81,13 +81,28 @@
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                        <div v-if="loading" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div v-else-if="error" class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        <ul v-else-if="pagination.totalPages > 0" class="pagination pagination-sm m-0 float-right">
+                            <li class="page-item" :class="{ disabled: pagination.pageNumber <= 0 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(pagination.pageNumber)">&laquo;</a>
+                            </li>
+                            <li v-for="page in pagesArray" :key="page" class="page-item" :class="{ active: page === pagination.pageNumber + 1 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: pagination.pageNumber >= pagination.totalPages - 1 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(pagination.pageNumber + 2)">&raquo;</a>
+                            </li>
                         </ul>
+                        <div v-else class="text-center">
+                            <p>No sales found</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -109,10 +124,10 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="customer">Customer</label>
-                                        <select class="form-control" id="customer" v-model="currentSale.customer" required>
+                                        <select class="form-control" id="customer" v-model="currentSale.customer.id" required>
                                             <option value="">Select Customer</option>
-                                            <option v-for="customer in customers" :key="customer.id" :value="customer.name">
-                                                {{ customer.name }}
+                                            <option v-for="customer in customers" :key="customer.id" :value="customer.id">
+                                                {{ customer.nama }}
                                             </option>
                                         </select>
                                     </div>
@@ -140,36 +155,20 @@
                                             <thead>
                                                 <tr>
                                                     <th>Product</th>
-                                                    <th>Size</th>
-                                                    <th>Price</th>
                                                     <th>Quantity</th>
                                                     <th>Subtotal</th>
                                                     <th>Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="(item, index) in currentSale.items" :key="index">
+                                                <tr v-for="(item, index) in currentSale.details" :key="index">
                                                     <td>
-                                                        <select class="form-control" v-model="item.product" @change="updateItemPrice(index)">
+                                                        <select class="form-control" v-model="item.product.id" @change="updateItemPrice(index)">
                                                             <option value="">Select Product</option>
-                                                            <option v-for="product in products" :key="product.id" :value="product.name">
-                                                                {{ product.name }}
+                                                            <option v-for="product in products" :key="product.id" :value="product.id">
+                                                                {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
                                                             </option>
                                                         </select>
-                                                    </td>
-                                                    <td>
-                                                        <select class="form-control" v-model="item.size">
-                                                            <option value="">Select Size</option>
-                                                            <option value="XS">XS</option>
-                                                            <option value="S">S</option>
-                                                            <option value="M">M</option>
-                                                            <option value="L">L</option>
-                                                            <option value="XL">XL</option>
-                                                            <option value="XXL">XXL</option>
-                                                        </select>
-                                                    </td>
-                                                    <td>
-                                                        <input type="number" class="form-control" v-model="item.price" @change="calculateSubtotal(index)" min="0">
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control" v-model="item.quantity" @change="calculateSubtotal(index)" min="1">
@@ -184,7 +183,7 @@
                                             </tbody>
                                             <tfoot>
                                                 <tr>
-                                                    <td colspan="6">
+                                                    <td colspan="4">
                                                         <button type="button" class="btn btn-primary btn-sm" @click="addItem">
                                                             <i class="fas fa-plus"></i> Add Item
                                                         </button>
@@ -206,17 +205,9 @@
                                 <div class="col-md-6">
                                     <div class="card">
                                         <div class="card-body">
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h6>Subtotal:</h6>
-                                                <span>{{ formatCurrency(calculateTotal()) }}</span>
-                                            </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <h6>Tax (10%):</h6>
-                                                <span>{{ formatCurrency(calculateTax()) }}</span>
-                                            </div>
                                             <div class="d-flex justify-content-between">
                                                 <h5>Total:</h5>
-                                                <h5>{{ formatCurrency(calculateGrandTotal()) }}</h5>
+                                                <h5>{{ formatCurrency(calculateTotal()) }}</h5>
                                             </div>
                                         </div>
                                     </div>
@@ -225,7 +216,10 @@
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-success">Complete Sale</button>
+                                <button type="submit" class="btn btn-success" :disabled="loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Complete Sale
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -246,13 +240,14 @@
                     <div class="modal-body" v-if="selectedSale">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>Invoice #:</strong> {{ selectedSale.invoice }}</p>
+                                <p><strong>Invoice #:</strong> {{ selectedSale.invoice_number }}</p>
                                 <p><strong>Date:</strong> {{ formatDate(selectedSale.date) }}</p>
                                 <p><strong>Status:</strong> <span :class="getStatusClass(selectedSale.status)">{{ selectedSale.status }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Customer:</strong> {{ selectedSale.customer }}</p>
+                                <p><strong>Customer:</strong> {{ selectedSale.customer ? selectedSale.customer.nama : '' }}</p>
                                 <p><strong>Total:</strong> {{ formatCurrency(selectedSale.total) }}</p>
+                                <p><strong>Admin:</strong> {{ selectedSale.admin ? selectedSale.admin.full_name : '' }}</p>
                             </div>
                         </div>
 
@@ -269,10 +264,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(item, index) in selectedSale.items" :key="index">
-                                        <td>{{ item.product }}</td>
-                                        <td>{{ item.size }}</td>
-                                        <td>{{ formatCurrency(item.price) }}</td>
+                                    <tr v-for="(item, index) in selectedSale.details" :key="index">
+                                        <td>{{ item.product ? item.product.name : '' }}</td>
+                                        <td>{{ item.product ? item.product.size : '' }}</td>
+                                        <td>{{ item.product ? formatCurrency(item.product.selling_price) : '' }}</td>
                                         <td>{{ item.quantity }}</td>
                                         <td>{{ formatCurrency(item.subtotal) }}</td>
                                     </tr>
@@ -314,131 +309,57 @@ export default {
             selectedSale: null,
             currentSale: {
                 id: null,
-                invoice: '',
+                invoice_number: '',
                 date: new Date().toISOString().substr(0, 10),
-                customer: '',
-                items: [],
+                customer: {
+                    id: null
+                },
+                details: [],
                 total: 0,
-                status: 'Completed',
+                status: 'COMPLETED',
                 notes: ''
             },
-            sales: [
-                {
-                    id: 1,
-                    invoice: 'INV-2023-001',
-                    date: '2023-06-15',
-                    customer: 'John Doe',
-                    items: [
-                        { product: 'School Uniform Set', size: 'M', price: 350000, quantity: 1, subtotal: 350000 }
-                    ],
-                    total: 350000,
-                    status: 'Completed',
-                    notes: 'Customer paid in cash'
-                },
-                {
-                    id: 2,
-                    invoice: 'INV-2023-002',
-                    date: '2023-06-16',
-                    customer: 'Jane Smith',
-                    items: [
-                        { product: 'School Shirt', size: 'L', price: 150000, quantity: 2, subtotal: 300000 },
-                        { product: 'School Pants', size: 'L', price: 200000, quantity: 1, subtotal: 200000 }
-                    ],
-                    total: 500000,
-                    status: 'Completed',
-                    notes: ''
-                },
-                {
-                    id: 3,
-                    invoice: 'INV-2023-003',
-                    date: '2023-06-17',
-                    customer: 'Robert Johnson',
-                    items: [
-                        { product: 'School Skirt', size: 'S', price: 180000, quantity: 1, subtotal: 180000 },
-                        { product: 'School Tie', size: 'One Size', price: 50000, quantity: 1, subtotal: 50000 }
-                    ],
-                    total: 230000,
-                    status: 'Pending',
-                    notes: 'Customer will pick up tomorrow'
-                },
-                {
-                    id: 4,
-                    invoice: 'INV-2023-004',
-                    date: '2023-06-18',
-                    customer: 'Emily Davis',
-                    items: [
-                        { product: 'School Uniform Set', size: 'S', price: 350000, quantity: 1, subtotal: 350000 }
-                    ],
-                    total: 350000,
-                    status: 'Cancelled',
-                    notes: 'Customer changed their mind'
-                },
-                {
-                    id: 5,
-                    invoice: 'INV-2023-005',
-                    date: '2023-06-19',
-                    customer: 'Michael Wilson',
-                    items: [
-                        { product: 'School Shirt', size: 'XL', price: 150000, quantity: 3, subtotal: 450000 }
-                    ],
-                    total: 450000,
-                    status: 'Completed',
-                    notes: ''
-                }
-            ],
-            customers: [
-                { id: 1, name: 'John Doe' },
-                { id: 2, name: 'Jane Smith' },
-                { id: 3, name: 'Robert Johnson' },
-                { id: 4, name: 'Emily Davis' },
-                { id: 5, name: 'Michael Wilson' }
-            ],
-            products: [
-                {
-                    id: 1,
-                    name: 'School Uniform Set',
-                    price: 350000
-                },
-                {
-                    id: 2,
-                    name: 'School Shirt',
-                    price: 150000
-                },
-                {
-                    id: 3,
-                    name: 'School Pants',
-                    price: 200000
-                },
-                {
-                    id: 4,
-                    name: 'School Skirt',
-                    price: 180000
-                },
-                {
-                    id: 5,
-                    name: 'School Tie',
-                    price: 50000
-                }
-            ]
+            sales: [],
+            customers: [],
+            products: [],
+            pagination: {
+                totalPages: 0,
+                totalElements: 0,
+                pageNumber: 0,
+                pageSize: 10
+            },
+            loading: false,
+            error: null
         }
     },
     computed: {
         filteredSales() {
-            let filtered = this.sales;
-            
-            if (this.searchQuery) {
-                const query = this.searchQuery.toLowerCase();
-                filtered = filtered.filter(sale => 
-                    sale.invoice.toLowerCase().includes(query) || 
-                    sale.customer.toLowerCase().includes(query)
-                );
+            // Since filtering is now done on the server side, 
+            // we simply return the sales array
+            return this.sales;
+        },
+        pagesArray() {
+            if (!this.pagination.totalPages || this.pagination.totalPages <= 0) return [];
+
+            const pages = [];
+            const maxVisiblePages = 5;
+            const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+
+            // Ensure pageNumber is a number and not negative
+            const currentPage = Math.max(0, this.pagination.pageNumber || 0);
+
+            let startPage = Math.max(1, currentPage + 1 - halfVisiblePages);
+            let endPage = Math.min(this.pagination.totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
             }
-            
-            if (this.statusFilter) {
-                filtered = filtered.filter(sale => sale.status === this.statusFilter);
+
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
             }
-            
-            return filtered;
+
+            return pages;
         }
     },
     mounted() {
@@ -448,110 +369,305 @@ export default {
                 format: 'MM/DD/YYYY'
             }
         });
+
+        // Fetch initial data
+        this.fetchSales(0);
+        this.fetchCustomers();
+        this.fetchProducts();
+    },
+    watch: {
+        searchQuery: function(newVal) {
+            // Debounce search to avoid too many requests
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+
+            this.searchTimeout = setTimeout(() => {
+                // Reset to first page and fetch sales with new search query
+                this.changePage(1);
+            }, 300); // 300ms debounce
+        },
+        statusFilter: function() {
+            // Reset to first page and fetch sales with new status filter
+            this.changePage(1);
+        }
     },
     methods: {
+        fetchSales(page = 0) {
+            this.loading = true;
+
+            // Prepare params object with pagination
+            const params = {
+                sort: '-id',
+                page: page, 
+                size: this.pagination.pageSize 
+            };
+
+            // Prepare filters array for backend
+            const filters = [];
+
+            // Add search query if present
+            if (this.searchQuery) {
+                // Add filter for invoice_number containing search query
+                filters.push(["invoice_number", "like", this.searchQuery]);
+
+                // If we want to search in customer name too, add OR operator and customer filter
+                if (this.searchQuery.trim() !== "") {
+                    filters.push(["or"]);
+                    filters.push(["customer.nama", "like", this.searchQuery]);
+                }
+            }
+
+            // Add status filter if present
+            if (this.statusFilter) {
+                // If we already have filters, add AND operator
+                if (filters.length > 0) {
+                    filters.push(["and"]);
+                }
+
+                // Add filter for status equals statusFilter
+                filters.push(["status", "=", this.statusFilter]);
+            }
+
+            // Add filters to params if any
+            if (filters.length > 0) {
+                params.filters = JSON.stringify(filters);
+            }
+
+            // Convert params object to URL query string
+            const queryParams = new URLSearchParams();
+
+            // Add pagination parameters
+            // Convert 0-based page to 1-based page for API
+            queryParams.append('page', params.page + 1);
+            queryParams.append('size', params.size);
+
+            // Add sort parameter if present
+            if (params.sort) {
+                queryParams.append('sort', params.sort);
+            }
+
+            // Add filters parameter if present
+            if (params.filters) {
+                queryParams.append('filters', params.filters);
+            }
+
+            // Make the API call with the constructed URL
+            this.Api.get(`/sale?${queryParams.toString()}`)
+                .then(response => {
+                    // Check if response has content property (Spring Data pagination)
+                    if (response.data && response.data.content) {
+                        this.sales = response.data.content;
+
+                        // Update pagination data
+                        this.pagination = {
+                            totalPages: response.data.total_pages || 0,
+                            totalElements: response.data.total_elements || 0,
+                            pageNumber: response.data.number !== undefined ? response.data.number : page,
+                            pageSize: response.data.size || this.pagination.pageSize
+                        };
+                    } else {
+                        // Handle case where response is not paginated
+                        this.sales = Array.isArray(response.data) ? response.data : [];
+                        this.pagination.totalElements = this.sales.length;
+                        this.pagination.totalPages = 1;
+                    }
+
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching sales:', error);
+
+                    // Provide more specific error message if available
+                    if (error.response) {
+                        // The request was made and the server responded with a status code
+                        // that falls out of the range of 2xx
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load sales'}`;
+                    } else if (error.request) {
+                        // The request was made but no response was received
+                        this.error = 'No response from server. Please check your connection.';
+                    } else {
+                        // Something happened in setting up the request that triggered an Error
+                        this.error = 'Failed to load sales: ' + error.message;
+                    }
+
+                    this.loading = false;
+                });
+        },
+
+        fetchCustomers() {
+            this.Api.get('/customers')
+                .then(response => {
+                    this.customers = response.data.content || response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching customers:', error);
+                });
+        },
+
+        fetchProducts() {
+            this.Api.get('/product')
+                .then(response => {
+                    this.products = response.data.content || response.data;
+                })
+                .catch(error => {
+                    console.error('Error fetching products:', error);
+                });
+        },
+
+        changePage(page) {
+            // page parameter is 1-based from UI, convert to 0-based for backend
+            const zeroBasedPage = page - 1;
+            if (zeroBasedPage < 0 || (this.pagination.totalPages > 0 && zeroBasedPage >= this.pagination.totalPages)) return;
+            this.pagination.pageNumber = zeroBasedPage;
+            this.fetchSales(zeroBasedPage);
+        },
+
         formatDate(dateString) {
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return new Date(dateString).toLocaleDateString(undefined, options);
         },
+
         formatCurrency(value) {
             return 'Rp ' + value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         },
+
         getStatusClass(status) {
             switch(status) {
-                case 'Completed':
+                case 'COMPLETED':
                     return 'badge badge-success';
-                case 'Pending':
+                case 'PENDING':
                     return 'badge badge-warning';
-                case 'Cancelled':
+                case 'CANCELLED':
                     return 'badge badge-danger';
                 default:
                     return 'badge badge-secondary';
             }
         },
+
         showNewSaleModal() {
             this.currentSale = {
                 id: null,
-                invoice: 'INV-' + new Date().getFullYear() + '-' + (this.sales.length + 1).toString().padStart(3, '0'),
+                invoice_number: '',
                 date: new Date().toISOString().substr(0, 10),
-                customer: '',
-                items: [{ product: '', size: '', price: 0, quantity: 1, subtotal: 0 }],
+                customer: {
+                    id: null
+                },
+                details: [{ 
+                    product: {
+                        id: null
+                    }, 
+                    quantity: 1, 
+                    subtotal: 0 
+                }],
                 total: 0,
-                status: 'Completed',
+                status: 'COMPLETED',
                 notes: ''
             };
             $('#newSaleModal').modal('show');
         },
+
         viewSaleDetails(sale) {
             this.selectedSale = sale;
             $('#saleDetailsModal').modal('show');
         },
+
         printInvoice(sale) {
             // In a real application, this would open a print view or generate a PDF
-            alert('Printing invoice: ' + sale.invoice);
+            alert('Printing invoice: ' + sale.invoice_number);
         },
+
         addItem() {
-            this.currentSale.items.push({ product: '', size: '', price: 0, quantity: 1, subtotal: 0 });
+            this.currentSale.details.push({ 
+                product: {
+                    id: null
+                }, 
+                quantity: 1, 
+                subtotal: 0 
+            });
         },
+
         removeItem(index) {
-            this.currentSale.items.splice(index, 1);
-            if (this.currentSale.items.length === 0) {
+            this.currentSale.details.splice(index, 1);
+            if (this.currentSale.details.length === 0) {
                 this.addItem();
             }
             this.calculateTotal();
         },
+
         updateItemPrice(index) {
-            const item = this.currentSale.items[index];
-            const product = this.products.find(p => p.name === item.product);
+            const item = this.currentSale.details[index];
+            const product = this.products.find(p => p.id === item.product.id);
             if (product) {
-                item.price = product.price;
                 this.calculateSubtotal(index);
             }
         },
+
         calculateSubtotal(index) {
-            const item = this.currentSale.items[index];
-            item.subtotal = item.price * item.quantity;
+            const item = this.currentSale.details[index];
+            const product = this.products.find(p => p.id === item.product.id);
+            if (product) {
+                item.subtotal = product.selling_price * item.quantity;
+            }
             this.calculateTotal();
         },
+
         calculateTotal() {
             let total = 0;
-            this.currentSale.items.forEach(item => {
-                total += item.subtotal;
+            this.currentSale.details.forEach(item => {
+                total += item.subtotal || 0;
             });
             this.currentSale.total = total;
             return total;
         },
-        calculateTax() {
-            return this.calculateTotal() * 0.1;
-        },
-        calculateGrandTotal() {
-            return this.calculateTotal() + this.calculateTax();
-        },
+
         saveSale() {
             // Validate form
-            if (!this.currentSale.customer || this.currentSale.items.some(item => !item.product)) {
+            if (!this.currentSale.customer.id || this.currentSale.details.some(item => !item.product.id)) {
                 alert('Please fill in all required fields');
                 return;
             }
 
-            // Calculate final total
-            this.currentSale.total = this.calculateGrandTotal();
+            this.loading = true;
 
-            if (this.currentSale.id) {
-                // Update existing sale
-                const index = this.sales.findIndex(s => s.id === this.currentSale.id);
-                if (index !== -1) {
-                    this.sales.splice(index, 1, { ...this.currentSale });
-                }
-            } else {
-                // Add new sale
-                const newId = Math.max(...this.sales.map(s => s.id), 0) + 1;
-                this.sales.push({
-                    ...this.currentSale,
-                    id: newId
+            // Prepare the request payload
+            const payload = {
+                customer: {
+                    id: this.currentSale.customer.id
+                },
+                details: this.currentSale.details.map(item => ({
+                    quantity: item.quantity,
+                    product: {
+                        id: item.product.id
+                    }
+                }))
+            };
+
+            // Make the API call to create a new sale
+            this.Api.post('/sale', payload)
+                .then(response => {
+                    // Add the new sale to the list
+                    this.sales.unshift(response.data);
+                    $('#newSaleModal').modal('hide');
+                    this.loading = false;
+
+                    // Refresh the sales list
+                    this.fetchSales(this.pagination.pageNumber);
+                })
+                .catch(error => {
+                    console.error('Error creating sale:', error);
+
+                    // Provide more specific error message if available
+                    if (error.response) {
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to create sale'}`;
+                    } else if (error.request) {
+                        this.error = 'No response from server. Please check your connection.';
+                    } else {
+                        this.error = 'Failed to create sale: ' + error.message;
+                    }
+
+                    this.loading = false;
                 });
-            }
-            $('#newSaleModal').modal('hide');
         }
     }
 }

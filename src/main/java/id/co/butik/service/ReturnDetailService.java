@@ -33,7 +33,6 @@ public class ReturnDetailService {
         ReturnDetail existingReturnDetail = findById(id);
         existingReturnDetail.setProduct(returnDetail.getProduct());
         existingReturnDetail.setSaleReturn(returnDetail.getSaleReturn());
-        existingReturnDetail.setSize(returnDetail.getSize());
         existingReturnDetail.setQuantity(returnDetail.getQuantity());
         existingReturnDetail.setNote(returnDetail.getNote());
         return returnDetailRepository.save(existingReturnDetail);
