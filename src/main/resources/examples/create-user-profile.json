@@ -1,0 +1,13 @@
+{
+  "username": "johndoe",
+  "password": "securePassword123",
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phoneNumber": "+6281234567890",
+  "address": "Jl. Contoh No. 123, Jakarta",
+  "roleName": "ROLE_ADMIN",
+  "fullName": "John Doe",
+  "description": "Senior Staff at Kanina House Uniform",
+  "jobTittle": "Senior Staff"
+}

@@ -35,5 +35,11 @@ public class UserProfile extends BaseEntity {
 
     private String address;
 
+    @Transient
+    private Boolean status;
+
+    @Transient
+    private String role;
+
 
 }

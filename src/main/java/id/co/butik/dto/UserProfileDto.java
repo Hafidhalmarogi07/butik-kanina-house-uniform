@@ -9,10 +9,6 @@ public class UserProfileDto {
 
     private String password;
 
-    private String firstName;
-
-    private String lastName;
-
     private String email;
 
     private String phoneNumber;
@@ -26,5 +22,7 @@ public class UserProfileDto {
     private String description;
 
     private String jobTittle;
+
+    private Boolean status;
 
 }
