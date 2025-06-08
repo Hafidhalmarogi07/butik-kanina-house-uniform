@@ -1,6 +1,7 @@
 package id.co.butik.entity;
 
-import id.co.butik.entity.users.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.OrderStatus;
 import id.co.butik.enums.PaymentStatus;
@@ -47,9 +48,12 @@ public class Order extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
+    @JsonIgnoreProperties("order")
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderDetail> details;
 
+
+    @JsonIgnoreProperties("order")
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderPayment> payments;
 
