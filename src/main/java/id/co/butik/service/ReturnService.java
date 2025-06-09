@@ -40,18 +40,16 @@ public class ReturnService {
 
     @Transactional
     public SaleReturn processReturn(ReturnRequest request, HttpServletRequest servletRequest) {
-        Order order = new Order();
-        Sale sale = new Sale();
+        SaleReturn saleReturn = new SaleReturn();
         if(ReturnSourceType.ORDER.equals(request.getReturnSourceType())) {
-           order = orderRepository.findById(request.getOrderId())
+            Order  order = orderRepository.findById(request.getOrderId())
                     .orElseThrow(() -> new RuntimeException("Order not found"));
+           saleReturn.setOrder(order);
         } else if (ReturnSourceType.SALE.equals(request.getReturnSourceType())) {
-            sale = saleRepository.findById(request.getSaleId()).orElseThrow(() -> new RuntimeException("Sale not found"));
+           Sale sale = saleRepository.findById(request.getSaleId()).orElseThrow(() -> new RuntimeException("Sale not found"));
+           saleReturn.setSale(sale);
         }
         UserProfile userProfile = userProfileRepository.findFirstByEmail(servletRequest.getRemoteUser());
-        SaleReturn saleReturn = new SaleReturn();
-        saleReturn.setOrder(order);
-        saleReturn.setSale(sale);
         saleReturn.setReturnDate(LocalDateTime.now());
         saleReturn.setNotes(request.getNote());
         saleReturn.setReturnType(request.getReturnType());
@@ -82,7 +80,7 @@ public class ReturnService {
         return returnRepository.findAll(spec, pageable);
     }
 
-    public Optional<SaleReturn> getById(Long id) {
-        return returnRepository.findById(id);
+    public SaleReturn getById(Long id) {
+        return returnRepository.findById(id).orElseThrow(() -> new RuntimeException("Return not found"));
     }
 }

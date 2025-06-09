@@ -1,38 +1,43 @@
 package id.co.butik.controller;
 
+import id.co.butik.dto.retur.ReturnRequest;
 import id.co.butik.entity.SaleReturn;
+import id.co.butik.service.ReturnService;
 import id.co.butik.service.SaleReturnService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/sale-returns")
-public class SaleReturnController {
+@RequestMapping("/api/v1/sale-order-returns")
+public class SaleOrderReturnController {
 
     private final SaleReturnService saleReturnService;
+    private final ReturnService returnService;
 
-    public SaleReturnController(SaleReturnService saleReturnService) {
+    public SaleOrderReturnController(SaleReturnService saleReturnService, ReturnService returnService) {
         this.saleReturnService = saleReturnService;
+        this.returnService = returnService;
     }
 
     @GetMapping({"", "/"})
     public Page<SaleReturn> getAllSaleReturns(@RequestParam Map<String, String> params) {
         PageableSpec<SaleReturn> pageableSpec = SpecificationUtils.of(params);
-        return saleReturnService.getSaleReturns(pageableSpec.getSpecification(), pageableSpec.getPageable());
+        return returnService.getAllReturns(pageableSpec.getSpecification(), pageableSpec.getPageable());
     }
 
     @GetMapping({"/{id}", "/{id}/"})
     public SaleReturn getSaleReturnById(@PathVariable Long id) {
-        return saleReturnService.getSaleReturnById(id);
+        return returnService.getById(id);
     }
 
     @PostMapping({"", "/"})
-    public SaleReturn createSaleReturn(@RequestBody SaleReturn saleReturn) {
-        return saleReturnService.createSaleReturn(saleReturn);
+    public SaleReturn createSaleReturn(@RequestBody ReturnRequest request, HttpServletRequest servletRequest) {
+        return returnService.processReturn(request, servletRequest);
     }
 
     @PutMapping({"/{id}", "/{id}/"})

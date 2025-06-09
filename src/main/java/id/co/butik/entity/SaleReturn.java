@@ -1,5 +1,6 @@
 package id.co.butik.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import id.co.butik.entity.users.User;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.ReturnSourceType;
@@ -23,8 +24,10 @@ public class SaleReturn extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"customer", "admin", "details"})
     @ManyToOne(fetch = FetchType.LAZY)
     private Sale sale;
+
 
     @ManyToOne
     private UserProfile admin;
@@ -35,12 +38,14 @@ public class SaleReturn extends BaseEntity {
 
     private BigDecimal totalRefund;
 
+    @JsonIgnoreProperties({"customer", "admin", "details"})
     @ManyToOne
     private Order order; // nullable
 
     @Enumerated(EnumType.STRING)
     private ReturnSourceType sourceType;
 
+    @JsonIgnoreProperties("sale_return")
     @OneToMany(mappedBy = "saleReturn", cascade = CascadeType.ALL)
     private List<ReturnDetail> details;
 
