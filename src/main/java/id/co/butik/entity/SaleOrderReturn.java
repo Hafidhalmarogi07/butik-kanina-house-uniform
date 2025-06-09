@@ -1,7 +1,6 @@
 package id.co.butik.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import id.co.butik.entity.users.User;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.ReturnSourceType;
 import id.co.butik.enums.ReturnType;
@@ -18,7 +17,7 @@ import java.util.List;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "return_tbl")
-public class SaleReturn extends BaseEntity {
+public class SaleOrderReturn extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,8 +44,8 @@ public class SaleReturn extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private ReturnSourceType sourceType;
 
-    @JsonIgnoreProperties("sale_return")
-    @OneToMany(mappedBy = "saleReturn", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties("sale_order_return")
+    @OneToMany(mappedBy = "saleOrderReturn", cascade = CascadeType.ALL)
     private List<ReturnDetail> details;
 
     @Enumerated(EnumType.STRING)

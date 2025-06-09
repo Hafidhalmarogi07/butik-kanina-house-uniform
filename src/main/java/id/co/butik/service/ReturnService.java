@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class ReturnService {
@@ -39,30 +38,30 @@ public class ReturnService {
     }
 
     @Transactional
-    public SaleReturn processReturn(ReturnRequest request, HttpServletRequest servletRequest) {
-        SaleReturn saleReturn = new SaleReturn();
+    public SaleOrderReturn processReturn(ReturnRequest request, HttpServletRequest servletRequest) {
+        SaleOrderReturn saleOrderReturn = new SaleOrderReturn();
         if(ReturnSourceType.ORDER.equals(request.getReturnSourceType())) {
             Order  order = orderRepository.findById(request.getOrderId())
                     .orElseThrow(() -> new RuntimeException("Order not found"));
-           saleReturn.setOrder(order);
+           saleOrderReturn.setOrder(order);
         } else if (ReturnSourceType.SALE.equals(request.getReturnSourceType())) {
            Sale sale = saleRepository.findById(request.getSaleId()).orElseThrow(() -> new RuntimeException("Sale not found"));
-           saleReturn.setSale(sale);
+           saleOrderReturn.setSale(sale);
         }
         UserProfile userProfile = userProfileRepository.findFirstByEmail(servletRequest.getRemoteUser());
-        saleReturn.setReturnDate(LocalDateTime.now());
-        saleReturn.setNotes(request.getNote());
-        saleReturn.setReturnType(request.getReturnType());
-        saleReturn.setSourceType(request.getReturnSourceType());
-        saleReturn.setAdmin(userProfile);
-        SaleReturn savedReturn = returnRepository.save(saleReturn);
+        saleOrderReturn.setReturnDate(LocalDateTime.now());
+        saleOrderReturn.setNotes(request.getNote());
+        saleOrderReturn.setReturnType(request.getReturnType());
+        saleOrderReturn.setSourceType(request.getReturnSourceType());
+        saleOrderReturn.setAdmin(userProfile);
+        SaleOrderReturn savedReturn = returnRepository.save(saleOrderReturn);
 
         for (ReturnItemRequest item : request.getItems()) {
             Product product = productRepository.findById(item.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
             ReturnDetail detail = new ReturnDetail();
-            detail.setSaleReturn(savedReturn);
+            detail.setSaleOrderReturn(savedReturn);
             detail.setProduct(product);
             detail.setQuantity(item.getQuantity());
             detail.setNote(item.getReason());
@@ -76,11 +75,11 @@ public class ReturnService {
         return savedReturn;
     }
 
-    public Page<SaleReturn> getAllReturns(Specification<SaleReturn> spec, Pageable pageable) {
+    public Page<SaleOrderReturn> getAllReturns(Specification<SaleOrderReturn> spec, Pageable pageable) {
         return returnRepository.findAll(spec, pageable);
     }
 
-    public SaleReturn getById(Long id) {
+    public SaleOrderReturn getById(Long id) {
         return returnRepository.findById(id).orElseThrow(() -> new RuntimeException("Return not found"));
     }
 }

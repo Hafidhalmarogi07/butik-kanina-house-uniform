@@ -1,6 +1,5 @@
 package id.co.butik.entity;
 
-import id.co.butik.enums.Size;
 import id.co.butik.util.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,7 +18,7 @@ public class ReturnDetail extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private SaleReturn saleReturn;
+    private SaleOrderReturn saleOrderReturn;
 
     @ManyToOne
     private Product product;

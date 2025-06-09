@@ -1,7 +1,7 @@
 package id.co.butik.controller;
 
 import id.co.butik.dto.retur.ReturnRequest;
-import id.co.butik.entity.SaleReturn;
+import id.co.butik.entity.SaleOrderReturn;
 import id.co.butik.service.ReturnService;
 import id.co.butik.service.SaleReturnService;
 import id.co.butik.util.PageableSpec;
@@ -25,24 +25,24 @@ public class SaleOrderReturnController {
     }
 
     @GetMapping({"", "/"})
-    public Page<SaleReturn> getAllSaleReturns(@RequestParam Map<String, String> params) {
-        PageableSpec<SaleReturn> pageableSpec = SpecificationUtils.of(params);
+    public Page<SaleOrderReturn> getAllSaleReturns(@RequestParam Map<String, String> params) {
+        PageableSpec<SaleOrderReturn> pageableSpec = SpecificationUtils.of(params);
         return returnService.getAllReturns(pageableSpec.getSpecification(), pageableSpec.getPageable());
     }
 
     @GetMapping({"/{id}", "/{id}/"})
-    public SaleReturn getSaleReturnById(@PathVariable Long id) {
+    public SaleOrderReturn getSaleReturnById(@PathVariable Long id) {
         return returnService.getById(id);
     }
 
     @PostMapping({"", "/"})
-    public SaleReturn createSaleReturn(@RequestBody ReturnRequest request, HttpServletRequest servletRequest) {
+    public SaleOrderReturn createSaleReturn(@RequestBody ReturnRequest request, HttpServletRequest servletRequest) {
         return returnService.processReturn(request, servletRequest);
     }
 
     @PutMapping({"/{id}", "/{id}/"})
-    public SaleReturn updateSaleReturn(@PathVariable Long id, @RequestBody SaleReturn saleReturn) {
-        return saleReturnService.updateSaleReturn(id, saleReturn);
+    public SaleOrderReturn updateSaleReturn(@PathVariable Long id, @RequestBody SaleOrderReturn saleOrderReturn) {
+        return saleReturnService.updateSaleReturn(id, saleOrderReturn);
     }
 
     @DeleteMapping({"/{id}", "/{id}/"})

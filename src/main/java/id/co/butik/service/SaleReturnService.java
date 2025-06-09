@@ -1,6 +1,6 @@
 package id.co.butik.service;
 
-import id.co.butik.entity.SaleReturn;
+import id.co.butik.entity.SaleOrderReturn;
 import id.co.butik.repository.SaleReturnRepository;
 import id.co.butik.responseException.BadRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -17,30 +17,30 @@ public class SaleReturnService {
     @Autowired
     private SaleReturnRepository saleReturnRepository;
 
-    public Page<SaleReturn> getSaleReturns(Specification<SaleReturn> specification, Pageable pageable) {
+    public Page<SaleOrderReturn> getSaleReturns(Specification<SaleOrderReturn> specification, Pageable pageable) {
         return saleReturnRepository.findAll(specification, pageable);
     }
 
-    public SaleReturn getSaleReturnById(Long id) {
+    public SaleOrderReturn getSaleReturnById(Long id) {
         return saleReturnRepository.findById(id).orElseThrow(() -> new BadRequest("Sale Return with id not found"));
     }
 
-    public SaleReturn createSaleReturn(SaleReturn saleReturn) {
-        return saleReturnRepository.save(saleReturn);
+    public SaleOrderReturn createSaleReturn(SaleOrderReturn saleOrderReturn) {
+        return saleReturnRepository.save(saleOrderReturn);
     }
 
-    public SaleReturn updateSaleReturn(Long id, SaleReturn saleReturn) {
-        SaleReturn oldSaleReturn = getSaleReturnById(id);
-        oldSaleReturn.setSale(saleReturn.getSale());
-        oldSaleReturn.setAdmin(saleReturn.getAdmin());
-        oldSaleReturn.setReason(saleReturn.getReason());
-        oldSaleReturn.setTotalRefund(saleReturn.getTotalRefund());
-        oldSaleReturn.setDetails(saleReturn.getDetails());
-        return saleReturnRepository.save(oldSaleReturn);
+    public SaleOrderReturn updateSaleReturn(Long id, SaleOrderReturn saleOrderReturn) {
+        SaleOrderReturn oldSaleOrderReturn = getSaleReturnById(id);
+        oldSaleOrderReturn.setSale(saleOrderReturn.getSale());
+        oldSaleOrderReturn.setAdmin(saleOrderReturn.getAdmin());
+        oldSaleOrderReturn.setReason(saleOrderReturn.getReason());
+        oldSaleOrderReturn.setTotalRefund(saleOrderReturn.getTotalRefund());
+        oldSaleOrderReturn.setDetails(saleOrderReturn.getDetails());
+        return saleReturnRepository.save(oldSaleOrderReturn);
     }
 
     public String deleteSaleReturn(Long id) {
-        SaleReturn saleReturn = saleReturnRepository.findById(id).orElseThrow(() -> new BadRequest("Sale Return not found"));
+        SaleOrderReturn saleOrderReturn = saleReturnRepository.findById(id).orElseThrow(() -> new BadRequest("Sale Return not found"));
         saleReturnRepository.deleteById(id);
         return "{\"success\":true}";
     }
