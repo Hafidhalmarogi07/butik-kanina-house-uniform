@@ -1,15 +1,7 @@
 package id.co.butik.service;
 
-import id.co.butik.entity.users.Client;
-import id.co.butik.entity.users.Role;
-import id.co.butik.entity.users.RolePath;
-import id.co.butik.entity.users.User;
-import id.co.butik.repository.ClientRepository;
-import id.co.butik.repository.RolePathRepository;
-import id.co.butik.repository.RoleRepository;
-import id.co.butik.repository.UserRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import id.co.butik.entity.users.*;
+import id.co.butik.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -59,6 +51,8 @@ public class DatabaseSeeder implements ApplicationRunner {
             "ROLE_ADMIN_GUDANG:user_role:^/.*:GET|PUT|POST|PATCH|DELETE|OPTIONS",
             "ROLE_ADMIN_TOKO:user_role:^/.*:GET|PUT|POST|PATCH|DELETE|OPTIONS"
     };
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
 
     @Override
@@ -148,6 +142,16 @@ public class DatabaseSeeder implements ApplicationRunner {
             }
 
             userRepository.save(oldUser);
+
+            UserProfile oldUserProfile = userProfileRepository.findFirstByEmail(username);
+            if (null == oldUserProfile) {
+                oldUserProfile = new UserProfile();
+                oldUserProfile.setUsername(username);
+                oldUserProfile.setEmail(username);
+                String[] name = username.split("@");
+                oldUserProfile.setFullName(name[0]);
+            }
+            userProfileRepository.save(oldUserProfile);
         }
     }
 }
