@@ -15,9 +15,11 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search expenses..." v-model="searchQuery">
+                                    <input type="text" class="form-control" placeholder="Search expenses..." 
+                                           v-model="searchQuery"
+                                           @keyup.enter="handleSearch">
                                     <div class="input-group-append">
-                                        <button class="btn btn-default" type="button">
+                                        <button class="btn btn-default" type="button" @click="handleSearch">
                                             <i class="fas fa-search"></i>
                                         </button>
                                     </div>
@@ -26,12 +28,9 @@
                             <div class="col-md-3">
                                 <select class="form-control" v-model="categoryFilter">
                                     <option value="">All Categories</option>
-                                    <option value="Materials">Materials</option>
-                                    <option value="Salaries">Salaries</option>
-                                    <option value="Rent">Rent</option>
-                                    <option value="Utilities">Utilities</option>
-                                    <option value="Equipment">Equipment</option>
-                                    <option value="Other">Other</option>
+                                    <option v-for="type in expenseTypes" :key="type" :value="type">
+                                        {{ type }}
+                                    </option>
                                 </select>
                             </div>
                             <div class="col-md-3">
@@ -52,13 +51,21 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="table-responsive">
+                        <div v-if="loading" class="text-center my-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div v-else-if="error" class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        <div v-else class="table-responsive">
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Date</th>
-                                        <th>Category</th>
+                                        <th>Type</th>
                                         <th>Description</th>
                                         <th>Amount</th>
                                         <th>Payment Method</th>
@@ -70,11 +77,11 @@
                                         <td>{{ expense.id }}</td>
                                         <td>{{ expense.date }}</td>
                                         <td>
-                                            <span :class="getCategoryClass(expense.category)">{{ expense.category }}</span>
+                                            <span :class="getCategoryClass(expense.type)">{{ expense.type }}</span>
                                         </td>
                                         <td>{{ expense.description }}</td>
                                         <td>Rp {{ expense.amount.toLocaleString() }}</td>
-                                        <td>{{ expense.paymentMethod }}</td>
+                                        <td>{{ expense.payment_method }}</td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-sm btn-info" @click="viewExpense(expense)">
@@ -101,13 +108,28 @@
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <ul class="pagination pagination-sm m-0 float-right">
-                            <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
-                            <li class="page-item"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+                        <div v-if="loading" class="text-center">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="sr-only">Loading...</span>
+                            </div>
+                        </div>
+                        <div v-else-if="error" class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        <ul v-else-if="pagination.totalPages > 0" class="pagination pagination-sm m-0 float-right">
+                            <li class="page-item" :class="{ disabled: pagination.pageNumber <= 0 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(pagination.pageNumber)">&laquo;</a>
+                            </li>
+                            <li v-for="page in pagesArray" :key="page" class="page-item" :class="{ active: page === pagination.pageNumber + 1 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(page)">{{ page }}</a>
+                            </li>
+                            <li class="page-item" :class="{ disabled: pagination.pageNumber >= pagination.totalPages - 1 }">
+                                <a class="page-link" href="#" @click.prevent="changePage(pagination.pageNumber + 2)">&raquo;</a>
+                            </li>
                         </ul>
+                        <div v-else class="text-center">
+                            <p>No expenses found</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -132,14 +154,12 @@
                                         <input type="date" class="form-control" id="expenseDate" v-model="currentExpense.date" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="expenseCategory">Category</label>
-                                        <select class="form-control" id="expenseCategory" v-model="currentExpense.category" required>
-                                            <option value="Materials">Materials</option>
-                                            <option value="Salaries">Salaries</option>
-                                            <option value="Rent">Rent</option>
-                                            <option value="Utilities">Utilities</option>
-                                            <option value="Equipment">Equipment</option>
-                                            <option value="Other">Other</option>
+                                        <label for="expenseType">Type</label>
+                                        <select class="form-control" id="expenseType" v-model="currentExpense.type" required>
+                                            <option value="">Select Type</option>
+                                            <option v-for="type in expenseTypes" :key="type" :value="type">
+                                                {{ type }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -155,12 +175,11 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="expensePaymentMethod">Payment Method</label>
-                                        <select class="form-control" id="expensePaymentMethod" v-model="currentExpense.paymentMethod" required>
-                                            <option value="Cash">Cash</option>
-                                            <option value="Bank Transfer">Bank Transfer</option>
-                                            <option value="Credit Card">Credit Card</option>
-                                            <option value="Debit Card">Debit Card</option>
-                                            <option value="Other">Other</option>
+                                        <select class="form-control" id="expensePaymentMethod" v-model="currentExpense.payment_method" required>
+                                            <option value="">Select Payment Method</option>
+                                            <option v-for="method in paymentMethods" :key="method" :value="method">
+                                                {{ method }}
+                                            </option>
                                         </select>
                                     </div>
                                 </div>
@@ -170,12 +189,15 @@
                                 <textarea class="form-control" id="expenseDescription" rows="3" v-model="currentExpense.description" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="expenseNotes">Additional Notes</label>
-                                <textarea class="form-control" id="expenseNotes" rows="2" v-model="currentExpense.notes"></textarea>
+                                <label for="expenseNote">Additional Notes</label>
+                                <textarea class="form-control" id="expenseNote" rows="2" v-model="currentExpense.note"></textarea>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="submit" class="btn btn-primary" :disabled="loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Save
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -198,13 +220,15 @@
                             <div class="col-md-6">
                                 <p><strong>ID:</strong> {{ currentExpense.id }}</p>
                                 <p><strong>Date:</strong> {{ currentExpense.date }}</p>
-                                <p><strong>Category:</strong> <span :class="getCategoryClass(currentExpense.category)">{{ currentExpense.category }}</span></p>
+                                <p><strong>Type:</strong> <span :class="getCategoryClass(currentExpense.type)">{{ currentExpense.type }}</span></p>
                                 <p><strong>Description:</strong> {{ currentExpense.description }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Amount:</strong> Rp {{ currentExpense.amount ? currentExpense.amount.toLocaleString() : 0 }}</p>
-                                <p><strong>Payment Method:</strong> {{ currentExpense.paymentMethod }}</p>
-                                <p><strong>Additional Notes:</strong> {{ currentExpense.notes || 'No additional notes' }}</p>
+                                <p><strong>Payment Method:</strong> {{ currentExpense.payment_method }}</p>
+                                <p><strong>Additional Notes:</strong> {{ currentExpense.note || 'No additional notes' }}</p>
+                                <p><strong>Created:</strong> {{ currentExpense.created || 'N/A' }}</p>
+                                <p><strong>Updated:</strong> {{ currentExpense.updated || 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
@@ -230,7 +254,10 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete" :disabled="loading">
+                            <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                            Delete
+                        </button>
                     </div>
                 </div>
             </div>
@@ -246,117 +273,231 @@ export default {
             categoryFilter: '',
             monthFilter: '',
             isEditing: false,
+            searchTimeout: null,
             currentExpense: {
                 id: null,
                 date: '',
-                category: '',
                 description: '',
                 amount: 0,
-                paymentMethod: 'Cash',
-                notes: ''
+                type: '',
+                payment_method: '',
+                note: ''
             },
             expenseToDelete: null,
-            expenses: [
-                {
-                    id: 'EXP-001',
-                    date: '2023-05-05',
-                    category: 'Materials',
-                    description: 'Fabric purchase for school uniforms',
-                    amount: 5000000,
-                    paymentMethod: 'Bank Transfer',
-                    notes: 'Bulk purchase for upcoming production'
-                },
-                {
-                    id: 'EXP-002',
-                    date: '2023-05-10',
-                    category: 'Salaries',
-                    description: 'Staff salaries for May',
-                    amount: 8000000,
-                    paymentMethod: 'Bank Transfer',
-                    notes: 'Monthly payroll'
-                },
-                {
-                    id: 'EXP-003',
-                    date: '2023-05-15',
-                    category: 'Rent',
-                    description: 'Shop rent for May',
-                    amount: 3500000,
-                    paymentMethod: 'Bank Transfer',
-                    notes: 'Monthly rent payment'
-                },
-                {
-                    id: 'EXP-004',
-                    date: '2023-05-18',
-                    category: 'Utilities',
-                    description: 'Electricity and water bills',
-                    amount: 1200000,
-                    paymentMethod: 'Cash',
-                    notes: 'Monthly utilities'
-                },
-                {
-                    id: 'EXP-005',
-                    date: '2023-05-22',
-                    category: 'Equipment',
-                    description: 'New sewing machine',
-                    amount: 4500000,
-                    paymentMethod: 'Credit Card',
-                    notes: 'Replacement for broken machine'
-                }
-            ]
+            expenses: [],
+            expenseTypes: [
+                'MATERIAL',
+                'SALARY',
+                'OPERATIONAL',
+                'REFUND',
+                'OTHER'
+            ],
+            paymentMethods: [
+                'CASH',
+                'CREDIT_CARD',
+                'TRANSFER',
+                'BANK_TRANSFER',
+                'DEBIT_CARD',
+                'OTHERS'
+            ],
+            pagination: {
+                totalPages: 0,
+                totalElements: 0,
+                pageNumber: 0,
+                pageSize: 10
+            },
+            loading: false,
+            error: null
         }
     },
     computed: {
         filteredExpenses() {
-            let filtered = this.expenses;
-            
-            if (this.searchQuery) {
-                const query = this.searchQuery.toLowerCase();
-                filtered = filtered.filter(expense => 
-                    expense.id.toLowerCase().includes(query) || 
-                    expense.description.toLowerCase().includes(query) ||
-                    expense.category.toLowerCase().includes(query)
-                );
-            }
-            
-            if (this.categoryFilter) {
-                filtered = filtered.filter(expense => expense.category === this.categoryFilter);
-            }
-            
-            if (this.monthFilter) {
-                filtered = filtered.filter(expense => {
-                    const expenseMonth = expense.date.split('-')[1];
-                    return expenseMonth === this.monthFilter;
-                });
-            }
-            
-            return filtered;
+            // Since filtering is now done on the server side, 
+            // we simply return the expenses array
+            return this.expenses;
         },
         totalAmount() {
             return this.filteredExpenses.reduce((total, expense) => total + expense.amount, 0);
+        },
+        pagesArray() {
+            if (!this.pagination.totalPages || this.pagination.totalPages <= 0) return [];
+
+            const pages = [];
+            const maxVisiblePages = 5;
+            const halfVisiblePages = Math.floor(maxVisiblePages / 2);
+
+            // Ensure pageNumber is a number and not negative
+            const currentPage = Math.max(0, this.pagination.pageNumber || 0);
+
+            let startPage = Math.max(1, currentPage + 1 - halfVisiblePages);
+            let endPage = Math.min(this.pagination.totalPages, startPage + maxVisiblePages - 1);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                startPage = Math.max(1, endPage - maxVisiblePages + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+
+            return pages;
+        }
+    },
+    mounted() {
+        this.fetchExpenses(0); // Start with page 0 for backend (equivalent to UI page 1)
+    },
+    watch: {
+        searchQuery: function(newVal) {
+            // Debounce search to avoid too many requests
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+
+            this.searchTimeout = setTimeout(() => {
+                // Reset to first page and fetch expenses with new search query
+                this.changePage(1);
+            }, 300); // 300ms debounce
+        },
+        categoryFilter: function() {
+            // Reset to first page and fetch expenses with new category filter
+            this.changePage(1);
+        },
+        monthFilter: function() {
+            // Reset to first page and fetch expenses with new month filter
+            this.changePage(1);
         }
     },
     methods: {
-        getCategoryClass(category) {
-            switch(category) {
-                case 'Materials': return 'badge badge-primary';
-                case 'Salaries': return 'badge badge-info';
-                case 'Rent': return 'badge badge-warning';
-                case 'Utilities': return 'badge badge-secondary';
-                case 'Equipment': return 'badge badge-success';
-                case 'Other': return 'badge badge-dark';
+        getCategoryClass(type) {
+            switch(type) {
+                case 'MATERIAL': return 'badge badge-primary';
+                case 'SALARY': return 'badge badge-info';
+                case 'OPERATIONAL': return 'badge badge-warning';
+                case 'REFUND': return 'badge badge-secondary';
+                case 'OTHER': return 'badge badge-dark';
                 default: return 'badge badge-light';
             }
+        },
+        fetchExpenses(page = 0) {
+            this.loading = true;
+
+            // Prepare params object with pagination
+            const params = { 
+                page: page, 
+                size: this.pagination.pageSize 
+            };
+
+            // Prepare filters array for backend
+            const filters = [];
+
+            // Add search query if present
+            if (this.searchQuery) {
+                // Add filter for description containing search query
+                filters.push(["description", "like", this.searchQuery]);
+            }
+
+            // Add category filter if present
+            if (this.categoryFilter) {
+                // If we already have filters, add AND operator
+                if (filters.length > 0) {
+                    filters.push(["and"]);
+                }
+                // Add filter for type equals categoryFilter
+                filters.push(["type", "=", this.categoryFilter]);
+            }
+
+            // Add month filter if present
+            if (this.monthFilter) {
+                // If we already have filters, add AND operator
+                if (filters.length > 0) {
+                    filters.push(["and"]);
+                }
+                // Add filter for date containing month
+                filters.push(["date", "like", `%-${this.monthFilter}-%`]);
+            }
+
+            // Add filters to params if any
+            if (filters.length > 0) {
+                params.filters = JSON.stringify(filters);
+            }
+
+            // Convert params object to URL query string
+            const queryParams = new URLSearchParams();
+
+            // Add pagination parameters
+            // Convert 0-based page to 1-based page for API
+            queryParams.append('page', params.page + 1);
+            queryParams.append('size', params.size);
+
+            // Add sort parameter if present
+            if (params.sort) {
+                queryParams.append('sort', params.sort);
+            }
+
+            // Add filters parameter if present
+            if (params.filters) {
+                queryParams.append('filters', params.filters);
+            }
+
+            // Make the API call with the constructed URL
+            this.Api.get(`/expense?${queryParams.toString()}`)
+                .then(response => {
+                    // Check if response has content property (Spring Data pagination)
+                    if (response.data && response.data.content) {
+                        this.expenses = response.data.content;
+
+                        // Update pagination data
+                        this.pagination = {
+                            totalPages: response.data.total_pages || 0,
+                            totalElements: response.data.total_elements || 0,
+                            pageNumber: response.data.number !== undefined ? response.data.number : page,
+                            pageSize: response.data.size || this.pagination.pageSize
+                        };
+                    } else {
+                        // Handle case where response is not paginated
+                        this.expenses = Array.isArray(response.data) ? response.data : [];
+                        this.pagination.totalElements = this.expenses.length;
+                        this.pagination.totalPages = 1;
+                    }
+
+                    this.loading = false;
+                })
+                .catch(error => {
+                    console.error('Error fetching expenses:', error);
+
+                    // Provide more specific error message if available
+                    if (error.response) {
+                        // The request was made and the server responded with a status code
+                        // that falls out of the range of 2xx
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load expenses'}`;
+                    } else if (error.request) {
+                        // The request was made but no response was received
+                        this.error = 'No response from server. Please check your connection.';
+                    } else {
+                        // Something happened in setting up the request that triggered an Error
+                        this.error = 'Failed to load expenses: ' + error.message;
+                    }
+
+                    this.loading = false;
+                });
+        },
+        changePage(page) {
+            // page parameter is 1-based from UI, convert to 0-based for backend
+            const zeroBasedPage = page - 1;
+            if (zeroBasedPage < 0 || (this.pagination.totalPages > 0 && zeroBasedPage >= this.pagination.totalPages)) return;
+            this.pagination.pageNumber = zeroBasedPage;
+            this.fetchExpenses(zeroBasedPage);
         },
         showAddModal() {
             this.isEditing = false;
             this.currentExpense = {
                 id: null,
                 date: new Date().toISOString().split('T')[0],
-                category: '',
                 description: '',
                 amount: 0,
-                paymentMethod: 'Cash',
-                notes: ''
+                type: '',
+                payment_method: 'CASH',
+                note: ''
             };
             $('#expenseModal').modal('show');
         },
@@ -366,7 +507,7 @@ export default {
         },
         editExpense(expense) {
             this.isEditing = true;
-            this.currentExpense = { ...expense };
+            this.currentExpense = JSON.parse(JSON.stringify(expense));
             $('#expenseModal').modal('show');
         },
         deleteExpense(expense) {
@@ -375,30 +516,66 @@ export default {
         },
         confirmDelete() {
             if (this.expenseToDelete) {
-                const index = this.expenses.findIndex(e => e.id === this.expenseToDelete.id);
-                if (index !== -1) {
-                    this.expenses.splice(index, 1);
-                }
-                this.expenseToDelete = null;
-                $('#deleteModal').modal('hide');
+                this.loading = true;
+                this.Api.delete(`/expense/${this.expenseToDelete.id}`)
+                    .then(() => {
+                        const index = this.expenses.findIndex(e => e.id === this.expenseToDelete.id);
+                        if (index !== -1) {
+                            this.expenses.splice(index, 1);
+                        }
+                        this.expenseToDelete = null;
+                        $('#deleteModal').modal('hide');
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        console.error('Error deleting expense:', error);
+                        this.error = 'Failed to delete expense';
+                        this.loading = false;
+                    });
             }
         },
         saveExpense() {
+            this.loading = true;
+
             if (this.isEditing) {
                 // Update existing expense
-                const index = this.expenses.findIndex(e => e.id === this.currentExpense.id);
-                if (index !== -1) {
-                    this.expenses.splice(index, 1, { ...this.currentExpense });
-                }
+                this.Api.put(`/expense/${this.currentExpense.id}`, this.currentExpense)
+                    .then(response => {
+                        const index = this.expenses.findIndex(e => e.id === this.currentExpense.id);
+                        if (index !== -1) {
+                            this.expenses.splice(index, 1, response.data);
+                        }
+                        $('#expenseModal').modal('hide');
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        console.error('Error updating expense:', error);
+                        this.error = 'Failed to update expense';
+                        this.loading = false;
+                    });
             } else {
                 // Add new expense
-                const newId = `EXP-${String(this.expenses.length + 1).padStart(3, '0')}`;
-                this.expenses.push({
-                    ...this.currentExpense,
-                    id: newId
-                });
+                this.Api.post('/expense', this.currentExpense)
+                    .then(response => {
+                        this.expenses.push(response.data);
+                        $('#expenseModal').modal('hide');
+                        this.loading = false;
+                    })
+                    .catch(error => {
+                        console.error('Error adding expense:', error);
+                        this.error = 'Failed to add expense';
+                        this.loading = false;
+                    });
             }
-            $('#expenseModal').modal('hide');
+        },
+        handleSearch() {
+            // Clear any existing timeout
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+
+            // Reset to first page and fetch expenses with current search query
+            this.changePage(1);
         }
     }
 }
