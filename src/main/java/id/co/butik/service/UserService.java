@@ -47,7 +47,7 @@ public class UserService {
     }
 
     public UserProfile createUser(UserProfileDto userProfileDto) {
-        List<Role> role = roleRepository.findByName(userProfileDto.getRoleName());
+        List<Role> role = roleRepository.findByName(userProfileDto.getRole());
         User user = new User();
         user.setUsername(userProfileDto.getUsername());
         user.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));

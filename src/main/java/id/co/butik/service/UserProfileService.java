@@ -88,7 +88,7 @@ public class UserProfileService {
         }
 
         // Create user with role
-        List<Role> roles = roleRepository.findByName(userProfileDto.getRoleName());
+        List<Role> roles = roleRepository.findByName(userProfileDto.getRole());
         if (roles.isEmpty()) {
             throw new BadRequest("Role not found");
         }
@@ -167,8 +167,8 @@ public class UserProfileService {
         }
 
         // Update role if provided
-        if (userProfileDto.getRoleName() != null) {
-            List<Role> roles = roleRepository.findByName(userProfileDto.getRoleName());
+        if (userProfileDto.getRole() != null) {
+            List<Role> roles = roleRepository.findByName(userProfileDto.getRole());
             if (!roles.isEmpty()) {
                 user.setRoles(roles);
             }

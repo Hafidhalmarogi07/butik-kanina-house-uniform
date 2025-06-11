@@ -15,7 +15,7 @@ public class UserProfileDto {
 
     private String address;
 
-    private String roleName;
+    private String role;
 
     private String fullName;
 
