@@ -5,7 +5,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>150</h3>
+                        <h3>{{ dashboardData.sales }}</h3>
                         <p>Total Sales</p>
                     </div>
                     <div class="icon">
@@ -19,7 +19,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>53</h3>
+                        <h3>{{ dashboardData.orders }}</h3>
                         <p>Orders</p>
                     </div>
                     <div class="icon">
@@ -33,7 +33,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>Rp 44,500,000</h3>
+                        <h3>Rp {{ formatCurrency(dashboardData.revenue) }}</h3>
                         <p>Revenue</p>
                     </div>
                     <div class="icon">
@@ -47,7 +47,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>Rp 12,300,000</h3>
+                        <h3>Rp {{ formatCurrency(dashboardData.expenses) }}</h3>
                         <p>Expenses</p>
                     </div>
                     <div class="icon">
@@ -255,10 +255,45 @@
 
 <script>
 export default {
+    data() {
+        return {
+            dashboardData: {
+                sales: 0,
+                orders: 0,
+                revenue: 0,
+                expenses: 0
+            }
+        };
+    },
     mounted() {
+        this.fetchDashboardData();
         this.initCharts();
     },
     methods: {
+        fetchDashboardData() {
+            // Get the base URL from environment or use a default
+
+            // Fetch dashboard data from API
+          this.Api.get(`/dashboard/inner`)
+                .then(response => {
+                  if (response.data){
+                    this.dashboardData = response.data;
+                  }
+                })
+
+                .catch(error => {
+                    console.error('Error fetching dashboard data:', error);
+                });
+        },
+        formatCurrency(value) {
+            // Format number to Indonesian currency format
+            if (!value) return '0';
+
+            return new Intl.NumberFormat('id-ID', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(value);
+        },
         initCharts() {
             // Sales Chart
             if (document.getElementById('salesChart')) {
@@ -314,15 +349,15 @@ export default {
                 const pieChartCanvas = document.getElementById('pieChart').getContext('2d');
                 const pieData = {
                     labels: [
-                        'Shirts',
-                        'Pants',
-                        'Skirts',
+                        'SERAGAM',
+                        'BATIK',
+                        'BAJU OLAHRAGA',
                         'Ties',
                         'Sets'
                     ],
                     datasets: [
                         {
-                            data: [700, 500, 400, 600, 300],
+                            data: [10, 5, 2, 5, 0],
                             backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc'],
                         }
                     ]
