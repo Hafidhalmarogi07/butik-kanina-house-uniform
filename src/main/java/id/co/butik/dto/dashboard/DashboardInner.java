@@ -1,4 +1,4 @@
-package id.co.butik.dto;
+package id.co.butik.dto.dashboard;
 
 import lombok.Data;
 

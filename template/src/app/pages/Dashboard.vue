@@ -262,11 +262,13 @@ export default {
                 orders: 0,
                 revenue: 0,
                 expenses: 0
-            }
+            },
+            productCategories: []
         };
     },
     mounted() {
         this.fetchDashboardData();
+        this.fetchProductCategories();
         this.initCharts();
     },
     methods: {
@@ -283,6 +285,20 @@ export default {
 
                 .catch(error => {
                     console.error('Error fetching dashboard data:', error);
+                });
+        },
+        fetchProductCategories() {
+            // Fetch product categories data from API
+            this.Api.get(`/dashboard/product-category`)
+                .then(response => {
+                    if (response.data) {
+                        this.productCategories = response.data;
+                        // Update the pie chart with the new data
+                        this.updatePieChart();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product categories data:', error);
                 });
         },
         formatCurrency(value) {
@@ -344,34 +360,67 @@ export default {
                 });
             }
 
-            // Pie Chart
+            // Initialize Pie Chart with empty data
+            // The actual data will be loaded by updatePieChart method
+            this.initPieChart();
+        },
+
+        initPieChart() {
             if (document.getElementById('pieChart')) {
                 const pieChartCanvas = document.getElementById('pieChart').getContext('2d');
+
+                // Default colors for pie chart segments
+                const backgroundColors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de', '#6c757d', '#007bff', '#28a745', '#17a2b8'];
+
+                // Initial empty data
                 const pieData = {
-                    labels: [
-                        'SERAGAM',
-                        'BATIK',
-                        'BAJU OLAHRAGA',
-                        'Ties',
-                        'Sets'
-                    ],
+                    labels: [],
                     datasets: [
                         {
-                            data: [10, 5, 2, 5, 0],
-                            backgroundColor: ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc'],
+                            data: [],
+                            backgroundColor: backgroundColors,
                         }
                     ]
                 };
+
                 const pieOptions = {
                     maintainAspectRatio: false,
                     responsive: true,
                 };
 
-                new Chart(pieChartCanvas, {
+                // Store chart instance to update it later
+                this.pieChart = new Chart(pieChartCanvas, {
                     type: 'pie',
                     data: pieData,
                     options: pieOptions
                 });
+            }
+        },
+
+        updatePieChart() {
+            if (this.pieChart && this.productCategories.length > 0) {
+                // Extract category names and product counts from the API response
+                const labels = this.productCategories.map(category => category.category_name);
+                const data = this.productCategories.map(category => category.product_count);
+
+                // Update chart data
+                this.pieChart.data.labels = labels;
+                this.pieChart.data.datasets[0].data = data;
+
+                // Ensure we have enough background colors
+                const backgroundColors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de', '#6c757d', '#007bff', '#28a745', '#17a2b8'];
+                if (labels.length > backgroundColors.length) {
+                    // Generate additional colors if needed
+                    for (let i = backgroundColors.length; i < labels.length; i++) {
+                        const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
+                        backgroundColors.push(randomColor);
+                    }
+                }
+
+                this.pieChart.data.datasets[0].backgroundColor = backgroundColors.slice(0, labels.length);
+
+                // Update the chart
+                this.pieChart.update();
             }
         }
     }
