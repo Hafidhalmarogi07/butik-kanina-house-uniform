@@ -2,6 +2,7 @@ package id.co.butik.controller;
 
 import id.co.butik.dto.order.OrderPaymentRequest;
 import id.co.butik.dto.order.OrderRequest;
+import id.co.butik.dto.order.OrderStatusUpdateRequest;
 import id.co.butik.entity.Order;
 import id.co.butik.entity.Product;
 import id.co.butik.service.OrderService;
@@ -67,5 +68,15 @@ public class OrderController {
     public ResponseEntity<Order> cancelOrder(@PathVariable Long id) {
         Order canceled = orderService.cancelOrder(id);
         return ResponseEntity.ok(canceled);
+    }
+
+    // ✅ Update order status
+    @PostMapping("/{id}/status")
+    public ResponseEntity<Order> updateStatus(
+            @PathVariable Long id,
+            @RequestBody OrderStatusUpdateRequest request
+    ) {
+        Order updated = orderService.updateOrderStatus(id, request.getStatus());
+        return ResponseEntity.ok(updated);
     }
 }

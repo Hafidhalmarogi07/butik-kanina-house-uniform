@@ -76,6 +76,9 @@
                                                 <button type="button" class="btn btn-sm btn-primary" @click="addPayment(order)">
                                                     <i class="fas fa-money-bill"></i>
                                                 </button>
+                                                <button type="button" class="btn btn-sm btn-warning" @click="showUpdateStatusModal(order)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -439,6 +442,40 @@
                 </div>
             </div>
         </div>
+
+        <!-- Update Status Modal -->
+        <div class="modal fade" id="updateStatusModal" tabindex="-1" role="dialog" aria-labelledby="updateStatusModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateStatusModalLabel">Update Order Status</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form @submit.prevent="updateOrderStatus">
+                            <div class="form-group">
+                                <label for="orderStatus">Status</label>
+                                <select class="form-control" id="orderStatus" v-model="newStatus" required>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="CONFIRMED">Confirmed</option>
+                                    <option value="COMPLETED">Completed</option>
+                                    <option value="CANCELLED">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary" :disabled="loading">
+                                    <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                    Update Status
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -464,6 +501,8 @@ export default {
                 note: ''
             },
             orderToAddPayment: null,
+            orderToUpdateStatus: null,
+            newStatus: '',
             orders: [],
             customers: [],
             products: [],
@@ -891,6 +930,52 @@ export default {
                         this.error = 'No response from server. Please check your connection.';
                     } else {
                         this.error = 'Failed to add payment: ' + error.message;
+                    }
+
+                    this.loading = false;
+                });
+        },
+
+        showUpdateStatusModal(order) {
+            this.orderToUpdateStatus = order;
+            this.newStatus = order.orderStatus;
+            $('#updateStatusModal').modal('show');
+        },
+
+        updateOrderStatus() {
+            if (!this.orderToUpdateStatus) return;
+
+            this.loading = true;
+
+            // Prepare the status update request
+            const statusRequest = {
+                status: this.newStatus
+            };
+
+            // Make the API call to update the order status
+            this.Api.post(`/orders/${this.orderToUpdateStatus.id}/status`, statusRequest)
+                .then(response => {
+                    // Update the order in the list
+                    const index = this.orders.findIndex(o => o.id === this.orderToUpdateStatus.id);
+                    if (index !== -1) {
+                        this.orders.splice(index, 1, response.data);
+                    }
+                    $('#updateStatusModal').modal('hide');
+                    this.loading = false;
+
+                    // Refresh the orders list
+                    this.fetchOrders(this.pagination.pageNumber);
+                })
+                .catch(error => {
+                    console.error('Error updating order status:', error);
+
+                    // Provide more specific error message if available
+                    if (error.response) {
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to update order status'}`;
+                    } else if (error.request) {
+                        this.error = 'No response from server. Please check your connection.';
+                    } else {
+                        this.error = 'Failed to update order status: ' + error.message;
                     }
 
                     this.loading = false;
