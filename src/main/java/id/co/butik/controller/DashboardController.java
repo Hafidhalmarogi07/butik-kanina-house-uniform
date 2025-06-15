@@ -2,9 +2,12 @@ package id.co.butik.controller;
 
 import id.co.butik.dto.dashboard.DashboardInner;
 import id.co.butik.dto.dashboard.ProductCountByCategoryDto;
+import id.co.butik.dto.dashboard.RecentSalesDto;
+import id.co.butik.dto.dashboard.TopProductsDto;
 import id.co.butik.service.DataDashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,5 +31,15 @@ public class DashboardController {
     @GetMapping({"/product-category", "/product-category/"})
     public List<ProductCountByCategoryDto> productCategory(HttpServletRequest request) {
         return dataDashboardService.getProductByCategory(request);
+    }
+
+    @GetMapping({"/top-products", "/top-products/"})
+    public List<TopProductsDto> topProducts(HttpServletRequest request, @RequestParam(required = false) Integer limit) {
+        return dataDashboardService.getTopProducts(request, limit);
+    }
+
+    @GetMapping({"/recent-sales", "/recent-sales/"})
+    public List<RecentSalesDto> recentSales(HttpServletRequest request, @RequestParam(required = false) Integer limit) {
+        return dataDashboardService.getRecentSales(request, limit);
     }
 }

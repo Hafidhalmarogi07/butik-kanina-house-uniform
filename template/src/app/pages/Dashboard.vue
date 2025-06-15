@@ -130,42 +130,22 @@
                             <table class="table m-0">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
+                                        <th>Invoice Number</th>
                                         <th>Item</th>
                                         <th>Status</th>
                                         <th>Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><a href="#">OR9842</a></td>
-                                        <td>School Uniform Set</td>
-                                        <td><span class="badge badge-success">Shipped</span></td>
-                                        <td>Rp 350,000</td>
+                                    <tr v-for="sale in recentSales" :key="sale.id">
+                                        <td><a href="#">{{ sale.invoice_number }}</a></td>
+                                        <td>{{ sale.item_name }}</td>
+                                        <td><span class="badge" :class="getStatusBadgeClass(sale.status)">{{ sale.status }}</span></td>
+                                        <td>Rp {{ formatCurrency(sale.amount) }}</td>
                                     </tr>
-                                    <tr>
-                                        <td><a href="#">OR1848</a></td>
-                                        <td>School Shirt</td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td>Rp 150,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR7429</a></td>
-                                        <td>School Pants</td>
-                                        <td><span class="badge badge-info">Processing</span></td>
-                                        <td>Rp 200,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR7429</a></td>
-                                        <td>School Skirt</td>
-                                        <td><span class="badge badge-primary">Processing</span></td>
-                                        <td>Rp 180,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR1848</a></td>
-                                        <td>School Tie</td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td>Rp 50,000</td>
+                                    <!-- Fallback if no sales are available -->
+                                    <tr v-if="recentSales.length === 0">
+                                        <td colspan="4" class="text-center">No recent sales available</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -194,52 +174,22 @@
                     </div>
                     <div class="card-body p-0">
                         <ul class="products-list product-list-in-card pl-2 pr-2">
-                            <li class="item">
+                            <li v-for="(product, index) in topProducts" :key="product.product_id" class="item">
                                 <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
+                                    <img :src="product.image_url || '@assets/no-image.png'" alt="Product Image" class="img-size-50">
                                 </div>
                                 <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Uniform Set
-                                        <span class="badge badge-warning float-right">Rp 350,000</span></a>
+                                    <a href="javascript:void(0)" class="product-title">{{ product.product_name }}
+                                        <span class="badge float-right" :class="getBadgeClass(index)">Rp {{ formatCurrency(product.price) }}</span></a>
                                     <span class="product-description">
-                                        Complete school uniform set with shirt, pants/skirt, and tie
+                                        {{ product.product_description }}
                                     </span>
                                 </div>
                             </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
+                            <!-- Fallback if no products are available -->
+                            <li v-if="topProducts.length === 0" class="item">
                                 <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Shirt
-                                        <span class="badge badge-info float-right">Rp 150,000</span></a>
-                                    <span class="product-description">
-                                        White school shirt with embroidered logo
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Pants
-                                        <span class="badge badge-danger float-right">Rp 200,000</span></a>
-                                    <span class="product-description">
-                                        Grey school pants with adjustable waist
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Skirt
-                                        <span class="badge badge-success float-right">Rp 180,000</span></a>
-                                    <span class="product-description">
-                                        Pleated grey school skirt
-                                    </span>
+                                    <span class="product-title">No products available</span>
                                 </div>
                             </li>
                         </ul>
@@ -263,12 +213,16 @@ export default {
                 revenue: 0,
                 expenses: 0
             },
-            productCategories: []
+            productCategories: [],
+            topProducts: [],
+            recentSales: []
         };
     },
     mounted() {
         this.fetchDashboardData();
         this.fetchProductCategories();
+        this.fetchTopProducts();
+        this.fetchRecentSales();
         this.initCharts();
     },
     methods: {
@@ -301,6 +255,30 @@ export default {
                     console.error('Error fetching product categories data:', error);
                 });
         },
+        fetchTopProducts() {
+            // Fetch top products data from API (limit to 4 products)
+            this.Api.get(`/dashboard/top-products?limit=4`)
+                .then(response => {
+                    if (response.data) {
+                        this.topProducts = response.data;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching top products data:', error);
+                });
+        },
+        fetchRecentSales() {
+            // Fetch recent sales data from API (limit to 5 sales)
+            this.Api.get(`/dashboard/recent-sales?limit=5`)
+                .then(response => {
+                    if (response.data) {
+                        this.recentSales = response.data;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent sales data:', error);
+                });
+        },
         formatCurrency(value) {
             // Format number to Indonesian currency format
             if (!value) return '0';
@@ -309,6 +287,29 @@ export default {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
             }).format(value);
+        },
+        getBadgeClass(index) {
+            // Return different badge classes based on index
+            const badgeClasses = ['badge-warning', 'badge-info', 'badge-danger', 'badge-success', 'badge-primary'];
+            return badgeClasses[index % badgeClasses.length];
+        },
+        getStatusBadgeClass(status) {
+            // Return badge class based on sale status
+            if (!status) return 'badge-secondary';
+
+            switch(status) {
+                case 'COMPLETED':
+                case 'SHIPPED':
+                    return 'badge-success';
+                case 'PENDING':
+                    return 'badge-warning';
+                case 'PROCESSING':
+                    return 'badge-info';
+                case 'CANCELLED':
+                    return 'badge-danger';
+                default:
+                    return 'badge-primary';
+            }
         },
         initCharts() {
             // Sales Chart

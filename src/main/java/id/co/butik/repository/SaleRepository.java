@@ -1,11 +1,13 @@
 package id.co.butik.repository;
 
 import id.co.butik.entity.Sale;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface SaleRepository extends PagingAndSortingRepository<Sale, Long>, JpaSpecificationExecutor<Sale> {
 
@@ -13,4 +15,7 @@ public interface SaleRepository extends PagingAndSortingRepository<Sale, Long>, 
     BigDecimal getTotalSales();
 
     long count();
+
+    @Query("SELECT s FROM Sale s ORDER BY s.date DESC")
+    List<Sale> findRecentSales(Pageable pageable);
 }
