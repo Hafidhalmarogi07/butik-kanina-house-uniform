@@ -1,9 +1,6 @@
 package id.co.butik.service;
 
-import id.co.butik.dto.dashboard.DashboardInner;
-import id.co.butik.dto.dashboard.ProductCountByCategoryDto;
-import id.co.butik.dto.dashboard.RecentSalesDto;
-import id.co.butik.dto.dashboard.TopProductsDto;
+import id.co.butik.dto.dashboard.*;
 import id.co.butik.entity.Sale;
 import id.co.butik.entity.SaleDetail;
 import id.co.butik.repository.ExpenseRepository;
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -119,5 +117,29 @@ public class DataDashboardService {
         }
 
         return recentSalesDtos;
+    }
+
+    public List<MonthlySalesDto> getMonthlySales(HttpServletRequest request) {
+        // Fetch monthly sales data from repository
+        List<Object[]> monthlySalesData = saleRepository.getMonthlySalesForCurrentYear();
+
+        // Convert to DTOs
+        List<MonthlySalesDto> monthlySalesDtos = new ArrayList<>();
+
+        for (Object[] data : monthlySalesData) {
+            Integer monthNumber = (Integer) data[0];
+            BigDecimal amount = (BigDecimal) data[1];
+
+            // Convert month number to month name
+            String monthName = Month.of(monthNumber).toString();
+
+            MonthlySalesDto dto = new MonthlySalesDto();
+            dto.setMonth(monthName);
+            dto.setAmount(amount);
+
+            monthlySalesDtos.add(dto);
+        }
+
+        return monthlySalesDtos;
     }
 }

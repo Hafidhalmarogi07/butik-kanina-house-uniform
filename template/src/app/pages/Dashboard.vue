@@ -215,7 +215,8 @@ export default {
             },
             productCategories: [],
             topProducts: [],
-            recentSales: []
+            recentSales: [],
+            monthlySales: []
         };
     },
     mounted() {
@@ -223,6 +224,7 @@ export default {
         this.fetchProductCategories();
         this.fetchTopProducts();
         this.fetchRecentSales();
+        this.fetchMonthlySales();
         this.initCharts();
     },
     methods: {
@@ -279,6 +281,20 @@ export default {
                     console.error('Error fetching recent sales data:', error);
                 });
         },
+        fetchMonthlySales() {
+            // Fetch monthly sales data from API
+            this.Api.get(`/dashboard/monthly-sales`)
+                .then(response => {
+                    if (response.data) {
+                        this.monthlySales = response.data;
+                        // Update the sales chart with the new data
+                        this.updateSalesChart();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching monthly sales data:', error);
+                });
+        },
         formatCurrency(value) {
             // Format number to Indonesian currency format
             if (!value) return '0';
@@ -316,11 +332,12 @@ export default {
             if (document.getElementById('salesChart')) {
                 const salesChartCanvas = document.getElementById('salesChart').getContext('2d');
 
+                // Initial empty data
                 const salesChartData = {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    labels: [],
                     datasets: [
                         {
-                            label: 'Digital Goods',
+                            label: 'Monthly Sales',
                             backgroundColor: 'rgba(60,141,188,0.9)',
                             borderColor: 'rgba(60,141,188,0.8)',
                             pointRadius: false,
@@ -328,7 +345,7 @@ export default {
                             pointStrokeColor: 'rgba(60,141,188,1)',
                             pointHighlightFill: '#fff',
                             pointHighlightStroke: 'rgba(60,141,188,1)',
-                            data: [28, 48, 40, 19, 86, 27, 90]
+                            data: []
                         }
                     ]
                 };
@@ -353,8 +370,8 @@ export default {
                     }
                 };
 
-                // This will get the first returned node in the jQuery collection.
-                new Chart(salesChartCanvas, {
+                // Store chart instance to update it later
+                this.salesChart = new Chart(salesChartCanvas, {
                     type: 'bar',
                     data: salesChartData,
                     options: salesChartOptions
@@ -395,6 +412,21 @@ export default {
                     data: pieData,
                     options: pieOptions
                 });
+            }
+        },
+
+        updateSalesChart() {
+            if (this.salesChart && this.monthlySales.length > 0) {
+                // Extract month names and sales amounts from the API response
+                const labels = this.monthlySales.map(item => item.month);
+                const data = this.monthlySales.map(item => item.amount);
+
+                // Update chart data
+                this.salesChart.data.labels = labels;
+                this.salesChart.data.datasets[0].data = data;
+
+                // Update the chart
+                this.salesChart.update();
             }
         },
 

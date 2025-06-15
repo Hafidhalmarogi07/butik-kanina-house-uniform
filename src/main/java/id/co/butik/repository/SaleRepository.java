@@ -18,4 +18,7 @@ public interface SaleRepository extends PagingAndSortingRepository<Sale, Long>, 
 
     @Query("SELECT s FROM Sale s ORDER BY s.date DESC")
     List<Sale> findRecentSales(Pageable pageable);
+
+    @Query("SELECT FUNCTION('MONTH', s.date) as month, SUM(s.total) as amount FROM Sale s WHERE FUNCTION('YEAR', s.date) = FUNCTION('YEAR', CURRENT_DATE) GROUP BY FUNCTION('MONTH', s.date) ORDER BY FUNCTION('MONTH', s.date)")
+    List<Object[]> getMonthlySalesForCurrentYear();
 }

@@ -1,6 +1,7 @@
 package id.co.butik.controller;
 
 import id.co.butik.dto.dashboard.DashboardInner;
+import id.co.butik.dto.dashboard.MonthlySalesDto;
 import id.co.butik.dto.dashboard.ProductCountByCategoryDto;
 import id.co.butik.dto.dashboard.RecentSalesDto;
 import id.co.butik.dto.dashboard.TopProductsDto;
@@ -41,5 +42,10 @@ public class DashboardController {
     @GetMapping({"/recent-sales", "/recent-sales/"})
     public List<RecentSalesDto> recentSales(HttpServletRequest request, @RequestParam(required = false) Integer limit) {
         return dataDashboardService.getRecentSales(request, limit);
+    }
+
+    @GetMapping({"/monthly-sales", "/monthly-sales/"})
+    public List<MonthlySalesDto> monthlySales(HttpServletRequest request) {
+        return dataDashboardService.getMonthlySales(request);
     }
 }
