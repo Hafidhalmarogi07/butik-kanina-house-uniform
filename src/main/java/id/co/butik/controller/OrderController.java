@@ -4,7 +4,6 @@ import id.co.butik.dto.order.OrderPaymentRequest;
 import id.co.butik.dto.order.OrderRequest;
 import id.co.butik.dto.order.OrderStatusUpdateRequest;
 import id.co.butik.entity.Order;
-import id.co.butik.entity.Product;
 import id.co.butik.service.OrderService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
@@ -15,8 +14,6 @@ import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 import java.util.Map;
 
 @RestController
