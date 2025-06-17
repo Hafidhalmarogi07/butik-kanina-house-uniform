@@ -78,6 +78,13 @@
             "route":{
                 "name":"users"
             }
+        },
+        {
+            "title":"Returns",
+            "iconClass":"fas fa-undo",
+            "route":{
+                "name":"returns"
+            }
         }
     ],
     "warehouse":[
@@ -151,6 +158,13 @@
             "iconClass":"fas fa-tags",
             "route":{
                 "name":"category"
+            }
+        },
+        {
+            "title":"Returns",
+            "iconClass":"fas fa-undo",
+            "route":{
+                "name":"returns"
             }
         }
     ]

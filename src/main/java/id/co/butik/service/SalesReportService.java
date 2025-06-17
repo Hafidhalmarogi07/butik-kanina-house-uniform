@@ -1,0 +1,158 @@
+package id.co.butik.service;
+
+import id.co.butik.entity.Sale;
+import id.co.butik.entity.SaleDetail;
+import id.co.butik.repository.SalesReportRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.Chunk;
+import com.itextpdf.text.FontFactory;
+import com.itextpdf.text.PageSize;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+@Service
+@Slf4j
+public class SalesReportService {
+
+    @Autowired
+    private SalesReportRepository salesReportRepository;
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+    /**
+     * Generate sales report in Excel format
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return ByteArrayInputStream containing the Excel file
+     */
+    public ByteArrayInputStream generateExcelReport(LocalDateTime startDate, LocalDateTime endDate) throws IOException {
+        List<Sale> sales = salesReportRepository.findSalesByDateRange(startDate, endDate);
+
+        try (Workbook workbook = new XSSFWorkbook(); 
+             ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+            Sheet sheet = workbook.createSheet("Sales Report");
+
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("Invoice Number");
+            headerRow.createCell(1).setCellValue("Date");
+            headerRow.createCell(2).setCellValue("Customer");
+            headerRow.createCell(3).setCellValue("Admin");
+            headerRow.createCell(4).setCellValue("Total Items");
+            headerRow.createCell(5).setCellValue("Total Amount");
+            headerRow.createCell(6).setCellValue("Status");
+
+            // Create data rows
+            int rowIdx = 1;
+            for (Sale sale : sales) {
+                Row row = sheet.createRow(rowIdx++);
+                row.createCell(0).setCellValue(sale.getInvoiceNumber());
+                row.createCell(1).setCellValue(sale.getDate().format(DATE_FORMATTER));
+                row.createCell(2).setCellValue(sale.getCustomer() != null ? sale.getCustomer().getNama() : "N/A");
+                row.createCell(3).setCellValue(sale.getAdmin() != null ? sale.getAdmin().getFullName() : "N/A");
+                row.createCell(4).setCellValue(sale.getItems());
+                row.createCell(5).setCellValue(sale.getTotal().doubleValue());
+                row.createCell(6).setCellValue(sale.getStatus().toString());
+            }
+
+            // Resize columns to fit content
+            for (int i = 0; i < 7; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(out);
+            return new ByteArrayInputStream(out.toByteArray());
+        }
+    }
+
+    /**
+     * Generate sales report in PDF format
+     * @param startDate the start date
+     * @param endDate the end date
+     * @return ByteArrayInputStream containing the PDF file
+     */
+    public ByteArrayInputStream generatePdfReport(LocalDateTime startDate, LocalDateTime endDate) throws DocumentException {
+        List<Sale> sales = salesReportRepository.findSalesByDateRange(startDate, endDate);
+
+        Document document = new Document(PageSize.A4.rotate());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        try {
+            PdfWriter.getInstance(document, out);
+            document.open();
+
+            // Add title
+            com.itextpdf.text.Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 18);
+            Paragraph title = new Paragraph("Sales Report", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Add date range
+            com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
+            Paragraph dateRange = new Paragraph(
+                    "Period: " + startDate.format(DATE_FORMATTER) + " to " + endDate.format(DATE_FORMATTER),
+                    dateFont);
+            dateRange.setAlignment(Element.ALIGN_CENTER);
+            document.add(dateRange);
+
+            document.add(Chunk.NEWLINE);
+
+            // Create table
+            PdfPTable table = new PdfPTable(7);
+            table.setWidthPercentage(100);
+
+            // Add table headers
+            com.itextpdf.text.Font headerFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 12);
+            Stream.of("Invoice Number", "Date", "Customer", "Admin", "Total Items", "Total Amount", "Status")
+                    .forEach(columnTitle -> {
+                        PdfPCell header = new PdfPCell();
+                        header.setBackgroundColor(BaseColor.LIGHT_GRAY);
+                        header.setBorderWidth(2);
+                        header.setPhrase(new Phrase(columnTitle, headerFont));
+                        header.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        table.addCell(header);
+                    });
+
+            // Add data rows
+            for (Sale sale : sales) {
+                table.addCell(sale.getInvoiceNumber());
+                table.addCell(sale.getDate().format(DATE_FORMATTER));
+                table.addCell(sale.getCustomer() != null ? sale.getCustomer().getNama() : "N/A");
+                table.addCell(sale.getAdmin() != null ? sale.getAdmin().getFullName() : "N/A");
+                table.addCell(String.valueOf(sale.getItems()));
+                table.addCell(sale.getTotal().toString());
+                table.addCell(sale.getStatus().toString());
+            }
+
+            document.add(table);
+            document.close();
+
+        } catch (DocumentException e) {
+            log.error("Error generating PDF report", e);
+            throw e;
+        }
+
+        return new ByteArrayInputStream(out.toByteArray());
+    }
+}
