@@ -9,3 +9,6 @@
 !/*.json
 !/*.lock
 !/README.md
+
+!/cache/
+/cache
