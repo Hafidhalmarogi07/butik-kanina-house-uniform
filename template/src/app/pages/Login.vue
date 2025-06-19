@@ -85,6 +85,8 @@
 </template>
 
 <script>
+import {alert} from "ionicons/icons";
+
 const {console} = window
 export default {
     data: () => ({
@@ -109,6 +111,7 @@ export default {
             .then(res => {
                 this.loading = false
                 Api.setToken(res, this.form.remember)
+                console.log("ini setToken : "+Api.getToken());
 
                 // Fetch user info to get role
                 Api.get('/users/me')
@@ -119,6 +122,7 @@ export default {
                     if (userRoles.length > 0) {
                         roleName = userRoles[0].name;
                     }
+                  console.log("ini role : "+roleName);
 
                     // Redirect based on role
                     if (roleName === 'ROLE_ADMIN_GUDANG') {

@@ -76,10 +76,11 @@ export default {
                 full_name: this.$store.state.user.full_name || 'User'
             }
 
-            // Determine user role and set appropriate menu items
-            if (this.$store.state.user.user && this.$store.state.user.user.roles) {
-                const roles = this.$store.state.user.user.roles;
+            console.log("ini role sidebar : " +  this.$store.state.user.roles.at(0).name);
 
+            // Determine user role and set appropriate menu items
+            if (this.$store.state.user && this.$store.state.user.roles) {
+                const roles = this.$store.state.user.roles;
                 if (roles.some(role => role.name === 'ROLE_SUPERADMIN')) {
                     this.items = SidebarConfig.owner;
                     this.dashboardRoute = { name: 'dashboard' };
