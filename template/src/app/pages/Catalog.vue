@@ -186,12 +186,35 @@ export default {
         // Convert 0-based page to 1-based page for API
         let url = `/api/v1/public/products?page=${this.pagination.pageNumber + 1}&size=${this.pagination.pageSize}`;
 
+        // Prepare filters array for backend
+        const filters = [];
+
+        // Add search query if present
         if (this.searchQuery) {
-          url += `&name=${encodeURIComponent(this.searchQuery)}`;
+          // Add filter for name containing search query
+          filters.push(["name", "like", this.searchQuery]);
+
+          // If we want to search in description too, add OR operator and description filter
+          if (this.searchQuery.trim() !== "") {
+            filters.push(["or"]);
+            filters.push(["description", "like", this.searchQuery]);
+          }
         }
 
+        // Add category filter if present
         if (this.selectedCategory) {
-          url += `&category.id=${this.selectedCategory}`;
+          // If we already have filters, add AND operator
+          if (filters.length > 0) {
+            filters.push(["and"]);
+          }
+
+          // Add filter for category.id equals selectedCategory
+          filters.push(["category.id", "=", this.selectedCategory]);
+        }
+
+        // Add filters to URL if any
+        if (filters.length > 0) {
+          url += `&filters=${encodeURIComponent(JSON.stringify(filters))}`;
         }
 
         const response = await axios.get(url);

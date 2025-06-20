@@ -67,10 +67,10 @@ public class PublicController {
     @GetMapping("/contact")
     public Map<String, String> getContactInfo() {
         Map<String, String> contactInfo = new HashMap<>();
-        contactInfo.put("email", "admin@butik-kanina.com");
-        contactInfo.put("whatsapp", "+6281234567890");
-        contactInfo.put("address", "Jl. Contoh No. 123, Jakarta");
-        contactInfo.put("phone", "+6281234567890");
+        contactInfo.put("email", "lirarahmawati@gmail.com");
+        contactInfo.put("whatsapp", "+6283821081737");
+        contactInfo.put("address", "Jl. Dakota I No.5c, Sukaraja, Cicendo, Kota Cimahi, Jawa Barat 40175, Indonesia Kota Bandung, Jawa Barat");
+        contactInfo.put("phone", "+6283821081737");
         return contactInfo;
     }
 }
