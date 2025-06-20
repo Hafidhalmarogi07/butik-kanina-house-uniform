@@ -13,6 +13,7 @@ const Navbar = () => import('@components/Navbar.vue')
 const Sidebar = () => import('@components/Sidebar.vue')
 const Header = () => import('@components/Header.vue')
 const Footer = () => import('@components/Footer.vue')
+const Catalog = () => import('@pages/Catalog.vue')
 
 // Owner Dashboard Pages
 const Products = () => import('@pages/Products.vue')
@@ -192,6 +193,10 @@ export default {
                     path: '/recover-password',
                     name: 'recover_password',
                     component: RecoverPassword
+                }, {
+                    path: '/catalog',
+                    name: 'catalog',
+                    component: Catalog
                 }
             ]
         }

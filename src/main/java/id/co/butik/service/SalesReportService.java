@@ -65,6 +65,8 @@ public class SalesReportService {
 
             // Create data rows
             int rowIdx = 1;
+            int totalItems = 0;
+            double totalAmount = 0.0;
             for (Sale sale : sales) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(sale.getInvoiceNumber());
@@ -74,7 +76,14 @@ public class SalesReportService {
                 row.createCell(4).setCellValue(sale.getItems());
                 row.createCell(5).setCellValue(sale.getTotal().doubleValue());
                 row.createCell(6).setCellValue(sale.getStatus().toString());
+
+                totalItems += sale.getItems();
+                totalAmount += sale.getTotal().doubleValue();
             }
+            Row totalRow = sheet.createRow(rowIdx);
+            totalRow.createCell(3).setCellValue("TOTAL");
+            totalRow.createCell(4).setCellValue(totalItems);
+            totalRow.createCell(5).setCellValue(totalAmount);
 
             // Resize columns to fit content
             for (int i = 0; i < 7; i++) {
@@ -135,6 +144,8 @@ public class SalesReportService {
                     });
 
             // Add data rows
+            int totalItems = 0;
+            double totalAmount = 0.0;
             for (Sale sale : sales) {
                 table.addCell(sale.getInvoiceNumber());
                 table.addCell(sale.getDate().format(DATE_FORMATTER));
@@ -143,7 +154,18 @@ public class SalesReportService {
                 table.addCell(String.valueOf(sale.getItems()));
                 table.addCell(sale.getTotal().toString());
                 table.addCell(sale.getStatus().toString());
+
+                totalItems += sale.getItems();
+                totalAmount += sale.getTotal().doubleValue();
             }
+            PdfPCell totalCell = new PdfPCell(new Phrase("TOTAL"));
+            totalCell.setColspan(4);
+            totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            table.addCell(totalCell);
+
+            table.addCell(String.valueOf(totalItems));
+            table.addCell(String.valueOf(totalAmount));
+            table.addCell(""); // for status column
 
             document.add(table);
             document.close();

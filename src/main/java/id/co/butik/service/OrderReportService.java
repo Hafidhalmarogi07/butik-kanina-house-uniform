@@ -66,6 +66,8 @@ public class OrderReportService {
 
             // Create data rows
             int rowIdx = 1;
+            double totalAmount = 0;
+            double totalPaid = 0;
             for (Order order : orders) {
                 Row row = sheet.createRow(rowIdx++);
                 row.createCell(0).setCellValue(order.getOrderNumber());
@@ -77,7 +79,14 @@ public class OrderReportService {
                 row.createCell(6).setCellValue(order.getAmountPaid() != null ? order.getAmountPaid().doubleValue() : 0.0);
                 row.createCell(7).setCellValue(order.getOrderStatus() != null ? order.getOrderStatus().toString() : "N/A");
                 row.createCell(8).setCellValue(order.getPaymentStatus() != null ? order.getPaymentStatus().toString() : "N/A");
+
+                totalAmount += order.getTotalAmount().doubleValue();
+                totalPaid += order.getAmountPaid().doubleValue();
             }
+            Row totalRow = sheet.createRow(rowIdx);
+            totalRow.createCell(4).setCellValue("TOTAL");
+            totalRow.createCell(5).setCellValue(totalAmount);
+            totalRow.createCell(6).setCellValue(totalPaid);
 
             // Resize columns to fit content
             for (int i = 0; i < 9; i++) {
@@ -138,6 +147,8 @@ public class OrderReportService {
                     });
 
             // Add data rows
+            double totalAmount = 0;
+            double totalPaid = 0;
             for (Order order : orders) {
                 table.addCell(order.getOrderNumber());
                 table.addCell(order.getOrderDate().format(DATE_FORMATTER));
@@ -148,7 +159,20 @@ public class OrderReportService {
                 table.addCell(order.getAmountPaid() != null ? order.getAmountPaid().toString() : "0");
                 table.addCell(order.getOrderStatus() != null ? order.getOrderStatus().toString() : "N/A");
                 table.addCell(order.getPaymentStatus() != null ? order.getPaymentStatus().toString() : "N/A");
+
+                totalAmount += order.getTotalAmount().doubleValue();
+                totalPaid += order.getAmountPaid().doubleValue();
+
             }
+
+            PdfPCell totalCell = new PdfPCell(new Phrase("TOTAL"));
+            totalCell.setColspan(5);
+            totalCell.setHorizontalAlignment(Element.ALIGN_RIGHT);
+            table.addCell(totalCell);
+
+            table.addCell(String.valueOf(totalAmount));
+            table.addCell(String.valueOf(totalPaid));
+            table.addCell(""); // for status column
 
             document.add(table);
             document.close();

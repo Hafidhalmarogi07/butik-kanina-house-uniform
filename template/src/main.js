@@ -77,7 +77,7 @@ Vue.prototype.moment = window.moment = moment
 Vue.prototype.env = window.env = env
 window.adminlte = adminlte
 Vue.prototype.Api = window.Api = new Api(env, router,
-    ['login', 'forgot_password', 'recover_password'])
+    ['login', 'forgot_password', 'recover_password', 'catalog'])
 Vue.prototype.currencyOptions = currencyOptions.globalOptions
 window.Api.setStore(store)
 
