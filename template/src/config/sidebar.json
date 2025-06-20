@@ -6,15 +6,6 @@
             "route":{
                 "name":"dashboard"
             }
-        }
-    ],
-    "owner":[
-        {
-            "title":"Dashboard",
-            "iconClass":"fas fa-tachometer-alt",
-            "route":{
-                "name":"dashboard"
-            }
         },
         {
             "title":"Products",
@@ -87,6 +78,43 @@
             }
         }
     ],
+    "owner":[
+        {
+            "title":"Dashboard",
+            "iconClass":"fas fa-tachometer-alt",
+            "route":{
+                "name":"dashboard"
+            }
+        },
+        {
+            "title":"Products",
+            "iconClass":"fas fa-box",
+            "route":{
+                "name":"products"
+            }
+        },
+        {
+            "title":"Expenses",
+            "iconClass":"fas fa-money-bill-alt",
+            "route":{
+                "name":"expenses"
+            }
+        },
+        {
+            "title":"Reports",
+            "iconClass":"fas fa-chart-bar",
+            "route":{
+                "name":"reports"
+            }
+        },
+        {
+            "title":"Users",
+            "iconClass":"fas fa-user-cog",
+            "route":{
+                "name":"users"
+            }
+        }
+    ],
     "warehouse":[
         {
             "title":"Dashboard",
@@ -126,20 +154,6 @@
             }
         },
         {
-            "title":"Sales",
-            "iconClass":"fas fa-shopping-cart",
-            "route":{
-                "name":"sales"
-            }
-        },
-        {
-            "title":"Orders",
-            "iconClass":"fas fa-shopping-bag",
-            "route":{
-                "name":"orders"
-            }
-        },
-        {
             "title":"Customers",
             "iconClass":"fas fa-users",
             "route":{
@@ -154,12 +168,20 @@
             }
         },
         {
-            "title":"Categories",
-            "iconClass":"fas fa-tags",
+            "title":"Sales",
+            "iconClass":"fas fa-shopping-cart",
             "route":{
-                "name":"category"
+                "name":"sales"
             }
         },
+        {
+            "title":"Orders",
+            "iconClass":"fas fa-shopping-bag",
+            "route":{
+                "name":"orders"
+            }
+        },
+
         {
             "title":"Returns",
             "iconClass":"fas fa-undo",
