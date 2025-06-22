@@ -73,6 +73,12 @@
                                                 <button type="button" class="btn btn-sm btn-primary" @click="printInvoice(sale)">
                                                     <i class="fas fa-print"></i>
                                                 </button>
+                                                <button type="button" class="btn btn-sm btn-warning" @click="editSale(sale)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-danger" @click="deleteSale(sale)">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -564,6 +570,10 @@ export default {
                 status: 'COMPLETED',
                 notes: ''
             };
+
+            // Set the modal title to indicate we're creating a new sale
+            document.getElementById('newSaleModalLabel').textContent = 'New Sale';
+
             $('#newSaleModal').modal('show');
         },
 
@@ -573,8 +583,152 @@ export default {
         },
 
         printInvoice(sale) {
-            // In a real application, this would open a print view or generate a PDF
-            alert('Printing invoice: ' + sale.invoice_number);
+            // Store the current sale for printing
+            this.selectedSale = sale;
+
+            // Create a new window for printing
+            const printWindow = window.open('', '_blank');
+
+            // Generate the invoice HTML content
+            const invoiceContent = this.generateInvoiceHTML(sale);
+
+            // Write the content to the new window
+            printWindow.document.write(invoiceContent);
+
+            // Trigger print when content is loaded
+            printWindow.onload = function() {
+                setTimeout(function() {
+                    printWindow.print();
+                    // Close the window after printing (or after print dialog is closed)
+                    printWindow.onafterprint = function() {
+                        printWindow.close();
+                    };
+                }, 500);
+            };
+
+            // Close the document to finish loading
+            printWindow.document.close();
+        },
+
+        generateInvoiceHTML(sale) {
+            // Format the date
+            const formattedDate = this.formatDate(sale.date);
+
+            // Calculate total
+            let total = 0;
+            if (sale.details) {
+                sale.details.forEach(item => {
+                    total += item.subtotal || 0;
+                });
+            }
+
+            // Generate HTML for the invoice
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Invoice #${sale.invoice_number}</title>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .invoice-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .invoice-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                        }
+                        .invoice-details {
+                            margin-bottom: 20px;
+                        }
+                        .invoice-details div {
+                            margin-bottom: 5px;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        th, td {
+                            padding: 8px;
+                            text-align: left;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                        .total-row {
+                            font-weight: bold;
+                        }
+                        .notes {
+                            margin-top: 20px;
+                        }
+                        @media print {
+                            body {
+                                print-color-adjust: exact;
+                                -webkit-print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="invoice-header">
+                        <div class="invoice-title">INVOICE</div>
+                        <div>Butik Kanina House Uniform</div>
+                    </div>
+
+                    <div class="invoice-details">
+                        <div><strong>Invoice #:</strong> ${sale.invoice_number}</div>
+                        <div><strong>Date:</strong> ${formattedDate}</div>
+                        <div><strong>Customer:</strong> ${sale.customer ? sale.customer.nama : ''}</div>
+                        <div><strong>Status:</strong> ${sale.status}</div>
+                    </div>
+
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sale.details ? sale.details.map(item => `
+                                <tr>
+                                    <td>${item.product ? item.product.name : ''}</td>
+                                    <td>${item.product ? item.product.size : ''}</td>
+                                    <td>${item.product ? this.formatCurrency(item.product.selling_price) : ''}</td>
+                                    <td>${item.quantity}</td>
+                                    <td>${this.formatCurrency(item.subtotal)}</td>
+                                </tr>
+                            `).join('') : ''}
+                            <tr class="total-row">
+                                <td colspan="4" style="text-align: right;"><strong>Total:</strong></td>
+                                <td>${this.formatCurrency(sale.total)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    ${sale.notes ? `
+                    <div class="notes">
+                        <strong>Notes:</strong>
+                        <p>${sale.notes}</p>
+                    </div>
+                    ` : ''}
+
+                    <div style="margin-top: 50px; text-align: center;">
+                        <p>Thank you for your business!</p>
+                    </div>
+                </body>
+                </html>
+            `;
         },
 
         addItem() {
@@ -643,27 +797,112 @@ export default {
                 }))
             };
 
-            // Make the API call to create a new sale
-            this.Api.post('/sale', payload)
-                .then(response => {
-                    // Add the new sale to the list
-                    this.sales.unshift(response.data);
-                    $('#newSaleModal').modal('hide');
+            // If we have an ID, it's an update operation
+            if (this.currentSale.id) {
+                // Make the API call to update the sale
+                this.Api.put(`/sale/${this.currentSale.id}`, payload)
+                    .then(response => {
+                        // Update the sale in the list
+                        const index = this.sales.findIndex(s => s.id === this.currentSale.id);
+                        if (index !== -1) {
+                            this.sales.splice(index, 1, response.data);
+                        }
+                        $('#newSaleModal').modal('hide');
+                        this.loading = false;
+
+                        // Refresh the sales list
+                        this.fetchSales(this.pagination.pageNumber);
+                    })
+                    .catch(error => {
+                        console.error('Error updating sale:', error);
+
+                        // Provide more specific error message if available
+                        if (error.response) {
+                            this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to update sale'}`;
+                        } else if (error.request) {
+                            this.error = 'No response from server. Please check your connection.';
+                        } else {
+                            this.error = 'Failed to update sale: ' + error.message;
+                        }
+
+                        this.loading = false;
+                    });
+            } else {
+                // Make the API call to create a new sale
+                this.Api.post('/sale', payload)
+                    .then(response => {
+                        // Add the new sale to the list
+                        this.sales.unshift(response.data);
+                        $('#newSaleModal').modal('hide');
+                        this.loading = false;
+
+                        // Refresh the sales list
+                        this.fetchSales(this.pagination.pageNumber);
+                    })
+                    .catch(error => {
+                        console.error('Error creating sale:', error);
+
+                        // Provide more specific error message if available
+                        if (error.response) {
+                            this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to create sale'}`;
+                        } else if (error.request) {
+                            this.error = 'No response from server. Please check your connection.';
+                        } else {
+                            this.error = 'Failed to create sale: ' + error.message;
+                        }
+
+                        this.loading = false;
+                    });
+            }
+        },
+
+        editSale(sale) {
+            // Clone the sale object to avoid modifying the original
+            this.currentSale = JSON.parse(JSON.stringify(sale));
+
+            // Format the date for the input field
+            if (this.currentSale.date) {
+                this.currentSale.date = new Date(this.currentSale.date).toISOString().substr(0, 10);
+            }
+
+            // Set the modal title to indicate we're editing
+            document.getElementById('newSaleModalLabel').textContent = 'Edit Sale';
+
+            // Show the modal
+            $('#newSaleModal').modal('show');
+        },
+
+        deleteSale(sale) {
+            // Confirm before deleting
+            if (!confirm(`Are you sure you want to delete sale ${sale.invoice_number}?`)) {
+                return;
+            }
+
+            this.loading = true;
+
+            // Make the API call to delete the sale
+            this.Api.delete(`/sale/${sale.id}`)
+                .then(() => {
+                    // Remove the sale from the list
+                    const index = this.sales.findIndex(s => s.id === sale.id);
+                    if (index !== -1) {
+                        this.sales.splice(index, 1);
+                    }
                     this.loading = false;
 
                     // Refresh the sales list
                     this.fetchSales(this.pagination.pageNumber);
                 })
                 .catch(error => {
-                    console.error('Error creating sale:', error);
+                    console.error('Error deleting sale:', error);
 
                     // Provide more specific error message if available
                     if (error.response) {
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to create sale'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to delete sale'}`;
                     } else if (error.request) {
                         this.error = 'No response from server. Please check your connection.';
                     } else {
-                        this.error = 'Failed to create sale: ' + error.message;
+                        this.error = 'Failed to delete sale: ' + error.message;
                     }
 
                     this.loading = false;

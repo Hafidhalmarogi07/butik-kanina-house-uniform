@@ -176,4 +176,12 @@ public class OrderService {
         return orderRepository.save(order);
     }
 
+    public Order updateOrder(Long id, OrderRequest request) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new RuntimeException("Order not found"));
+        order.setOrderStatus(request.getStatus());
+        order.setOrderDate(request.getOrderDate());
+        order.setDueDate(request.getDueDate());
+
+        return orderRepository.save(order);
+    }
 }

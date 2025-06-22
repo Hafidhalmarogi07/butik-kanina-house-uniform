@@ -76,4 +76,20 @@ public class OrderController {
         Order updated = orderService.updateOrderStatus(id, request.getStatus());
         return ResponseEntity.ok(updated);
     }
+
+    // ✅ Update an order
+    @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN_TOKO"})
+    @PutMapping("/{id}")
+    public ResponseEntity<Order> updateOrder(@PathVariable Long id, @RequestBody OrderRequest request) {
+        Order updated = orderService.updateOrder(id, request);
+        return ResponseEntity.ok(updated);
+    }
+
+    // ✅ Delete an order
+    @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN_TOKO"})
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteOrder(@PathVariable Long id) {
+        orderService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
 }
