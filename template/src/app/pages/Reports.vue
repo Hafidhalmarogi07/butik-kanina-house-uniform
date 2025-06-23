@@ -13,10 +13,8 @@
                                     <label>Report Type</label>
                                     <select class="form-control" v-model="selectedReportType">
                                         <option value="sales">Sales Report</option>
-                                        <option value="inventory">Inventory Report</option>
-                                        <option value="production">Production Report</option>
                                         <option value="expenses">Expenses Report</option>
-                                        <option value="customers">Customer Report</option>
+                                        <option value="orders">Orders Report</option>
                                     </select>
                                 </div>
                             </div>
@@ -133,9 +131,78 @@
                                 </div>
                             </div>
                         </div>
+                      <!-- Order Report -->
+                      <div v-if="selectedReportType === 'orders' && showReport" class="report-container">
+                        <h4>Order Report - {{ formatPeriodTitle() }}</h4>
+                        <div class="card mt-4">
+                          <div class="card-header">
+                            <h5 class="card-title">Orders</h5>
+                          </div>
+                          <div class="card-body">
+                            <div class="table-responsive">
+                              <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                  <th>Order ID</th>
+                                  <th>Date</th>
+                                  <th>Customer</th>
+                                  <th>Items</th>
+                                  <th>Total</th>
+                                  <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="order in orderData" :key="order.id">
+                                  <td>{{ order.order_number }}</td>
+                                  <td>{{ formatDate(order.order_date) }}</td>
+                                  <td>{{ order.customer ? order.customer.nama : '' }}</td>
+                                  <td>{{ order.details ? order.details.length : 0 }}</td>
+                                  <td>Rp {{ formatCurrency(order.total_amount) }}</td>
+                                  <td><span :class="getStatusClass(order.order_status)">{{ order.order_status }}</span></td>
+                                </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Expenses Report -->
+                      <div v-if="selectedReportType === 'expenses' && showReport" class="report-container">
+                        <h4>Expenses Report - {{ formatPeriodTitle() }}</h4>
+                        <div class="card mt-4">
+                          <div class="card-header">
+                            <h5 class="card-title">Expenses</h5>
+                          </div>
+                          <div class="card-body">
+                            <div class="table-responsive">
+                              <table class="table table-bordered table-striped">
+                                <thead>
+                                <tr>
+                                  <th>ID</th>
+                                  <th>Date</th>
+                                  <th>Category</th>
+                                  <th>Description</th>
+                                  <th>Amount</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr v-for="expense in expenseData" :key="expense.id">
+                                  <td>{{ expense.id }}</td>
+                                  <td>{{ formatDate(expense.date) }}</td>
+                                  <td>{{ expense.payment_method }}</td>
+                                  <td>{{ expense.description }}</td>
+                                  <td>Rp {{ formatCurrency(expense.amount) }}</td>
+                                </tr>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
 
                         <!-- Other report types would be implemented similarly -->
-                        <div v-if="(selectedReportType === 'production' || selectedReportType === 'expenses' || selectedReportType === 'customers') && showReport" class="report-container">
+                        <div v-if="(selectedReportType === 'production' ||  selectedReportType === 'customers') && showReport" class="report-container">
                             <h4>{{ getReportTitle() }} - {{ formatPeriodTitle() }}</h4>
                             <div class="text-center py-5">
                                 <i class="fas fa-chart-bar fa-4x text-muted"></i>
@@ -155,10 +222,10 @@
                             <button type="button" class="btn btn-default">
                                 <i class="fas fa-print"></i> Print
                             </button>
-                            <button type="button" class="btn btn-default">
+                            <button type="button" class="btn btn-default" @click="exportPDF">
                                 <i class="fas fa-file-pdf"></i> Export PDF
                             </button>
-                            <button type="button" class="btn btn-default">
+                            <button type="button" class="btn btn-default" @click="exportExcel">
                                 <i class="fas fa-file-excel"></i> Export Excel
                             </button>
                         </div>
@@ -178,61 +245,22 @@ export default {
             startDate: new Date().toISOString().split('T')[0],
             endDate: new Date().toISOString().split('T')[0],
             showReport: false,
-            
+
             // Sample data for sales report
             totalSales: 22500000,
             totalOrders: 45,
             averageOrderValue: 500000,
             topSellingProduct: 'School Uniform Set',
             recentSales: [],
-            
+
             // Sample data for inventory report
             totalProducts: 15,
             totalStock: 230,
             lowStockItems: 3,
             inventoryValue: 34500000,
-            inventoryItems: [
-                {
-                    id: 1,
-                    name: 'School Uniform Set',
-                    category: 'Sets',
-                    size: 'M',
-                    stock: 25,
-                    price: 350000
-                },
-                {
-                    id: 2,
-                    name: 'School Shirt',
-                    category: 'Shirts',
-                    size: 'L',
-                    stock: 50,
-                    price: 150000
-                },
-                {
-                    id: 3,
-                    name: 'School Pants',
-                    category: 'Pants',
-                    size: 'M',
-                    stock: 30,
-                    price: 200000
-                },
-                {
-                    id: 4,
-                    name: 'School Skirt',
-                    category: 'Skirts',
-                    size: 'S',
-                    stock: 20,
-                    price: 180000
-                },
-                {
-                    id: 5,
-                    name: 'School Tie',
-                    category: 'Ties',
-                    size: 'One Size',
-                    stock: 5,
-                    price: 50000
-                }
-            ]
+            inventoryItems: [],
+            orderData: [],
+            expenseData: [],
         }
     },
     methods: {
@@ -271,7 +299,6 @@ export default {
             // Make API request
             this.Api.get(endpoint,  params )
                 .then(response => {
-
                   // Update data based on report type
                   if (this.selectedReportType === 'sales') {
                     this.recentSales = response.data;
@@ -301,10 +328,8 @@ export default {
         getReportTitle() {
             switch(this.selectedReportType) {
                 case 'sales': return 'Sales Report';
-                case 'inventory': return 'Inventory Report';
-                case 'production': return 'Production Report';
                 case 'expenses': return 'Expenses Report';
-                case 'customers': return 'Customer Report';
+                case 'orders': return 'Orders Report';
                 default: return 'Report';
             }
         },
@@ -327,6 +352,82 @@ export default {
             if (stock <= 5) return 'badge badge-danger';
             if (stock <= 20) return 'badge badge-warning';
             return 'badge badge-success';
+        },
+        formatDate(dateString) {
+          if (!dateString) return '';
+          const date = new Date(dateString);
+          return date.toLocaleDateString('id-ID');
+        },
+
+        formatCurrency(value) {
+          if (!value) return '0';
+          return value.toLocaleString('id-ID');
+        },
+        exportPDF() {
+            try {
+                let endpoint = '';
+
+                // Determine which API endpoint to use based on report type
+                if (this.selectedReportType === 'sales') {
+                    endpoint = '/api/v1/sales-report/pdf';
+                } else if (this.selectedReportType === 'expenses') {
+                    endpoint = '/api/v1/expense-report/pdf';
+                } else if (this.selectedReportType === 'orders') {
+                    endpoint = '/api/v1/order-report/pdf';
+                } else {
+                    alert('PDF export is not available for this report type');
+                    return;
+                }
+
+                // Prepare query parameters
+                const params = { options: this.selectedPeriod };
+
+                // Add start and end dates if custom period is selected
+                if (this.selectedPeriod === 'custom') {
+                    params.startDate = this.startDate;
+                    params.endDate = this.endDate;
+                }
+
+                // Open the PDF in a new window/tab
+                window.open(`${endpoint}?options=${this.selectedPeriod}`, '_blank');
+
+            } catch (error) {
+                console.error('Error exporting PDF:', error);
+                alert('Failed to export PDF. Please try again.');
+            }
+        },
+        exportExcel() {
+            try {
+                let endpoint = '';
+
+                // Determine which API endpoint to use based on report type
+                if (this.selectedReportType === 'sales') {
+                    endpoint = '/api/v1/sales-report/excel';
+                } else if (this.selectedReportType === 'expenses') {
+                    endpoint = '/api/v1/expense-report/excel';
+                } else if (this.selectedReportType === 'orders') {
+                    endpoint = '/api/v1/order-report/excel';
+                } else {
+                    alert('Excel export is not available for this report type');
+                    return;
+                }
+
+                // Prepare query parameters
+                const params = { options: this.selectedPeriod };
+
+                // Add start and end dates if custom period is selected
+                if (this.selectedPeriod === 'custom') {
+                    params.startDate = this.startDate;
+                    params.endDate = this.endDate;
+                }
+
+                // Open the Excel download in a new window/tab
+                window.open(`${endpoint}?options=${this.selectedPeriod}`, '_blank');
+
+            } catch (error) {
+                console.error('Error exporting Excel:', error);
+                alert('Failed to export Excel. Please try again.');
+            }
         }
     }
 }
