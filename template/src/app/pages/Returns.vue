@@ -58,14 +58,14 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="returnItem in filteredReturns" :key="returnItem.id">
-                                        <td>{{ returnItem.return_number }}</td>
-                                        <td>{{ formatDate(returnItem.date) }}</td>
-                                        <td>{{ returnItem.customer ? returnItem.customer.nama : '' }}</td>
-                                        <td>{{ returnItem.original_invoice }}</td>
+                                        <td>{{ returnItem.id }}</td>
+                                        <td>{{ formatDate(returnItem.returnDate) }}</td>
+                                        <td>{{ returnItem.sale ? returnItem.sale.customer.nama : (returnItem.order ? returnItem.order.customer.nama : '') }}</td>
+                                        <td>{{ returnItem.sale ? returnItem.sale.invoiceNumber : (returnItem.order ? returnItem.order.orderNumber : '') }}</td>
                                         <td>{{ returnItem.details ? returnItem.details.length : 0 }}</td>
-                                        <td>{{ formatCurrency(returnItem.total) }}</td>
+                                        <td>{{ formatCurrency(returnItem.totalRefund) }}</td>
                                         <td>
-                                            <span :class="getStatusClass(returnItem.status)">{{ returnItem.status }}</span>
+                                            <span :class="getStatusClass(returnItem.returnType)">{{ returnItem.returnType }}</span>
                                         </td>
                                         <td>
                                             <div class="btn-group">
@@ -292,16 +292,16 @@
                     <div class="modal-body" v-if="selectedReturn">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>Return #:</strong> {{ selectedReturn.return_number }}</p>
-                                <p><strong>Date:</strong> {{ formatDate(selectedReturn.date) }}</p>
-                                <p><strong>Status:</strong> <span :class="getStatusClass(selectedReturn.status)">{{ selectedReturn.status }}</span></p>
+                                <p><strong>Return #:</strong> {{ selectedReturn.id }}</p>
+                                <p><strong>Date:</strong> {{ formatDate(selectedReturn.returnDate) }}</p>
+                                <p><strong>Return Type:</strong> <span :class="getStatusClass(selectedReturn.returnType)">{{ selectedReturn.returnType }}</span></p>
                                 <p><strong>Reason:</strong> {{ selectedReturn.reason }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Customer:</strong> {{ selectedReturn.customer ? selectedReturn.customer.nama : '' }}</p>
-                                <p><strong>Original Invoice:</strong> {{ selectedReturn.original_invoice }}</p>
-                                <p><strong>Total:</strong> {{ formatCurrency(selectedReturn.total) }}</p>
-                                <p><strong>Admin:</strong> {{ selectedReturn.admin ? selectedReturn.admin.full_name : '' }}</p>
+                                <p><strong>Customer:</strong> {{ selectedReturn.sale ? selectedReturn.sale.customer.nama : (selectedReturn.order ? selectedReturn.order.customer.nama : '') }}</p>
+                                <p><strong>Original Invoice:</strong> {{ selectedReturn.sale ? selectedReturn.sale.invoiceNumber : (selectedReturn.order ? selectedReturn.order.orderNumber : '') }}</p>
+                                <p><strong>Total:</strong> {{ formatCurrency(selectedReturn.totalRefund) }}</p>
+                                <p><strong>Admin:</strong> {{ selectedReturn.admin ? selectedReturn.admin.name : '' }}</p>
                             </div>
                         </div>
 
@@ -329,7 +329,7 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="4" class="text-right"><strong>Total:</strong></td>
-                                        <td>{{ formatCurrency(selectedReturn.total) }}</td>
+                                        <td>{{ formatCurrency(selectedReturn.totalRefund) }}</td>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -363,19 +363,16 @@ export default {
             selectedReturn: null,
             currentReturn: {
                 id: null,
-                return_number: '',
-                date: new Date().toISOString().substr(0, 10),
-                customer: {
-                    id: null
-                },
+                returnDate: new Date().toISOString().substr(0, 10),
+                sale: null,
+                order: null,
                 sale_id: null,
                 order_id: null,
-                return_source_type: 'SALE', // Default to SALE
-                return_type: 'REFUND', // Default to REFUND
+                sourceType: 'SALE', // Default to SALE
+                returnType: 'REFUND', // Default to REFUND
                 reason: '',
                 details: [],
-                total: 0,
-                status: 'PENDING',
+                totalRefund: 0,
                 notes: ''
             },
             returns: [],
@@ -520,8 +517,8 @@ export default {
 
                         // Update pagination data
                         this.pagination = {
-                            totalPages: response.data.total_pages || 0,
-                            totalElements: response.data.total_elements || 0,
+                            totalPages: response.data.totalPages || 0,
+                            totalElements: response.data.totalElements || 0,
                             pageNumber: response.data.number !== undefined ? response.data.number : page,
                             pageSize: response.data.size || this.pagination.pageSize
                         };
@@ -535,6 +532,7 @@ export default {
                     this.loading = false;
                 })
                 .catch(error => {
+                    // eslint-disable-next-line no-console
                     console.error('Error fetching returns:', error);
 
                     // Provide more specific error message if available
@@ -560,6 +558,7 @@ export default {
                     this.customers = response.data.content || response.data;
                 })
                 .catch(error => {
+                    // eslint-disable-next-line no-console
                     console.error('Error fetching customers:', error);
                 });
         },
@@ -570,6 +569,7 @@ export default {
                     this.products = response.data.content || response.data;
                 })
                 .catch(error => {
+                    // eslint-disable-next-line no-console
                     console.error('Error fetching products:', error);
                 });
         },
@@ -593,12 +593,10 @@ export default {
 
         getStatusClass(status) {
             switch(status) {
-                case 'APPROVED':
-                    return 'badge badge-success';
-                case 'PENDING':
-                    return 'badge badge-warning';
-                case 'REJECTED':
+                case 'REFUND':
                     return 'badge badge-danger';
+                case 'EXCHANGE':
+                    return 'badge badge-warning';
                 default:
                     return 'badge badge-secondary';
             }
@@ -607,26 +605,24 @@ export default {
         showNewReturnModal() {
             this.currentReturn = {
                 id: null,
-                return_number: '',
-                date: new Date().toISOString().substr(0, 10),
-                customer: {
-                    id: null
-                },
+                returnDate: new Date().toISOString().substr(0, 10),
+                sale: null,
+                order: null,
                 sale_id: null,
                 order_id: null,
-                return_source_type: 'SALE', // Default to SALE
-                return_type: 'REFUND', // Default to REFUND
+                sourceType: 'SALE', // Default to SALE
+                returnType: 'REFUND', // Default to REFUND
                 reason: '',
+                customer: { id: null },
                 details: [{ 
                     product: {
                         id: null
                     }, 
                     quantity: 1, 
                     subtotal: 0,
-                    reason: '' // Add reason field for each item
+                    note: '' // Add note field for each item
                 }],
-                total: 0,
-                status: 'PENDING',
+                totalRefund: 0,
                 notes: ''
             };
             $('#newReturnModal').modal('show');
@@ -639,7 +635,7 @@ export default {
 
         printReturn(returnItem) {
             // In a real application, this would open a print view or generate a PDF
-            alert('Printing return: ' + returnItem.return_number);
+            alert('Printing return: ' + returnItem.id);
         },
 
         addItem() {
@@ -649,7 +645,7 @@ export default {
                 }, 
                 quantity: 1, 
                 subtotal: 0,
-                reason: '' 
+                note: '' 
             });
         },
 
@@ -683,7 +679,7 @@ export default {
             this.currentReturn.details.forEach(item => {
                 total += item.subtotal || 0;
             });
-            this.currentReturn.total = total;
+            this.currentReturn.totalRefund = total;
             return total;
         },
 
@@ -731,6 +727,7 @@ export default {
                     this.fetchReturns(this.pagination.pageNumber);
                 })
                 .catch(error => {
+                    // eslint-disable-next-line no-console
                     console.error('Error creating return:', error);
 
                     // Provide more specific error message if available

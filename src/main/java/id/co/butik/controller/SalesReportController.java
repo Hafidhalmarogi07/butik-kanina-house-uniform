@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/sales-report")
@@ -25,16 +25,17 @@ public class SalesReportController {
 
     /**
      * Generate sales report in Excel format
-     * @param startDate the start date (format: yyyy-MM-dd'T'HH:mm:ss)
-     * @param endDate the end date (format: yyyy-MM-dd'T'HH:mm:ss)
+     * @param startDate the start date (format: yyyy-MM-dd)
+     * @param endDate the end date (format: yyyy-MM-dd)
      * @return Excel file as response
      */
     @GetMapping(value = "/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> generateExcelReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws IOException {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws IOException {
 
-        ByteArrayInputStream in = salesReportService.generateExcelReport(startDate, endDate);
+        ByteArrayInputStream in = salesReportService.generateExcelReport(options,startDate, endDate);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=sales_report.xlsx");
@@ -47,16 +48,17 @@ public class SalesReportController {
 
     /**
      * Generate sales report in PDF format
-     * @param startDate the start date (format: yyyy-MM-dd'T'HH:mm:ss)
-     * @param endDate the end date (format: yyyy-MM-dd'T'HH:mm:ss)
+     * @param startDate the start date (format: yyyy-MM-dd)
+     * @param endDate the end date (format: yyyy-MM-dd)
      * @return PDF file as response
      */
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> generatePdfReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws Exception {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws Exception {
 
-        ByteArrayInputStream in = salesReportService.generatePdfReport(startDate, endDate);
+        ByteArrayInputStream in = salesReportService.generatePdfReport(options, startDate, endDate);
         
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=sales_report.pdf");

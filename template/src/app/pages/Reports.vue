@@ -49,7 +49,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
+                            <div class="col-md-2 mb-3 d-flex align-items-end">
                                 <button type="button" class="btn btn-primary btn-block" @click="generateReport">
                                     <i class="fas fa-chart-bar mr-1"></i> Generate Report
                                 </button>
@@ -58,91 +58,8 @@
 
                         <!-- Sales Report -->
                         <div v-if="selectedReportType === 'sales' && showReport" class="report-container">
-                            <h4>Sales Report - {{ formatPeriodTitle() }}</h4>
-                            
-                            <div class="row mb-4">
-                                <div class="col-md-3">
-                                    <div class="small-box bg-info">
-                                        <div class="inner">
-                                            <h3>Rp {{ totalSales.toLocaleString() }}</h3>
-                                            <p>Total Sales</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-shopping-cart"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-success">
-                                        <div class="inner">
-                                            <h3>{{ totalOrders }}</h3>
-                                            <p>Total Orders</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-shopping-bag"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-warning">
-                                        <div class="inner">
-                                            <h3>Rp {{ averageOrderValue.toLocaleString() }}</h3>
-                                            <p>Average Order Value</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-calculator"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-danger">
-                                        <div class="inner">
-                                            <h3>{{ topSellingProduct }}</h3>
-                                            <p>Top Selling Product</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-crown"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 class="card-title">Sales Trend</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="chart-container" style="position: relative; height:300px;">
-                                                <!-- Chart would be rendered here in a real application -->
-                                                <div class="text-center py-5">
-                                                    <i class="fas fa-chart-line fa-4x text-muted"></i>
-                                                    <p class="mt-3">Sales trend chart would be displayed here</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 class="card-title">Sales by Product Category</h5>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="chart-container" style="position: relative; height:300px;">
-                                                <!-- Pie chart would be rendered here in a real application -->
-                                                <div class="text-center py-5">
-                                                    <i class="fas fa-chart-pie fa-4x text-muted"></i>
-                                                    <p class="mt-3">Product category distribution chart would be displayed here</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="card mt-4">
+                          <h4>Sales Report - {{ formatPeriodTitle() }}</h4>
+                          <div class="card mt-4">
                                 <div class="card-header">
                                     <h5 class="card-title">Recent Sales</h5>
                                 </div>
@@ -178,54 +95,6 @@
                         <!-- Inventory Report -->
                         <div v-if="selectedReportType === 'inventory' && showReport" class="report-container">
                             <h4>Inventory Report - {{ formatPeriodTitle() }}</h4>
-                            
-                            <div class="row mb-4">
-                                <div class="col-md-3">
-                                    <div class="small-box bg-info">
-                                        <div class="inner">
-                                            <h3>{{ totalProducts }}</h3>
-                                            <p>Total Products</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-boxes"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-success">
-                                        <div class="inner">
-                                            <h3>{{ totalStock }}</h3>
-                                            <p>Total Stock</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-warehouse"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-warning">
-                                        <div class="inner">
-                                            <h3>{{ lowStockItems }}</h3>
-                                            <p>Low Stock Items</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-exclamation-triangle"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="small-box bg-danger">
-                                        <div class="inner">
-                                            <h3>Rp {{ inventoryValue.toLocaleString() }}</h3>
-                                            <p>Inventory Value</p>
-                                        </div>
-                                        <div class="icon">
-                                            <i class="fas fa-money-bill-alt"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
                             <div class="card">
                                 <div class="card-header">
                                     <h5 class="card-title">Inventory Status</h5>
