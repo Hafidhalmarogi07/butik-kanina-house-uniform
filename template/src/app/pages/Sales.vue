@@ -23,16 +23,16 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text">
-                                            <i class="far fa-calendar-alt"></i>
-                                        </span>
-                                    </div>
-                                    <input type="text" class="form-control" id="dateRange" placeholder="Date range">
-                                </div>
-                            </div>
+<!--                            <div class="col-md-3">-->
+<!--                                <div class="input-group">-->
+<!--                                    <div class="input-group-prepend">-->
+<!--                                        <span class="input-group-text">-->
+<!--                                            <i class="far fa-calendar-alt"></i>-->
+<!--                                        </span>-->
+<!--                                    </div>-->
+<!--                                    <input type="text" class="form-control" id="dateRange" placeholder="Date range">-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter">
                                     <option value="">All Statuses</option>
