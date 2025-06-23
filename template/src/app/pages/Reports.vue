@@ -219,9 +219,9 @@
                     </div>
                     <div class="card-footer" v-if="showReport">
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default">
-                                <i class="fas fa-print"></i> Print
-                            </button>
+<!--                            <button type="button" class="btn btn-default" @click="printReport">-->
+<!--                                <i class="fas fa-print"></i> Print-->
+<!--                            </button>-->
                             <button type="button" class="btn btn-default" @click="exportPDF">
                                 <i class="fas fa-file-pdf"></i> Export PDF
                             </button>
@@ -356,12 +356,12 @@ export default {
         formatDate(dateString) {
           if (!dateString) return '';
           const date = new Date(dateString);
-          return date.toLocaleDateString('id-ID');
+          return date.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
         },
 
         formatCurrency(value) {
-          if (!value) return '0';
-          return value.toLocaleString('id-ID');
+          if (value === undefined || value === null) return 'Rp 0';
+          return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value);
         },
         exportPDF() {
             try {
@@ -428,7 +428,301 @@ export default {
                 console.error('Error exporting Excel:', error);
                 alert('Failed to export Excel. Please try again.');
             }
-        }
+        },
+        printReport() {
+            try {
+                // Create a new window for printing
+                const printWindow = window.open('', '_blank');
+
+                // Generate the report HTML content
+                const reportContent = this.generateReportHTML();
+
+                // Write the content to the new window
+                printWindow.document.write(reportContent);
+
+                // Trigger print when content is loaded
+                printWindow.onload = function() {
+                    setTimeout(function() {
+                        printWindow.print();
+                        // Close the window after printing (or after print dialog is closed)
+                        printWindow.onafterprint = function() {
+                            printWindow.close();
+                        };
+                    }, 500);
+                };
+
+                // Close the document to finish loading
+                printWindow.document.close();
+
+            } catch (error) {
+                console.error('Error printing report:', error);
+                alert('Failed to print report. Please try again.');
+            }
+        },
+
+        generateReportHTML() {
+            // Format the date range
+            let dateRange = '';
+            if (this.selectedPeriod === 'custom') {
+                dateRange = `${this.formatDate(this.startDate)} to ${this.formatDate(this.endDate)}`;
+            } else {
+                dateRange = this.selectedPeriod.charAt(0).toUpperCase() + this.selectedPeriod.slice(1);
+            }
+
+            // Determine report title based on type
+            let reportTitle = '';
+            let reportData = '';
+
+            if (this.selectedReportType === 'sales') {
+                reportTitle = 'Sales Report';
+                reportData = this.generateSalesReportHTML();
+            } else if (this.selectedReportType === 'expenses') {
+                reportTitle = 'Expenses Report';
+                reportData = this.generateExpensesReportHTML();
+            } else if (this.selectedReportType === 'orders') {
+                reportTitle = 'Orders Report';
+                reportData = this.generateOrdersReportHTML();
+            } else if (this.selectedReportType === 'inventory') {
+                reportTitle = 'Inventory Report';
+                reportData = this.generateInventoryReportHTML();
+            }
+
+            // Generate HTML for the report
+            return `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${reportTitle}</title>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .report-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                        }
+                        .report-title {
+                            font-size: 24px;
+                            font-weight: bold;
+                        }
+                        .report-subtitle {
+                            font-size: 16px;
+                            margin-top: 5px;
+                        }
+                        .report-details {
+                            margin-bottom: 20px;
+                        }
+                        .report-details div {
+                            margin-bottom: 5px;
+                        }
+                        .summary-box {
+                            border: 1px solid #ddd;
+                            padding: 10px;
+                            margin-bottom: 20px;
+                            background-color: #f9f9f9;
+                        }
+                        .summary-item {
+                            display: inline-block;
+                            width: 24%;
+                            text-align: center;
+                            padding: 10px 0;
+                        }
+                        .summary-value {
+                            font-size: 20px;
+                            font-weight: bold;
+                        }
+                        .summary-label {
+                            font-size: 14px;
+                            color: #666;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 20px;
+                        }
+                        th, td {
+                            padding: 8px;
+                            text-align: left;
+                            border-bottom: 1px solid #ddd;
+                        }
+                        th {
+                            background-color: #f2f2f2;
+                        }
+                        @media print {
+                            body {
+                                print-color-adjust: exact;
+                                -webkit-print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="report-header">
+                        <div class="report-title">${reportTitle}</div>
+                        <div class="report-subtitle">Butik Kanina House Uniform</div>
+                        <div class="report-subtitle">Period: ${dateRange}</div>
+                    </div>
+
+                    ${reportData}
+                </body>
+                </html>
+            `;
+        },
+
+        generateSalesReportHTML() {
+            return `
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <div class="summary-value">${this.formatCurrency(this.totalSales)}</div>
+                        <div class="summary-label">Total Sales</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.totalOrders}</div>
+                        <div class="summary-label">Total Orders</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.formatCurrency(this.averageOrderValue)}</div>
+                        <div class="summary-label">Average Order</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.topSellingProduct}</div>
+                        <div class="summary-label">Top Product</div>
+                    </div>
+                </div>
+
+                <h3>Recent Sales</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Invoice</th>
+                            <th>Customer</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.recentSales.map(sale => `
+                            <tr>
+                                <td>${this.formatDate(sale.date)}</td>
+                                <td>${sale.invoice}</td>
+                                <td>${sale.customer}</td>
+                                <td>${this.formatCurrency(sale.amount)}</td>
+                                <td>${sale.status}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        generateExpensesReportHTML() {
+            return `
+                <h3>Expenses Summary</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.expenseData.map(expense => `
+                            <tr>
+                                <td>${expense.category}</td>
+                                <td>${this.formatCurrency(expense.amount)}</td>
+                                <td>${this.formatDate(expense.date)}</td>
+                                <td>${expense.description}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        generateOrdersReportHTML() {
+            return `
+                <h3>Orders Summary</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Date</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.orderData.map(order => `
+                            <tr>
+                                <td>${order.id}</td>
+                                <td>${this.formatDate(order.date)}</td>
+                                <td>${order.customer}</td>
+                                <td>${order.status}</td>
+                                <td>${this.formatCurrency(order.total)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
+        generateInventoryReportHTML() {
+            return `
+                <div class="summary-box">
+                    <div class="summary-item">
+                        <div class="summary-value">${this.totalProducts}</div>
+                        <div class="summary-label">Total Products</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.totalStock}</div>
+                        <div class="summary-label">Total Stock</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.lowStockItems}</div>
+                        <div class="summary-label">Low Stock Items</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="summary-value">${this.formatCurrency(this.inventoryValue)}</div>
+                        <div class="summary-label">Inventory Value</div>
+                    </div>
+                </div>
+
+                <h3>Inventory Items</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>SKU</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                            <th>Price</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.inventoryItems.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.sku}</td>
+                                <td>${item.category}</td>
+                                <td>${item.stock}</td>
+                                <td>${this.formatCurrency(item.price)}</td>
+                                <td>${this.formatCurrency(item.price * item.stock)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        },
+
     }
 }
 </script>
