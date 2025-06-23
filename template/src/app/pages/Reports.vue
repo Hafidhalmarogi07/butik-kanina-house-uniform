@@ -78,9 +78,9 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="sale in recentSales" :key="sale.id">
-                                                    <td>{{ sale.id }}</td>
+                                                    <td>{{ sale.invoice_number }}</td>
                                                     <td>{{ sale.date }}</td>
-                                                    <td>{{ sale.customer }}</td>
+                                                    <td>{{ sale.customer.nama }}</td>
                                                     <td>{{ sale.items }}</td>
                                                     <td>Rp {{ sale.total.toLocaleString() }}</td>
                                                     <td><span :class="getStatusClass(sale.status)">{{ sale.status }}</span></td>
@@ -184,48 +184,7 @@ export default {
             totalOrders: 45,
             averageOrderValue: 500000,
             topSellingProduct: 'School Uniform Set',
-            recentSales: [
-                {
-                    id: 'ORD-001',
-                    date: '2023-05-15',
-                    customer: 'John Doe',
-                    items: 3,
-                    total: 550000,
-                    status: 'Delivered'
-                },
-                {
-                    id: 'ORD-002',
-                    date: '2023-05-18',
-                    customer: 'Jane Smith',
-                    items: 1,
-                    total: 150000,
-                    status: 'Processing'
-                },
-                {
-                    id: 'ORD-003',
-                    date: '2023-05-20',
-                    customer: 'SMA Negeri 1 Jakarta',
-                    items: 5,
-                    total: 850000,
-                    status: 'Pending'
-                },
-                {
-                    id: 'ORD-004',
-                    date: '2023-05-22',
-                    customer: 'SD Islam Al-Azhar',
-                    items: 2,
-                    total: 350000,
-                    status: 'Shipped'
-                },
-                {
-                    id: 'ORD-005',
-                    date: '2023-05-25',
-                    customer: 'PT Maju Bersama',
-                    items: 4,
-                    total: 650000,
-                    status: 'Cancelled'
-                }
-            ],
+            recentSales: [],
             
             // Sample data for inventory report
             totalProducts: 15,
@@ -280,7 +239,53 @@ export default {
         generateReport() {
             // In a real application, this would fetch data from the server
             // For this demo, we'll just show the static sample data
-            this.showReport = true;
+
+          this.showReport = false;
+
+          try {
+            let endpoint = '';
+            let response = null;
+
+            // Determine which API endpoint to use based on report type
+            if (this.selectedReportType === 'sales') {
+              endpoint = '/sales-report/get';
+            } else if (this.selectedReportType === 'expenses') {
+              endpoint = '/expense-report/get';
+            } else if (this.selectedReportType === 'orders') {
+              endpoint = '/order-report/get';
+            } else {
+              // For other report types, show static data for now
+              this.showReport = true;
+              return;
+            }
+
+            // Prepare query parameters
+            const params = { options: this.selectedPeriod };
+
+            // Add start and end dates if custom period is selected
+            if (this.selectedPeriod === 'custom') {
+              params.startDate = this.startDate;
+              params.endDate = this.endDate;
+            }
+
+            // Make API request
+            this.Api.get(endpoint,  params )
+                .then(response => {
+
+                  // Update data based on report type
+                  if (this.selectedReportType === 'sales') {
+                    this.recentSales = response.data;
+                  } else if (this.selectedReportType === 'expenses') {
+                    this.expenseData = response.data;
+                  } else if (this.selectedReportType === 'orders') {
+                    this.orderData = response.data;
+                  }
+                  this.showReport = true;
+                })
+          } catch (error) {
+            console.error('Error fetching report data:', error);
+            alert('Failed to fetch report data. Please try again.');
+          }
         },
         formatPeriodTitle() {
             switch(this.selectedPeriod) {
