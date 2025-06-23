@@ -41,6 +41,62 @@ public class SalesReportService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
+    public List<Sale> getSalesReport(String options, LocalDate startDate, LocalDate endDate) {
+        LocalDateTime startDateTime;
+        LocalDateTime endDateTime;
+        LocalDate today = LocalDate.now();
+
+        if (options == null || options.isEmpty()) {
+            throw new IllegalArgumentException("options is empty");
+        }
+        switch (options.toLowerCase()) {
+            case "daily":
+                startDateTime = today.atStartOfDay();
+                endDateTime = today.atTime(23, 59, 59);
+                break;
+            case "weekly":
+                // Mulai dari hari Senin minggu ini sampai Minggu
+                LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+                LocalDate endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
+                startDateTime = startOfWeek.atStartOfDay();
+                endDateTime = endOfWeek.atTime(23, 59, 59);
+                break;
+            case "monthly":
+                LocalDate firstDayOfMonth = today.withDayOfMonth(1);
+                LocalDate lastDayOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+                startDateTime = firstDayOfMonth.atStartOfDay();
+                endDateTime = lastDayOfMonth.atTime(23, 59, 59);
+                break;
+            case "quarterly":
+                int currentMonth = today.getMonthValue();
+                int startMonth = ((currentMonth - 1) / 3) * 3 + 1;
+                LocalDate startOfQuarter = LocalDate.of(today.getYear(), startMonth, 1);
+                LocalDate endOfQuarter = startOfQuarter.plusMonths(2).withDayOfMonth(startOfQuarter.plusMonths(2).lengthOfMonth());
+                startDateTime = startOfQuarter.atStartOfDay();
+                endDateTime = endOfQuarter.atTime(23, 59, 59);
+                break;
+            case "yearly":
+                LocalDate firstDayOfYear = today.withDayOfYear(1);
+                LocalDate lastDayOfYear = today.withDayOfYear(today.lengthOfYear());
+                startDateTime = firstDayOfYear.atStartOfDay();
+                endDateTime = lastDayOfYear.atTime(23, 59, 59);
+                break;
+            case "custom":
+                if (startDate == null || endDate == null) {
+                    throw new IllegalArgumentException("startDate and endDate must not be null for custom option");
+                }
+                startDateTime = startDate.atStartOfDay();
+                endDateTime = endDate.atTime(23, 59, 59);
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid report option: " + options);
+        }
+
+        return  salesReportRepository.findSalesByDateRange(startDateTime, endDateTime);
+
+
+    }
+
     /**
      * Generate sales report in Excel format
      * @param startDate the start date

@@ -1,5 +1,6 @@
 package id.co.butik.controller;
 
+import id.co.butik.entity.Expense;
 import id.co.butik.service.ExpenseReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -16,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/expense-report")
@@ -24,25 +26,31 @@ public class ExpenseReportController {
     @Autowired
     private ExpenseReportService expenseReportService;
 
+    @GetMapping("/get")
+    public List<Expense> getExpenseReport( @RequestParam("options") String options,
+                                           @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                           @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+        return expenseReportService.getExpenseReport(options, startDate, endDate);
+    }
+
     /**
      * Generate expense report in Excel format
-     * @param startDate the start date (format: yyyy-MM-dd'T'HH:mm:ss)
-     * @param endDate the end date (format: yyyy-MM-dd'T'HH:mm:ss)
+     * @param options the report option (daily, weekly, monthly, quarterly, yearly, custom)
+     * @param startDate the start date (format: yyyy-MM-dd) - required for custom option
+     * @param endDate the end date (format: yyyy-MM-dd) - required for custom option
      * @return Excel file as response
      */
     @GetMapping(value = "/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> generateExcelReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws IOException {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws IOException {
 
-        LocalDate startLocalDate = expenseReportService.convertToLocalDate(startDate);
-        LocalDate endLocalDate = expenseReportService.convertToLocalDate(endDate);
-        
-        ByteArrayInputStream in = expenseReportService.generateExcelReport(startLocalDate, endLocalDate);
-        
+        ByteArrayInputStream in = expenseReportService.generateExcelReport(options, startDate, endDate);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=expense_report.xlsx");
-        
+
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -57,17 +65,15 @@ public class ExpenseReportController {
      */
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> generatePdfReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws Exception {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws Exception {
 
-        LocalDate startLocalDate = expenseReportService.convertToLocalDate(startDate);
-        LocalDate endLocalDate = expenseReportService.convertToLocalDate(endDate);
-        
-        ByteArrayInputStream in = expenseReportService.generatePdfReport(startLocalDate, endLocalDate);
-        
+        ByteArrayInputStream in = expenseReportService.generatePdfReport(options,startDate, endDate);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=expense_report.pdf");
-        
+
         return ResponseEntity
                 .ok()
                 .headers(headers)

@@ -38,14 +38,102 @@ public class ExpenseReportService {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
+    public List<Expense> getExpenseReport(String options, LocalDate startDate, LocalDate endDate) {
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+        LocalDate today = LocalDate.now();
+
+        if (options == null || options.isEmpty()) {
+            throw new IllegalArgumentException("options is empty");
+        }
+        switch (options.toLowerCase()) {
+            case "daily":
+                startLocalDate = today;
+                endLocalDate = today;
+                break;
+            case "weekly":
+                // Mulai dari hari Senin minggu ini sampai Minggu
+                startLocalDate = today.with(java.time.DayOfWeek.MONDAY);
+                endLocalDate = today.with(java.time.DayOfWeek.SUNDAY);
+                break;
+            case "monthly":
+                startLocalDate = today.withDayOfMonth(1);
+                endLocalDate = today.withDayOfMonth(today.lengthOfMonth());
+                break;
+            case "quarterly":
+                int currentMonth = today.getMonthValue();
+                int startMonth = ((currentMonth - 1) / 3) * 3 + 1;
+                startLocalDate = LocalDate.of(today.getYear(), startMonth, 1);
+                endLocalDate = startLocalDate.plusMonths(2).withDayOfMonth(startLocalDate.plusMonths(2).lengthOfMonth());
+                break;
+            case "yearly":
+                startLocalDate = today.withDayOfYear(1);
+                endLocalDate = today.withDayOfYear(today.lengthOfYear());
+                break;
+            case "custom":
+                if (startDate == null || endDate == null) {
+                    throw new IllegalArgumentException("startDate and endDate must not be null for custom option");
+                }
+                startLocalDate = startDate;
+                endLocalDate = endDate;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid report option: " + options);
+        }
+        return expenseReportRepository.findExpensesByDateRange(startLocalDate, endLocalDate);
+
+    }
+
     /**
      * Generate expense report in Excel format
-     * @param startDate the start date
-     * @param endDate the end date
+     * @param options the report option (daily, weekly, monthly, quarterly, yearly, custom)
+     * @param startDate the start date - required for custom option
+     * @param endDate the end date - required for custom option
      * @return ByteArrayInputStream containing the Excel file
      */
-    public ByteArrayInputStream generateExcelReport(LocalDate startDate, LocalDate endDate) throws IOException {
-        List<Expense> expenses = expenseReportRepository.findExpensesByDateRange(startDate, endDate);
+    public ByteArrayInputStream generateExcelReport(String options, LocalDate startDate, LocalDate endDate) throws IOException {
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+        LocalDate today = LocalDate.now();
+
+        if (options == null || options.isEmpty()) {
+            throw new IllegalArgumentException("options is empty");
+        }
+        switch (options.toLowerCase()) {
+            case "daily":
+                startLocalDate = today;
+                endLocalDate = today;
+                break;
+            case "weekly":
+                // Mulai dari hari Senin minggu ini sampai Minggu
+                startLocalDate = today.with(java.time.DayOfWeek.MONDAY);
+                endLocalDate = today.with(java.time.DayOfWeek.SUNDAY);
+                break;
+            case "monthly":
+                startLocalDate = today.withDayOfMonth(1);
+                endLocalDate = today.withDayOfMonth(today.lengthOfMonth());
+                break;
+            case "quarterly":
+                int currentMonth = today.getMonthValue();
+                int startMonth = ((currentMonth - 1) / 3) * 3 + 1;
+                startLocalDate = LocalDate.of(today.getYear(), startMonth, 1);
+                endLocalDate = startLocalDate.plusMonths(2).withDayOfMonth(startLocalDate.plusMonths(2).lengthOfMonth());
+                break;
+            case "yearly":
+                startLocalDate = today.withDayOfYear(1);
+                endLocalDate = today.withDayOfYear(today.lengthOfYear());
+                break;
+            case "custom":
+                if (startDate == null || endDate == null) {
+                    throw new IllegalArgumentException("startDate and endDate must not be null for custom option");
+                }
+                startLocalDate = startDate;
+                endLocalDate = endDate;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid report option: " + options);
+        }
+        List<Expense> expenses = expenseReportRepository.findExpensesByDateRange(startLocalDate, endLocalDate);
 
         try (Workbook workbook = new XSSFWorkbook(); 
              ByteArrayOutputStream out = new ByteArrayOutputStream()) {
@@ -87,12 +175,54 @@ public class ExpenseReportService {
 
     /**
      * Generate expense report in PDF format
-     * @param startDate the start date
-     * @param endDate the end date
+     * @param options the report option (daily, weekly, monthly, quarterly, yearly, custom)
+     * @param startDate the start date - required for custom option
+     * @param endDate the end date - required for custom option
      * @return ByteArrayInputStream containing the PDF file
      */
-    public ByteArrayInputStream generatePdfReport(LocalDate startDate, LocalDate endDate) throws DocumentException {
-        List<Expense> expenses = expenseReportRepository.findExpensesByDateRange(startDate, endDate);
+    public ByteArrayInputStream generatePdfReport(String options, LocalDate startDate, LocalDate endDate) throws DocumentException {
+        LocalDate startLocalDate;
+        LocalDate endLocalDate;
+        LocalDate today = LocalDate.now();
+
+        if (options == null || options.isEmpty()) {
+            throw new IllegalArgumentException("options is empty");
+        }
+        switch (options.toLowerCase()) {
+            case "daily":
+                startLocalDate = today;
+                endLocalDate = today;
+                break;
+            case "weekly":
+                // Mulai dari hari Senin minggu ini sampai Minggu
+                startLocalDate = today.with(java.time.DayOfWeek.MONDAY);
+                endLocalDate = today.with(java.time.DayOfWeek.SUNDAY);
+                break;
+            case "monthly":
+                startLocalDate = today.withDayOfMonth(1);
+                endLocalDate = today.withDayOfMonth(today.lengthOfMonth());
+                break;
+            case "quarterly":
+                int currentMonth = today.getMonthValue();
+                int startMonth = ((currentMonth - 1) / 3) * 3 + 1;
+                startLocalDate = LocalDate.of(today.getYear(), startMonth, 1);
+                endLocalDate = startLocalDate.plusMonths(2).withDayOfMonth(startLocalDate.plusMonths(2).lengthOfMonth());
+                break;
+            case "yearly":
+                startLocalDate = today.withDayOfYear(1);
+                endLocalDate = today.withDayOfYear(today.lengthOfYear());
+                break;
+            case "custom":
+                if (startDate == null || endDate == null) {
+                    throw new IllegalArgumentException("startDate and endDate must not be null for custom option");
+                }
+                startLocalDate = startDate;
+                endLocalDate = endDate;
+                break;
+            default:
+                throw new IllegalArgumentException("Invalid report option: " + options);
+        }
+        List<Expense> expenses = expenseReportRepository.findExpensesByDateRange(startLocalDate, endLocalDate);
 
         Document document = new Document(PageSize.A4.rotate());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -110,7 +240,7 @@ public class ExpenseReportService {
             // Add date range
             com.itextpdf.text.Font dateFont = FontFactory.getFont(FontFactory.HELVETICA, 12);
             Paragraph dateRange = new Paragraph(
-                    "Period: " + startDate.format(DATE_FORMATTER) + " to " + endDate.format(DATE_FORMATTER),
+                    "Period: " + startLocalDate.format(DATE_FORMATTER) + " to " + endLocalDate.format(DATE_FORMATTER),
                     dateFont);
             dateRange.setAlignment(Element.ALIGN_CENTER);
             document.add(dateRange);
@@ -154,7 +284,7 @@ public class ExpenseReportService {
 
         return new ByteArrayInputStream(out.toByteArray());
     }
-    
+
     /**
      * Convert LocalDateTime to LocalDate for the controller
      * @param dateTime the LocalDateTime to convert

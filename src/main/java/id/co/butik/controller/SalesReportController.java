@@ -1,5 +1,6 @@
 package id.co.butik.controller;
 
+import id.co.butik.entity.Sale;
 import id.co.butik.service.SalesReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/sales-report")
@@ -22,6 +24,13 @@ public class SalesReportController {
 
     @Autowired
     private SalesReportService salesReportService;
+
+    @GetMapping("/get")
+    public List<Sale> getReport(@RequestParam("options") String options,
+                                @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate){
+        return salesReportService.getSalesReport(options, startDate, endDate);
+    }
 
     /**
      * Generate sales report in Excel format

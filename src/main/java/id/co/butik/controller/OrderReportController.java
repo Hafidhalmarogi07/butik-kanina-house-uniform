@@ -1,5 +1,6 @@
 package id.co.butik.controller;
 
+import id.co.butik.entity.Order;
 import id.co.butik.service.OrderReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -14,7 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/order-report")
@@ -23,22 +26,31 @@ public class OrderReportController {
     @Autowired
     private OrderReportService orderReportService;
 
+    @GetMapping("/get")
+    public List<Order> getOrderReport( @RequestParam("options") String options,
+                                       @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+                                       @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return orderReportService.getOrderReport(options, startDate, endDate);
+    }
+
     /**
      * Generate order report in Excel format
-     * @param startDate the start date (format: yyyy-MM-dd'T'HH:mm:ss)
-     * @param endDate the end date (format: yyyy-MM-dd'T'HH:mm:ss)
+     * @param options the report option (daily, weekly, monthly, quarterly, yearly, custom)
+     * @param startDate the start date (format: yyyy-MM-dd) - required for custom option
+     * @param endDate the end date (format: yyyy-MM-dd) - required for custom option
      * @return Excel file as response
      */
     @GetMapping(value = "/excel", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<InputStreamResource> generateExcelReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws IOException {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws IOException {
 
-        ByteArrayInputStream in = orderReportService.generateExcelReport(startDate, endDate);
-        
+        ByteArrayInputStream in = orderReportService.generateExcelReport(options, startDate, endDate);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=order_report.xlsx");
-        
+
         return ResponseEntity
                 .ok()
                 .headers(headers)
@@ -47,20 +59,22 @@ public class OrderReportController {
 
     /**
      * Generate order report in PDF format
-     * @param startDate the start date (format: yyyy-MM-dd'T'HH:mm:ss)
-     * @param endDate the end date (format: yyyy-MM-dd'T'HH:mm:ss)
+     * @param options the report option (daily, weekly, monthly, quarterly, yearly, custom)
+     * @param startDate the start date (format: yyyy-MM-dd) - required for custom option
+     * @param endDate the end date (format: yyyy-MM-dd) - required for custom option
      * @return PDF file as response
      */
     @GetMapping(value = "/pdf", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<InputStreamResource> generatePdfReport(
-            @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-            @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate) throws Exception {
+            @RequestParam("options") String options,
+            @RequestParam(value = "startDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(value = "endDate", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) throws Exception {
 
-        ByteArrayInputStream in = orderReportService.generatePdfReport(startDate, endDate);
-        
+        ByteArrayInputStream in = orderReportService.generatePdfReport(options, startDate, endDate);
+
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=order_report.pdf");
-        
+
         return ResponseEntity
                 .ok()
                 .headers(headers)
