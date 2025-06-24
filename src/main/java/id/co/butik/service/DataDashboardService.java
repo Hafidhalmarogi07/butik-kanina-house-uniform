@@ -1,8 +1,10 @@
 package id.co.butik.service;
 
 import id.co.butik.dto.dashboard.*;
+import id.co.butik.entity.Order;
 import id.co.butik.entity.Sale;
 import id.co.butik.entity.SaleDetail;
+import id.co.butik.enums.OrderStatus;
 import id.co.butik.repository.ExpenseRepository;
 import id.co.butik.repository.OrderRepository;
 import id.co.butik.repository.ProductRepository;
@@ -141,5 +143,47 @@ public class DataDashboardService {
         }
 
         return monthlySalesDtos;
+    }
+
+    public DashboardInner getDataToday(HttpServletRequest request) {
+        DashboardInner dashboardInner = new DashboardInner();
+        dashboardInner.setSales(saleRepository.countSalesToday());
+        dashboardInner.setOrders(orderRepository.countOrderToday());
+        dashboardInner.setOrdersPending(orderRepository.countOrderTodayAndOrderStatus(OrderStatus.PENDING));
+
+        // Handle potential null values from repository methods
+        BigDecimal totalSales = saleRepository.getTotalSalesToday();
+        BigDecimal totalOrder = orderRepository.getTotalOrderToday();
+
+        // Set revenue (sum of sales and orders)
+        if (totalSales == null && totalOrder == null) {
+            dashboardInner.setRevenue(BigDecimal.ZERO);
+        } else if (totalSales == null) {
+            dashboardInner.setRevenue(totalOrder);
+        } else if (totalOrder == null) {
+            dashboardInner.setRevenue(totalSales);
+        } else {
+            dashboardInner.setRevenue(totalSales.add(totalOrder));
+        }
+        return dashboardInner;
+
+    }
+
+    public List<RecentOrderDto> getRecentOrders(HttpServletRequest request, Integer limit) {
+        int saleLimit = (limit != null && limit > 0) ? limit : 5;
+        List<Order> recentOrders = orderRepository.findRecentOrder(PageRequest.of(0, saleLimit));
+        List<RecentOrderDto> recentOrderDtos = new ArrayList<>();
+
+        for (Order order : recentOrders) {
+            RecentOrderDto dto = new RecentOrderDto();
+            dto.setId(order.getId());
+            dto.setOrderNumber(order.getOrderNumber());
+            dto.setStatus(order.getOrderStatus());
+            dto.setCustomerName(order.getCustomer().getNama());
+            dto.setAmount(order.getTotalAmount());
+            recentOrderDtos.add(dto);
+        }
+        return recentOrderDtos;
+
     }
 }

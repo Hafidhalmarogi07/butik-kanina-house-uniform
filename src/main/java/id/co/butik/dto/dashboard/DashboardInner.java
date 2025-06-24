@@ -11,6 +11,8 @@ public class DashboardInner {
 
     private long orders;
 
+    private long ordersPending;
+
     private BigDecimal revenue;
 
     private BigDecimal expenses;

@@ -1,10 +1,6 @@
 package id.co.butik.controller;
 
-import id.co.butik.dto.dashboard.DashboardInner;
-import id.co.butik.dto.dashboard.MonthlySalesDto;
-import id.co.butik.dto.dashboard.ProductCountByCategoryDto;
-import id.co.butik.dto.dashboard.RecentSalesDto;
-import id.co.butik.dto.dashboard.TopProductsDto;
+import id.co.butik.dto.dashboard.*;
 import id.co.butik.service.DataDashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -48,4 +44,15 @@ public class DashboardController {
     public List<MonthlySalesDto> monthlySales(HttpServletRequest request) {
         return dataDashboardService.getMonthlySales(request);
     }
+
+    @GetMapping({"/today","/today"})
+    public DashboardInner today(HttpServletRequest request) {
+        return dataDashboardService.getDataToday(request);
+    }
+
+    @GetMapping({"/recent-orders", "/recent-orders/"})
+    public List<RecentOrderDto> recentOrders(HttpServletRequest request, @RequestParam(required = false) Integer limit) {
+        return dataDashboardService.getRecentOrders(request, limit);
+    }
+
 }

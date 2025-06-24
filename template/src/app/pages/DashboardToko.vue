@@ -5,7 +5,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>45</h3>
+                        <h3>{{ dashboardData.sales }}</h3>
                         <p>Today's Sales</p>
                     </div>
                     <div class="icon">
@@ -19,7 +19,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>12</h3>
+                        <h3>{{ dashboardData.orders }}</h3>
                         <p>New Orders</p>
                     </div>
                     <div class="icon">
@@ -33,7 +33,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>8</h3>
+                        <h3>{{ dashboardData.orders_pending }}</h3>
                         <p>Pending Orders</p>
                     </div>
                     <div class="icon">
@@ -47,7 +47,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>Rp 5,250,000</h3>
+                        <h3>Rp {{ formatCurrency(dashboardData.revenue) }}</h3>
                         <p>Today's Revenue</p>
                     </div>
                     <div class="icon">
@@ -137,42 +137,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><a href="#">OR9842</a></td>
-                                        <td>John Smith</td>
-                                        <td><span class="badge badge-success">Completed</span></td>
-                                        <td>Rp 350,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR1848</a></td>
-                                        <td>Susan Johnson</td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td>Rp 150,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR7429</a></td>
-                                        <td>Michael Brown</td>
-                                        <td><span class="badge badge-info">Processing</span></td>
-                                        <td>Rp 200,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR7430</a></td>
-                                        <td>Emily Davis</td>
-                                        <td><span class="badge badge-primary">Processing</span></td>
-                                        <td>Rp 180,000</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">OR1849</a></td>
-                                        <td>Robert Wilson</td>
-                                        <td><span class="badge badge-warning">Pending</span></td>
-                                        <td>Rp 50,000</td>
-                                    </tr>
+                                <tr v-for="order in recentOrders" :key="order.id">
+                                  <td><a href="#">{{ order.order_number }}</a></td>
+                                  <td>{{ order.customer_name }}</td>
+                                  <td><span class="badge" :class="getStatusBadgeClass(order.status)">{{ order.status }}</span></td>
+                                  <td>Rp {{ formatCurrency(order.amount) }}</td>
+                                </tr>
+                                <!-- Fallback if no sales are available -->
+                                <tr v-if="recentOrders.length === 0">
+                                  <td colspan="4" class="text-center">No recent sales available</td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <router-link to="/order/create" class="btn btn-sm btn-info float-left">Create New Order</router-link>
+                        <router-link to="/orders" class="btn btn-sm btn-info float-left">Create New Order</router-link>
                         <router-link to="/orders" class="btn btn-sm btn-secondary float-right">View All Orders</router-link>
                     </div>
                 </div>
@@ -193,56 +173,24 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
-                        <ul class="products-list product-list-in-card pl-2 pr-2">
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Uniform Set
-                                        <span class="badge badge-success float-right">120 sold</span></a>
-                                    <span class="product-description">
-                                        Complete school uniform set with shirt, pants/skirt, and tie
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Shirt
-                                        <span class="badge badge-info float-right">95 sold</span></a>
-                                    <span class="product-description">
-                                        White school shirt with embroidered logo
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Pants
-                                        <span class="badge badge-warning float-right">85 sold</span></a>
-                                    <span class="product-description">
-                                        Grey school pants with adjustable waist
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Skirt
-                                        <span class="badge badge-danger float-right">75 sold</span></a>
-                                    <span class="product-description">
-                                        Pleated grey school skirt
-                                    </span>
-                                </div>
-                            </li>
-                        </ul>
+                      <ul class="products-list product-list-in-card pl-2 pr-2">
+                        <li v-for="(product, index) in topProducts" :key="product.product_id" class="item">
+                          <div class="product-img">
+                            <img :src="product.image_url || '@assets/no-image.png'" alt="Product Image" class="img-size-50">
+                          </div>
+                          <div class="product-info">
+                            <a href="javascript:void(0)" class="product-title">{{ product.product_name }}
+                              <span class="badge float-right" :class="getBadgeClass(index)">Rp {{ formatCurrency(product.price) }}</span></a>
+                            <span class="product-description"> {{ product.product_description }} </span>
+                          </div>
+                        </li>
+                        <!-- Fallback if no products are available -->
+                        <li v-if="topProducts.length === 0" class="item">
+                          <div class="product-info">
+                            <span class="product-title">No products available</span>
+                          </div>
+                        </li>
+                      </ul>
                     </div>
                     <div class="card-footer text-center">
                         <router-link to="/products" class="uppercase">View All Products</router-link>
@@ -255,10 +203,100 @@
 
 <script>
 export default {
+  data() {
+    return {
+      dashboardData: {
+        sales: 0,
+        orders: 0,
+        revenue: 0,
+        expenses: 0,
+        orders_pending:0
+      },
+      productCategories: [],
+      topProducts: [],
+      recentSales: [],
+      recentOrders: [],
+      monthlySales: []
+    };
+  },
     mounted() {
+        this.fetchDashboardData();
+        this.fetchTopProducts();
+        this.fetchRecentOrders();
         this.initCharts();
     },
     methods: {
+      fetchDashboardData() {
+        // Get the base URL from environment or use a default
+
+        // Fetch dashboard data from API
+        this.Api.get(`/dashboard/today`)
+            .then(response => {
+              if (response.data){
+                this.dashboardData = response.data;
+              }
+            })
+
+            .catch(error => {
+              console.error('Error fetching dashboard data:', error);
+            });
+      },
+      fetchTopProducts() {
+        // Fetch top products data from API (limit to 4 products)
+        this.Api.get(`/dashboard/top-products?limit=4`)
+            .then(response => {
+              if (response.data) {
+                this.topProducts = response.data;
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching top products data:', error);
+            });
+      },
+      fetchRecentOrders() {
+        // Fetch recent sales data from API (limit to 5 sales)
+        this.Api.get(`/dashboard/recent-orders?limit=5`)
+            .then(response => {
+              if (response.data) {
+                this.recentOrders = response.data;
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching recent sales data:', error);
+            });
+      },
+      getBadgeClass(index) {
+        // Return different badge classes based on index
+        const badgeClasses = ['badge-warning', 'badge-info', 'badge-danger', 'badge-success', 'badge-primary'];
+        return badgeClasses[index % badgeClasses.length];
+      },
+      getStatusBadgeClass(status) {
+        // Return badge class based on sale status
+        if (!status) return 'badge-secondary';
+
+        switch(status) {
+          case 'COMPLETED':
+          case 'SHIPPED':
+            return 'badge-success';
+          case 'PENDING':
+            return 'badge-warning';
+          case 'PROCESSING':
+            return 'badge-info';
+          case 'CANCELLED':
+            return 'badge-danger';
+          default:
+            return 'badge-primary';
+        }
+      },
+      formatCurrency(value) {
+        // Format number to Indonesian currency format
+        if (!value) return '0';
+
+        return new Intl.NumberFormat('id-ID', {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(value);
+      },
         initCharts() {
             // Daily Sales Chart
             if (document.getElementById('dailySalesChart')) {
