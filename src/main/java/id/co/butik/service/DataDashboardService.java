@@ -15,9 +15,14 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -130,14 +135,14 @@ public class DataDashboardService {
 
         for (Object[] data : monthlySalesData) {
             Integer monthNumber = (Integer) data[0];
-            BigDecimal amount = (BigDecimal) data[1];
+            Long amount = (Long) data[1];
 
             // Convert month number to month name
             String monthName = Month.of(monthNumber).toString();
 
             MonthlySalesDto dto = new MonthlySalesDto();
             dto.setMonth(monthName);
-            dto.setAmount(amount);
+            dto.setItems(amount);
 
             monthlySalesDtos.add(dto);
         }
@@ -184,6 +189,30 @@ public class DataDashboardService {
             recentOrderDtos.add(dto);
         }
         return recentOrderDtos;
+    }
 
+    public List<DailySalesDto> getDailySales(HttpServletRequest request) {
+        // Fetch daily sales data for the last 7 days
+        List<Object[]> dailySalesData = saleRepository.getDailySalesForLastSevenDays();
+
+        // Convert to DTOs
+        List<DailySalesDto> dailySalesDtos = new ArrayList<>();
+
+        for (Object[] data : dailySalesData) {
+            LocalDate day =((java.sql.Date) data[0]).toLocalDate();
+            Long amount = (Long) data[1];
+
+            // Get day name (e.g., Monday, Tuesday, etc.)
+            String dayName = day.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+
+            DailySalesDto dto = new DailySalesDto();
+            dto.setDay(day);
+            dto.setDayName(dayName);
+            dto.setItems(amount != null ? amount : 0);
+
+            dailySalesDtos.add(dto);
+        }
+
+        return dailySalesDtos;
     }
 }

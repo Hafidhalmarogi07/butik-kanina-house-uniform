@@ -1,193 +1,140 @@
 {
-    "admin":[
+    "admin": [
         {
-            "title":"Dashboard",
-            "iconClass":"fas fa-tachometer-alt",
-            "route":{
-                "name":"dashboard"
-            }
+            "title": "Dashboard",
+            "iconClass": "fas fa-tachometer-alt",
+            "route": { "name": "dashboard" }
         },
         {
-            "title":"Products",
-            "iconClass":"fas fa-box",
-            "route":{
-                "name":"products"
-            }
+            "title": "Produk",
+            "iconClass": "fas fa-box",
+            "route": { "name": "products" }
         },
         {
-            "title":"Categories",
-            "iconClass":"fas fa-tags",
-            "route":{
-                "name":"category"
-            }
+            "title": "Kategori",
+            "iconClass": "fas fa-tags",
+            "route": { "name": "category" }
         },
         {
-            "title":"Sales",
-            "iconClass":"fas fa-shopping-cart",
-            "route":{
-                "name":"sales"
-            }
+            "title": "Penjualan",
+            "iconClass": "fas fa-shopping-cart",
+            "route": { "name": "sales" }
         },
         {
-            "title":"Orders",
-            "iconClass":"fas fa-shopping-bag",
-            "route":{
-                "name":"orders"
-            }
+            "title": "Pesanan",
+            "iconClass": "fas fa-shopping-bag",
+            "route": { "name": "orders" }
         },
         {
-            "title":"Production",
-            "iconClass":"fas fa-industry",
-            "route":{
-                "name":"production"
-            }
+            "title": "Produksi",
+            "iconClass": "fas fa-industry",
+            "route": { "name": "production" }
         },
         {
-            "title":"Expenses",
-            "iconClass":"fas fa-money-bill-alt",
-            "route":{
-                "name":"expenses"
-            }
+            "title": "Pengeluaran",
+            "iconClass": "fas fa-money-bill-alt",
+            "route": { "name": "expenses" }
         },
         {
-            "title":"Customers",
-            "iconClass":"fas fa-users",
-            "route":{
-                "name":"customers"
-            }
+            "title": "Pelanggan",
+            "iconClass": "fas fa-users",
+            "route": { "name": "customers" }
         },
         {
-            "title":"Reports",
-            "iconClass":"fas fa-chart-bar",
-            "route":{
-                "name":"reports"
-            }
+            "title": "Laporan",
+            "iconClass": "fas fa-chart-bar",
+            "route": { "name": "reports" }
         },
         {
-            "title":"Users",
-            "iconClass":"fas fa-user-cog",
-            "route":{
-                "name":"users"
-            }
+            "title": "Pengguna",
+            "iconClass": "fas fa-user-cog",
+            "route": { "name": "users" }
         },
         {
-            "title":"Returns",
-            "iconClass":"fas fa-undo",
-            "route":{
-                "name":"returns"
-            }
+            "title": "Return",
+            "iconClass": "fas fa-undo",
+            "route": { "name": "returns" }
         }
     ],
-    "owner":[
+    "owner": [
         {
-            "title":"Dashboard",
-            "iconClass":"fas fa-tachometer-alt",
-            "route":{
-                "name":"dashboard"
-            }
+            "title": "Dashboard",
+            "iconClass": "fas fa-tachometer-alt",
+            "route": { "name": "dashboard" }
         },
         {
-            "title":"Products",
-            "iconClass":"fas fa-box",
-            "route":{
-                "name":"products"
-            }
+            "title": "Produk",
+            "iconClass": "fas fa-box",
+            "route": { "name": "products" }
         },
         {
-            "title":"Expenses",
-            "iconClass":"fas fa-money-bill-alt",
-            "route":{
-                "name":"expenses"
-            }
+            "title": "Pengeluaran",
+            "iconClass": "fas fa-money-bill-alt",
+            "route": { "name": "expenses" }
         },
         {
-            "title":"Reports",
-            "iconClass":"fas fa-chart-bar",
-            "route":{
-                "name":"reports"
-            }
+            "title": "Laporan",
+            "iconClass": "fas fa-chart-bar",
+            "route": { "name": "reports" }
         },
         {
-            "title":"Users",
-            "iconClass":"fas fa-user-cog",
-            "route":{
-                "name":"users"
-            }
+            "title": "Pengguna",
+            "iconClass": "fas fa-user-cog",
+            "route": { "name": "users" }
         }
     ],
-    "warehouse":[
+    "warehouse": [
         {
-            "title":"Dashboard",
-            "iconClass":"fas fa-tachometer-alt",
-            "route":{
-                "name":"dashboard_gudang"
-            }
+            "title": "Dashboard",
+            "iconClass": "fas fa-tachometer-alt",
+            "route": { "name": "dashboard_gudang" }
         },
         {
-            "title":"Products",
-            "iconClass":"fas fa-box",
-            "route":{
-                "name":"products"
-            }
+            "title": "Produk",
+            "iconClass": "fas fa-box",
+            "route": { "name": "products" }
         },
         {
-            "title":"Categories",
-            "iconClass":"fas fa-tags",
-            "route":{
-                "name":"category"
-            }
+            "title": "Kategori",
+            "iconClass": "fas fa-tags",
+            "route": { "name": "category" }
         },
         {
-            "title":"Production",
-            "iconClass":"fas fa-industry",
-            "route":{
-                "name":"production"
-            }
+            "title": "Produksi",
+            "iconClass": "fas fa-industry",
+            "route": { "name": "production" }
         }
     ],
-    "boutique":[
+    "boutique": [
         {
-            "title":"Dashboard",
-            "iconClass":"fas fa-tachometer-alt",
-            "route":{
-                "name":"dashboard_toko"
-            }
+            "title": "Dashboard",
+            "iconClass": "fas fa-tachometer-alt",
+            "route": { "name": "dashboard_toko" }
         },
         {
-            "title":"Customers",
-            "iconClass":"fas fa-users",
-            "route":{
-                "name":"customers"
-            }
+            "title": "Pelanggan",
+            "iconClass": "fas fa-users",
+            "route": { "name": "customers" }
         },
         {
-            "title":"Products",
-            "iconClass":"fas fa-box",
-            "route":{
-                "name":"products"
-            }
+            "title": "Produk",
+            "iconClass": "fas fa-box",
+            "route": { "name": "products" }
         },
         {
-            "title":"Sales",
-            "iconClass":"fas fa-shopping-cart",
-            "route":{
-                "name":"sales"
-            }
+            "title": "Penjualan",
+            "iconClass": "fas fa-shopping-cart",
+            "route": { "name": "sales" }
         },
         {
-            "title":"Orders",
-            "iconClass":"fas fa-shopping-bag",
-            "route":{
-                "name":"orders"
-            }
+            "title": "Pesanan",
+            "iconClass": "fas fa-shopping-bag",
+            "route": { "name": "orders" }
         },
-
         {
-            "title":"Returns",
-            "iconClass":"fas fa-undo",
-            "route":{
-                "name":"returns"
-            }
+            "title": "Return",
+            "iconClass": "fas fa-undo",
+            "route": { "name": "returns" }
         }
     ]
 }

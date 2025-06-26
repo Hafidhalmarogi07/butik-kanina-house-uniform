@@ -5,14 +5,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 /**
- * DTO for monthly sales data
+ * DTO for daily sales data
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class MonthlySalesDto {
-    private String month;
+public class DailySalesDto {
+    private LocalDate day;
+    private String dayName;
     private Long items;
 }

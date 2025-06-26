@@ -55,4 +55,8 @@ public class DashboardController {
         return dataDashboardService.getRecentOrders(request, limit);
     }
 
+    @GetMapping({"/daily-sales", "/daily-sales/"})
+    public List<DailySalesDto> dailySales(HttpServletRequest request) {
+        return dataDashboardService.getDailySales(request);
+    }
 }

@@ -419,7 +419,7 @@ export default {
             if (this.salesChart && this.monthlySales.length > 0) {
                 // Extract month names and sales amounts from the API response
                 const labels = this.monthlySales.map(item => item.month);
-                const data = this.monthlySales.map(item => item.amount);
+                const data = this.monthlySales.map(item => item.items);
 
                 // Update chart data
                 this.salesChart.data.labels = labels;

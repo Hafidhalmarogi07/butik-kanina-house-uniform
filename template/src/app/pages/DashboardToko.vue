@@ -216,14 +216,15 @@ export default {
       topProducts: [],
       recentSales: [],
       recentOrders: [],
-      monthlySales: []
+      monthlySales: [],
+      dailySales: []
     };
   },
     mounted() {
         this.fetchDashboardData();
         this.fetchTopProducts();
         this.fetchRecentOrders();
-        this.initCharts();
+        this.fetchDailySales();
     },
     methods: {
       fetchDashboardData() {
@@ -296,6 +297,21 @@ export default {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
         }).format(value);
+      },
+
+      fetchDailySales() {
+        // Fetch daily sales data from API
+        this.Api.get(`/dashboard/daily-sales`)
+            .then(response => {
+              if (response.data) {
+                this.dailySales = response.data;
+                this.initCharts();
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching daily sales data:', error);
+              this.initCharts(); // Initialize charts even if there's an error
+            });
       },
         initCharts() {
             // Daily Sales Chart
