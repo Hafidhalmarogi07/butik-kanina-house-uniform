@@ -5,7 +5,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">Product List</h3>
-                        <div class="card-tools">
+                        <div class="card-tools" v-if="!isAdminToko">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
                                 <i class="fas fa-plus"></i> Add Product
                             </button>
@@ -45,7 +45,8 @@
                                         <th>Size</th>
                                         <th>Stock</th>
                                         <th>Price</th>
-                                        <th>Actions</th>
+                                        <th v-if="!isAdminToko">Actions</th>
+                                        <th v-else></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -62,7 +63,7 @@
                                         </td>
                                         <td>{{ product.selling_price }}</td>
                                         <td>
-                                            <div class="btn-group">
+                                            <div class="btn-group" v-if="!isAdminToko">
                                                 <button type="button" class="btn btn-sm btn-info" @click="editProduct(product)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
@@ -70,6 +71,7 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
+                                            <span v-else>-</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -243,6 +245,13 @@ export default {
         }
     },
     computed: {
+        isAdminToko() {
+            // Check if user has ROLE_ADMIN_TOKO role
+            if (this.$store && this.$store.state && this.$store.state.user && this.$store.state.user.roles) {
+                return this.$store.state.user.roles.some(role => role.name === 'ROLE_ADMIN_TOKO');
+            }
+            return false;
+        },
         filteredProducts() {
             // Since filtering is now done on the server side, 
             // we simply return the products array
