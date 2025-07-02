@@ -68,4 +68,33 @@ public class DashboardController {
     public List<StockAlert> getActiveStockAlerts() {
         return stockAlertRepository.findByResolvedFalse();
     }
+
+    // Warehouse Dashboard Endpoints
+
+    @GetMapping("/warehouse-summary")
+    public WarehouseSummaryDto getWarehouseSummary(HttpServletRequest request) {
+        return dataDashboardService.getWarehouseSummary(request);
+    }
+
+    @GetMapping("/inventory-movement")
+    public List<InventoryMovementDto> getInventoryMovement(HttpServletRequest request) {
+        return dataDashboardService.getInventoryMovement(request);
+    }
+
+    @GetMapping("/warehouse-capacity")
+    public WarehouseCapacityDto getWarehouseCapacity(HttpServletRequest request) {
+        return dataDashboardService.getWarehouseCapacity(request);
+    }
+
+    @GetMapping("/recent-stock-movements")
+    public List<StockMovementDto> getRecentStockMovements(HttpServletRequest request, 
+                                                         @RequestParam(required = false) Integer limit) {
+        return dataDashboardService.getRecentStockMovements(request, limit);
+    }
+
+    @GetMapping("/low-stock-items")
+    public List<LowStockItemDto> getLowStockItems(HttpServletRequest request, 
+                                                 @RequestParam(required = false) Integer limit) {
+        return dataDashboardService.getLowStockItems(request, limit);
+    }
 }

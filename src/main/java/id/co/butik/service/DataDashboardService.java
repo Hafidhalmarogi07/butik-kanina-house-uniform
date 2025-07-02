@@ -2,13 +2,19 @@ package id.co.butik.service;
 
 import id.co.butik.dto.dashboard.*;
 import id.co.butik.entity.Order;
+import id.co.butik.entity.Product;
+import id.co.butik.entity.Production;
 import id.co.butik.entity.Sale;
 import id.co.butik.entity.SaleDetail;
+import id.co.butik.entity.StockAlert;
 import id.co.butik.enums.OrderStatus;
+import id.co.butik.enums.ProductionStatus;
 import id.co.butik.repository.ExpenseRepository;
 import id.co.butik.repository.OrderRepository;
 import id.co.butik.repository.ProductRepository;
+import id.co.butik.repository.ProductionRepository;
 import id.co.butik.repository.SaleRepository;
+import id.co.butik.repository.StockAlertRepository;
 import id.co.butik.util.PropertiesUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,9 +27,11 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 public class DataDashboardService {
@@ -33,12 +41,18 @@ public class DataDashboardService {
     private final OrderRepository orderRepository;
     private final ExpenseRepository expenseRepository;
     private final ProductRepository productRepository;
+    private final ProductionRepository productionRepository;
+    private final StockAlertRepository stockAlertRepository;
 
-    public DataDashboardService(SaleRepository saleRepository, OrderRepository orderRepository, ExpenseRepository expenseRepository, ProductRepository productRepository) {
+    public DataDashboardService(SaleRepository saleRepository, OrderRepository orderRepository, 
+                               ExpenseRepository expenseRepository, ProductRepository productRepository,
+                               ProductionRepository productionRepository, StockAlertRepository stockAlertRepository) {
         this.saleRepository = saleRepository;
         this.orderRepository = orderRepository;
         this.expenseRepository = expenseRepository;
         this.productRepository = productRepository;
+        this.productionRepository = productionRepository;
+        this.stockAlertRepository = stockAlertRepository;
     }
 
     public DashboardInner getDataDashoard(HttpServletRequest request) {
@@ -214,5 +228,172 @@ public class DataDashboardService {
         }
 
         return dailySalesDtos;
+    }
+
+    // Warehouse Dashboard Methods
+
+    /**
+     * Get warehouse summary data
+     */
+    public WarehouseSummaryDto getWarehouseSummary(HttpServletRequest request) {
+        WarehouseSummaryDto summary = new WarehouseSummaryDto();
+
+        // Count total inventory (sum of all product stocks)
+        long totalInventory = StreamSupport.stream(productRepository.findAll().spliterator(), false)
+                .mapToLong(Product::getStock)
+                .sum();
+        summary.setTotalInventory(totalInventory);
+
+        // Count incoming stock (estimate based on current productions)
+        long incomingStock = StreamSupport.stream(productionRepository.findAll().spliterator(), false)
+                .filter(p -> p.getStatus() == ProductionStatus.IN_PROGRESS)
+                .count();
+        summary.setIncomingStock(incomingStock);
+
+        // Count outgoing stock (orders processed today)
+        long outgoingStock = orderRepository.countOrderToday();
+        summary.setOutgoingStock(outgoingStock);
+
+        // Count low stock items
+        long lowStockItems = stockAlertRepository.findByResolvedFalse().size();
+        summary.setLowStockItems(lowStockItems);
+
+        return summary;
+    }
+
+    /**
+     * Get inventory movement data for chart
+     */
+    public List<InventoryMovementDto> getInventoryMovement(HttpServletRequest request) {
+        List<InventoryMovementDto> movementData = new ArrayList<>();
+
+        // Get last 7 months
+        LocalDate now = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = now.minusMonths(i);
+            String monthName = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+
+            // For demonstration purposes, generate some sample data
+            // In a real application, this would come from actual database queries
+            long incomingStock = 40 + (int)(Math.random() * 40); // Random value between 40-80
+            long outgoingStock = 30 + (int)(Math.random() * 50); // Random value between 30-80
+
+            movementData.add(new InventoryMovementDto(monthName, incomingStock, outgoingStock));
+        }
+
+        return movementData;
+    }
+
+    /**
+     * Get warehouse capacity data
+     */
+    public WarehouseCapacityDto getWarehouseCapacity(HttpServletRequest request) {
+        // For demonstration, we'll assume a fixed warehouse capacity of 1000 items
+        // In a real application, this would come from a configuration or database
+        long totalCapacity = 1000;
+
+        // Calculate used space (sum of all product stocks)
+        long usedSpace = StreamSupport.stream(productRepository.findAll().spliterator(), false)
+                .mapToLong(Product::getStock)
+                .sum();
+
+        // Calculate available space
+        long availableSpace = Math.max(0, totalCapacity - usedSpace);
+
+        return new WarehouseCapacityDto(usedSpace, availableSpace);
+    }
+
+    /**
+     * Get recent stock movements
+     */
+    public List<StockMovementDto> getRecentStockMovements(HttpServletRequest request, Integer limit) {
+        int movementLimit = (limit != null && limit > 0) ? limit : 5;
+        List<StockMovementDto> movements = new ArrayList<>();
+
+        // For demonstration purposes, create sample stock movement data
+        // In a real application, this would come from actual database queries
+
+        // Sample incoming stock movements
+        movements.add(new StockMovementDto("SM9842", "School Uniform Set", "IN", 50, LocalDate.now().minusDays(0)));
+        movements.add(new StockMovementDto("SM7429", "School Pants", "IN", 30, LocalDate.now().minusDays(2)));
+        movements.add(new StockMovementDto("SM1849", "School Tie", "IN", 100, LocalDate.now().minusDays(4)));
+
+        // Sample outgoing stock movements
+        movements.add(new StockMovementDto("SM1848", "School Shirt", "OUT", 20, LocalDate.now().minusDays(1)));
+        movements.add(new StockMovementDto("SM7430", "School Skirt", "OUT", 15, LocalDate.now().minusDays(3)));
+
+        // Sort by date (most recent first) and limit
+        movements.sort((a, b) -> b.getDate().compareTo(a.getDate()));
+        if (movements.size() > movementLimit) {
+            movements = movements.subList(0, movementLimit);
+        }
+
+        return movements;
+    }
+
+    /**
+     * Get low stock items
+     */
+    public List<LowStockItemDto> getLowStockItems(HttpServletRequest request, Integer limit) {
+        int itemLimit = (limit != null && limit > 0) ? limit : 5;
+        List<LowStockItemDto> lowStockItems = new ArrayList<>();
+
+        // Get unresolved stock alerts
+        List<StockAlert> stockAlerts = stockAlertRepository.findByResolvedFalse();
+
+        for (StockAlert alert : stockAlerts) {
+            Product product = alert.getProduct();
+            if (product != null) {
+                LowStockItemDto dto = new LowStockItemDto(
+                    product.getId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getImageUrl() != null ? PropertiesUtils.CDN_BASEURL + product.getImageUrl() : null,
+                    alert.getCurrentStock(),
+                    product.getSellingPrice()
+                );
+                lowStockItems.add(dto);
+            }
+        }
+
+        // If we don't have enough items from stock alerts, add products with low stock
+        if (lowStockItems.size() < itemLimit) {
+            // Get all products sorted by stock (ascending)
+            List<Product> products = StreamSupport.stream(productRepository.findAll().spliterator(), false)
+                    .sorted((a, b) -> Integer.compare(a.getStock(), b.getStock()))
+                    .collect(Collectors.toList());
+
+            for (Product product : products) {
+                // Skip products that are already in the list
+                if (lowStockItems.stream().anyMatch(item -> item.getProductId().equals(product.getId()))) {
+                    continue;
+                }
+
+                // Add products with stock less than 10 (arbitrary threshold)
+                if (product.getStock() < 10) {
+                    LowStockItemDto dto = new LowStockItemDto(
+                        product.getId(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.getImageUrl() != null ? PropertiesUtils.CDN_BASEURL + product.getImageUrl() : null,
+                        product.getStock(),
+                        product.getSellingPrice()
+                    );
+                    lowStockItems.add(dto);
+
+                    // Stop if we have enough items
+                    if (lowStockItems.size() >= itemLimit) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Limit the results
+        if (lowStockItems.size() > itemLimit) {
+            lowStockItems = lowStockItems.subList(0, itemLimit);
+        }
+
+        return lowStockItems;
     }
 }

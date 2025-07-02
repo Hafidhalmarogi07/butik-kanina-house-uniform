@@ -5,7 +5,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-info">
                     <div class="inner">
-                        <h3>120</h3>
+                        <h3>{{ warehouseSummary.total_inventory }}</h3>
                         <p>Total Inventory</p>
                     </div>
                     <div class="icon">
@@ -19,7 +19,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-success">
                     <div class="inner">
-                        <h3>42</h3>
+                        <h3>{{ warehouseSummary.incoming_stock }}</h3>
                         <p>Incoming Stock</p>
                     </div>
                     <div class="icon">
@@ -33,7 +33,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-warning">
                     <div class="inner">
-                        <h3>35</h3>
+                        <h3>{{ warehouseSummary.outgoing_stock }}</h3>
                         <p>Outgoing Stock</p>
                     </div>
                     <div class="icon">
@@ -47,7 +47,7 @@
             <div class="col-lg-3 col-6">
                 <div class="small-box bg-danger">
                     <div class="inner">
-                        <h3>15</h3>
+                        <h3>{{ warehouseSummary.low_stock_items }}</h3>
                         <p>Low Stock Items</p>
                     </div>
                     <div class="icon">
@@ -251,7 +251,7 @@
                         </ul>
                     </div>
                     <div class="card-footer text-center">
-                        <router-link to="/low-stock" class="uppercase">View All Low Stock Items</router-link>
+                        <router-link to="/products" class="uppercase">View All Product</router-link>
                     </div>
                 </div>
             </div>
@@ -261,11 +261,95 @@
 
 <script>
 export default {
+    data() {
+        return {
+            warehouseSummary: {
+                total_inventory: 0,
+                incoming_stock: 0,
+                outgoing_stock: 0,
+                low_stock_items: 0
+            },
+            inventoryMovement: [],
+            warehouseCapacity: {
+                usedSpace: 0,
+                availableSpace: 0
+            },
+            recentStockMovements: [],
+            lowStockItems: []
+        };
+    },
     mounted() {
-        this.initCharts();
+        this.fetchWarehouseSummary();
+        this.fetchInventoryMovement();
+        this.fetchWarehouseCapacity();
+        this.fetchRecentStockMovements();
+        this.fetchLowStockItems();
     },
     methods: {
+        fetchWarehouseSummary() {
+            this.Api.get('/dashboard/warehouse-summary')
+                .then(response => {
+                    if (response.data) {
+                        this.warehouseSummary = response.data;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching warehouse summary:', error);
+                });
+        },
+        fetchInventoryMovement() {
+            this.Api.get('/dashboard/inventory-movement')
+                .then(response => {
+                    if (response.data) {
+                        this.inventoryMovement = response.data;
+                        this.initInventoryChart();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching inventory movement:', error);
+                    this.initInventoryChart(); // Initialize chart even if there's an error
+                });
+        },
+        fetchWarehouseCapacity() {
+            this.Api.get('/dashboard/warehouse-capacity')
+                .then(response => {
+                    if (response.data) {
+                        this.warehouseCapacity = response.data;
+                        this.initCapacityChart();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching warehouse capacity:', error);
+                    this.initCapacityChart(); // Initialize chart even if there's an error
+                });
+        },
+        fetchRecentStockMovements() {
+            this.Api.get('/dashboard/recent-stock-movements?limit=5')
+                .then(response => {
+                    if (response.data) {
+                        this.recentStockMovements = response.data;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching recent stock movements:', error);
+                });
+        },
+        fetchLowStockItems() {
+            this.Api.get('/dashboard/low-stock-items?limit=4')
+                .then(response => {
+                    if (response.data) {
+                        this.lowStockItems = response.data;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching low stock items:', error);
+                });
+        },
         initCharts() {
+            this.initInventoryChart();
+            this.initCapacityChart();
+        },
+        initInventoryChart() {
             // Inventory Movement Chart
             if (document.getElementById('inventoryChart')) {
                 const inventoryChartCanvas = document.getElementById('inventoryChart').getContext('2d');
