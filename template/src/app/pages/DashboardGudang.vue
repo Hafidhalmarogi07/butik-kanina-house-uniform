@@ -1,5 +1,41 @@
 <template>
     <div class="container-fluid">
+        <!-- Stock Alert Modal -->
+        <div v-if="showStockAlertModal && stockAlerts.length > 0" class="stock-alert-modal-overlay">
+            <div class="stock-alert-modal">
+                <div class="stock-alert-body">
+                    <div v-for="(alert, index) in stockAlerts" :key="index">
+                        <div v-if="alert.reason === 'ORDER_DEFICIT'" class="alert alert-danger">
+                            <button @click="removeAlert(index)" class="close-alert-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h5><i class="fas fa-exclamation-circle"></i> Kekurangan stok produk!</h5>
+                            <p>Produk <strong>{{ alert.product.name }}</strong> membutuhkan tambahan <strong>{{ alert.needed_quantity }}</strong> pcs. Stok saat ini hanya <strong>{{ alert.current_stock }}</strong> pcs.</p>
+                            <p><i class="fas fa-hand-point-right"></i> Segera buat produksi agar order bisa diproses.</p>
+                            <button @click="goToProduction(alert.product)" class="btn btn-primary mt-2">
+                                <i class="fas fa-plus"></i> Buat Produksi
+                            </button>
+                        </div>
+                        <div v-else-if="alert.reason === 'LOW_STOCK'" class="alert alert-warning">
+                            <button @click="removeAlert(index)" class="close-alert-btn">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            <h5><i class="fas fa-exclamation-triangle"></i> Stok hampir habis!</h5>
+                            <p>Produk <strong>{{ alert.product.name }}</strong> hanya tersisa <strong>{{ alert.current_stock }}</strong> pcs.</p>
+                            <p><i class="fas fa-search"></i> Periksa apakah perlu produksi ulang.</p>
+                            <button @click="goToProduction(alert.product)" class="btn btn-primary mt-2">
+                                <i class="fas fa-plus"></i> Buat Produksi
+                            </button>
+                        </div>
+                    </div>
+                    <div class="text-right mt-3">
+                        <button @click="closeStockAlertModal" class="btn btn-secondary mr-2">
+                            <i class="fas fa-times"></i> Tutup
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Stat Cards -->
         <div class="row">
             <div class="col-lg-3 col-6">
@@ -275,7 +311,9 @@ export default {
                 availableSpace: 0
             },
             recentStockMovements: [],
-            lowStockItems: []
+            lowStockItems: [],
+            stockAlerts: [],
+            showStockAlertModal: false
         };
     },
     mounted() {
@@ -284,8 +322,19 @@ export default {
         this.fetchWarehouseCapacity();
         this.fetchRecentStockMovements();
         this.fetchLowStockItems();
+        this.fetchStockAlerts();
     },
     methods: {
+        goToProduction(product) {
+            // Store the product in localStorage to be used in Production page
+            localStorage.setItem('selectedProductForProduction', JSON.stringify(product));
+
+            // Close the modal
+            this.closeStockAlertModal();
+
+            // Navigate to Production page
+            this.$router.push('/production');
+        },
         fetchWarehouseSummary() {
             this.Api.get('/dashboard/warehouse-summary')
                 .then(response => {
@@ -343,6 +392,48 @@ export default {
                 })
                 .catch(error => {
                     console.error('Error fetching low stock items:', error);
+                });
+        },
+        fetchStockAlerts() {
+            this.Api.get('/dashboard/stock-alerts')
+                .then(response => {
+                    if (response.data && response.data.length > 0) {
+                        this.stockAlerts = response.data;
+                        this.showStockAlertModal = true;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching stock alerts:', error);
+                });
+        },
+        closeStockAlertModal() {
+            this.showStockAlertModal = false;
+        },
+        removeAlert(index) {
+            // Remove the alert at the specified index
+            this.stockAlerts.splice(index, 1);
+
+            // If no more alerts, close the modal
+            if (this.stockAlerts.length === 0) {
+                this.showStockAlertModal = false;
+            }
+        },
+        markAlertAsResolved(alertId) {
+            this.Api.put(`/api/v1/dashboard/stock-alerts/${alertId}/resolve`)
+                .then(() => {
+                    // Remove the alert from the list
+                    this.stockAlerts = this.stockAlerts.filter(alert => alert.id !== alertId);
+
+                    // If no more alerts, close the modal
+                    if (this.stockAlerts.length === 0) {
+                        this.showStockAlertModal = false;
+                    } else if (this.currentAlertIndex >= this.stockAlerts.length) {
+                        // If the current index is now out of bounds, adjust it
+                        this.currentAlertIndex = this.stockAlerts.length - 1;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error marking alert as resolved:', error);
                 });
         },
         initCharts() {
@@ -441,6 +532,120 @@ export default {
 </script>
 
 <style scoped>
+/* Stock Alert Modal Styles */
+.stock-alert-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1050;
+}
+
+.stock-alert-modal {
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Removed stock-alert-header styles as it's no longer used */
+
+.stock-alert-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.stock-alert-body .alert {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 5px;
+    position: relative;
+}
+
+.stock-alert-body .alert-danger {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.stock-alert-body .alert-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+    color: #856404;
+}
+
+.stock-alert-body .alert h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.stock-alert-body .alert i {
+    margin-right: 5px;
+}
+
+.product-details {
+    display: flex;
+    margin-top: 20px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+    padding: 15px;
+}
+
+.product-image {
+    width: 100px;
+    height: 100px;
+    margin-right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.product-info {
+    flex-grow: 1;
+}
+
+.product-info h5 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.product-info p {
+    margin: 5px 0;
+    color: #6c757d;
+}
+
+.close-alert-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: inherit;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+}
+
+/* Existing styles */
 .small-box {
     border-radius: 0.25rem;
     box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);

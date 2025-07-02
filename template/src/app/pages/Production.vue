@@ -345,6 +345,9 @@ export default {
                 this.fetchProducts(0, false);
             }
         });
+
+        // Check if there's a selected product in localStorage
+        this.checkForSelectedProduct();
     },
     watch: {
         searchQuery: function(newVal) {
@@ -646,6 +649,76 @@ export default {
             if (scrollHeight - scrollPosition <= 20) {
                 this.loadMoreProducts();
             }
+        },
+
+        checkForSelectedProduct() {
+            // Check if there's a selected product in localStorage
+            const selectedProductJson = localStorage.getItem('selectedProductForProduction');
+
+            if (selectedProductJson) {
+                try {
+                    // Parse the product data
+                    const selectedProduct = JSON.parse(selectedProductJson);
+
+                    // Clear the localStorage entry to prevent it from opening again on page refresh
+                    localStorage.removeItem('selectedProductForProduction');
+
+                    // Wait for products to be loaded
+                    this.waitForProductsAndShowModal(selectedProduct);
+                } catch (error) {
+                    console.error('Error parsing selected product:', error);
+                    localStorage.removeItem('selectedProductForProduction');
+                }
+            }
+        },
+
+        waitForProductsAndShowModal(selectedProduct) {
+            // If products are already loaded
+            if (this.products.length > 0) {
+                this.setupProductionWithSelectedProduct(selectedProduct);
+            } else {
+                // If products are not loaded yet, wait for them
+                const checkInterval = setInterval(() => {
+                    if (this.products.length > 0) {
+                        clearInterval(checkInterval);
+                        this.setupProductionWithSelectedProduct(selectedProduct);
+                    }
+                }, 100);
+
+                // Set a timeout to clear the interval if products don't load within 5 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    // Try to set up with the selected product anyway
+                    this.setupProductionWithSelectedProduct(selectedProduct);
+                }, 5000);
+            }
+        },
+
+        setupProductionWithSelectedProduct(selectedProduct) {
+            // Initialize a new production with today's date
+            const today = new Date().toISOString().split('T')[0];
+
+            // Set up the current production with the selected product
+            this.currentProduction = {
+                id: null,
+                product: {
+                    id: selectedProduct.id,
+                    name: selectedProduct.name,
+                    category: selectedProduct.category || { id: null, name: '' }
+                },
+                quantity: 0,
+                start_date: today,
+                end_date: '',
+                status: 'WAITING',
+                progress: 0,
+                description: ''
+            };
+
+            // Set isEditing to false since we're adding a new production
+            this.isEditing = false;
+
+            // Show the production modal
+            $('#productionModal').modal('show');
         },
 
         saveProduction() {
