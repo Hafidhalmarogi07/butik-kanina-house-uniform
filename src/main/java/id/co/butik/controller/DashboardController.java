@@ -1,6 +1,8 @@
 package id.co.butik.controller;
 
 import id.co.butik.dto.dashboard.*;
+import id.co.butik.entity.StockAlert;
+import id.co.butik.repository.StockAlertRepository;
 import id.co.butik.service.DataDashboardService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,9 +17,11 @@ import java.util.List;
 public class DashboardController {
 
     private final DataDashboardService dataDashboardService;
+    private final StockAlertRepository stockAlertRepository;
 
-    public DashboardController(DataDashboardService dataDashboardService) {
+    public DashboardController(DataDashboardService dataDashboardService, StockAlertRepository stockAlertRepository) {
         this.dataDashboardService = dataDashboardService;
+        this.stockAlertRepository = stockAlertRepository;
     }
 
     @GetMapping({"/inner","/inner/"})
@@ -58,5 +62,10 @@ public class DashboardController {
     @GetMapping({"/daily-sales", "/daily-sales/"})
     public List<DailySalesDto> dailySales(HttpServletRequest request) {
         return dataDashboardService.getDailySales(request);
+    }
+
+    @GetMapping("/stock-alerts")
+    public List<StockAlert> getActiveStockAlerts() {
+        return stockAlertRepository.findByResolvedFalse();
     }
 }

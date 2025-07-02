@@ -130,11 +130,21 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="productionProduct">Product</label>
-                                        <select class="form-control" id="productionProduct" v-model="currentProduction.product.id" required>
-                                            <option v-for="product in products" :key="product.id" :value="product.id">
-                                                {{ product.name }} ({{ product.size }})
-                                            </option>
-                                        </select>
+                                        <div class="position-relative">
+                                            <select class="form-control" id="productionProduct" v-model="currentProduction.product.id" 
+                                                    required @scroll="handleProductScroll" ref="productSelect">
+                                                <option v-for="product in products" :key="product.id" :value="product.id">
+                                                    {{ product.name }} ({{ product.size }})
+                                                </option>
+                                                <option v-if="productPagination.loading" value="" disabled>Loading more products...</option>
+                                                <option v-if="!productPagination.hasMore && products.length > 0" value="" disabled>No more products</option>
+                                            </select>
+                                            <div v-if="productPagination.loading" class="position-absolute" style="right: 10px; top: 10px;">
+                                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                    <span class="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="productionQuantity">Quantity</label>
@@ -279,6 +289,14 @@ export default {
             productionToDelete: null,
             productions: [],
             products: [],
+            productPagination: {
+                totalPages: 0,
+                totalElements: 0,
+                pageNumber: 0,
+                pageSize: 1000,
+                loading: false,
+                hasMore: true
+            },
             pagination: {
                 totalPages: 0,
                 totalElements: 0,
@@ -317,6 +335,16 @@ export default {
     mounted() {
         this.fetchProductions(0); // Start with page 0 for backend (equivalent to UI page 1)
         this.fetchProducts();
+
+        // Add event listener for modal shown to reset product pagination
+        $(document).on('shown.bs.modal', '#productionModal', () => {
+            // Reset product pagination if needed
+            if (this.products.length === 0 || this.productPagination.pageNumber > 0) {
+                this.productPagination.pageNumber = 0;
+                this.productPagination.hasMore = true;
+                this.fetchProducts(0, false);
+            }
+        });
     },
     watch: {
         searchQuery: function(newVal) {
@@ -433,14 +461,48 @@ export default {
                 });
         },
 
-        fetchProducts() {
-            this.Api.get('/product')
+        fetchProducts(page = 0, append = false) {
+            if (this.productPagination.loading || (!append && !this.productPagination.hasMore)) return;
+
+            this.productPagination.loading = true;
+
+            // Prepare query parameters
+            const queryParams = new URLSearchParams();
+            queryParams.append('page', page + 1); // Convert 0-based to 1-based
+            queryParams.append('size', this.productPagination.pageSize);
+
+            this.Api.get(`/product?${queryParams.toString()}`)
                 .then(response => {
-                    this.products = response.data.content || response.data;
+                    const newProducts = response.data.content || response.data;
+
+                    // If append is true, add to existing products, otherwise replace
+                    if (append) {
+                        this.products = [...this.products, ...newProducts];
+                    } else {
+                        this.products = newProducts;
+                    }
+
+                    // Update product pagination data
+                    this.productPagination = {
+                        ...this.productPagination,
+                        totalPages: response.data.total_pages || 0,
+                        totalElements: response.data.total_elements || 0,
+                        pageNumber: page,
+                        hasMore: page < (response.data.total_pages - 1),
+                        loading: false
+                    };
                 })
                 .catch(error => {
                     console.error('Error fetching products:', error);
+                    this.productPagination.loading = false;
                 });
+        },
+
+        loadMoreProducts() {
+            if (this.productPagination.hasMore && !this.productPagination.loading) {
+                const nextPage = this.productPagination.pageNumber + 1;
+                this.fetchProducts(nextPage, true);
+            }
         },
 
         changePage(page) {
@@ -574,6 +636,18 @@ export default {
             }
         },
 
+        handleProductScroll(event) {
+            // Check if user has scrolled to the bottom
+            const select = event.target;
+            const scrollPosition = select.scrollTop + select.clientHeight;
+            const scrollHeight = select.scrollHeight;
+
+            // If scrolled to near bottom (within 20px), load more products
+            if (scrollHeight - scrollPosition <= 20) {
+                this.loadMoreProducts();
+            }
+        },
+
         saveProduction() {
             this.loading = true;
 
@@ -638,5 +712,10 @@ export default {
 }
 .progress-bar {
     min-width: 2em;
+}
+/* Style for product dropdown to enable scrolling */
+#productionProduct {
+    max-height: 200px;
+    overflow-y: auto;
 }
 </style>

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,17 +31,19 @@ public class OrderService {
     private final ProductRepository productRepository;
     private final OrderPaymentRepository orderPaymentRepository;
     private final UserProfileRepository userProfileRepository;
+    private final StockAlertRepository stockAlertRepository;
     private NumberGenerator numberGenerator;
 
     public OrderService(OrderRepository orderRepository, CustomerRepository customerRepository,
-                        ProductRepository productRepository, OrderDetailRepository orderDetailRepository,
-                        OrderPaymentRepository orderPaymentRepository, UserProfileRepository userProfileRepository, NumberGenerator numberGenerator) {
+                        ProductRepository productRepository,
+                        OrderPaymentRepository orderPaymentRepository, UserProfileRepository userProfileRepository, NumberGenerator numberGenerator, StockAlertRepository stockAlertRepository) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
         this.orderPaymentRepository = orderPaymentRepository;
         this.userProfileRepository = userProfileRepository;
         this.numberGenerator = numberGenerator;
+        this.stockAlertRepository = stockAlertRepository;
     }
 
 
@@ -83,13 +86,6 @@ public class OrderService {
             Product product = productRepository.findById(detailReq.getProductId())
                     .orElseThrow(() -> new RuntimeException("Product not found"));
 
-//            if (product.getStock() < detailReq.getQuantity()) {
-//                throw new RuntimeException("Stock tidak mencukupi untuk produk: " + product.getName());
-//            }
-//
-//            product.setStock(product.getStock() - detailReq.getQuantity());
-//            productRepository.save(product);
-
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setProduct(product);
@@ -98,13 +94,14 @@ public class OrderService {
             detail.setSubtotal(product.getSellingPrice().multiply(BigDecimal.valueOf(detailReq.getQuantity())));
             detailList.add(detail);
             totalAmount = totalAmount.add(product.getSellingPrice().multiply(BigDecimal.valueOf(detailReq.getQuantity())));
+
+            //check stock alerts
+            checkStockAndCreateAlerts(detail);
+
         }
 
         order.setTotalAmount(totalAmount);
         order.setAmountPaid(BigDecimal.ZERO); // akan dihitung dari payments
-
-       // Order savedOrder = orderRepository.save(order);
-       // orderDetailRepository.saveAll(detailList);
         order.setDetails(detailList);
 
         // Handle pembayaran awal (DP)
@@ -123,7 +120,6 @@ public class OrderService {
                 payments.add(payment);
             }
             order.setPayments(payments);
-            //orderPaymentRepository.saveAll(payments);
         }
 
         order.setAmountPaid(totalPaid);
@@ -173,6 +169,11 @@ public class OrderService {
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
         order.setOrderStatus(status);
+        if(OrderStatus.COMPLETED.equals(status)){
+            for(OrderDetail detail : order.getDetails()) {
+                detail.getProduct().setStock(detail.getProduct().getStock() - detail.getQuantity());
+            }
+        }
         return orderRepository.save(order);
     }
 
@@ -181,7 +182,56 @@ public class OrderService {
         order.setOrderStatus(request.getStatus());
         order.setOrderDate(request.getOrderDate());
         order.setDueDate(request.getDueDate());
+        if(OrderStatus.COMPLETED.equals(request.getStatus())){
+            for(OrderDetail detail : order.getDetails()) {
+                detail.getProduct().setStock(detail.getProduct().getStock() - detail.getQuantity());
+            }
+        }
 
         return orderRepository.save(order);
+    }
+
+    public void checkStockAndCreateAlerts(OrderDetail detail) {
+        Product product = productRepository.findById(detail.getProduct().getId()).orElseThrow(() -> new RuntimeException("Order not found"));
+        int stock = product.getStock();
+        int required = detail.getQuantity();
+
+        if (stock < required) {
+            int deficit = required - stock;
+
+            // Cek apakah sudah ada alert yang belum selesai untuk produk ini
+            List<StockAlert> existingAlertOpt = stockAlertRepository.findByProductAndReasonAndResolvedFalse(product, "ORDER_DEFICIT");
+
+            if (!existingAlertOpt.isEmpty()) {
+                StockAlert existingAlert = existingAlertOpt.get(0);
+                existingAlert.setNeededQuantity(existingAlert.getNeededQuantity() + deficit);
+                existingAlert.setCurrentStock(stock);
+                stockAlertRepository.save(existingAlert);
+            } else {
+                StockAlert alert = new StockAlert();
+                alert.setProduct(product);
+                alert.setNeededQuantity(deficit);
+                alert.setCurrentStock(stock);
+                alert.setReason("ORDER_DEFICIT");
+                alert.setCreatedAt(LocalDateTime.now());
+                alert.setResolved(false);
+                stockAlertRepository.save(alert);
+            }
+        }
+
+        // Low stock alert
+        if (stock < 5) {
+            boolean exists = stockAlertRepository.existsByProductAndReasonAndResolvedFalse(product, "LOW_STOCK");
+            if (!exists) {
+                StockAlert lowStock = new StockAlert();
+                lowStock.setProduct(product);
+                lowStock.setNeededQuantity(0);
+                lowStock.setCurrentStock(stock);
+                lowStock.setReason("LOW_STOCK");
+                lowStock.setCreatedAt(LocalDateTime.now());
+                lowStock.setResolved(false);
+                stockAlertRepository.save(lowStock);
+            }
+        }
     }
 }

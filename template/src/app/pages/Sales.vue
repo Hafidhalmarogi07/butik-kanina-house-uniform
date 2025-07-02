@@ -23,16 +23,6 @@
                                     </div>
                                 </div>
                             </div>
-<!--                            <div class="col-md-3">-->
-<!--                                <div class="input-group">-->
-<!--                                    <div class="input-group-prepend">-->
-<!--                                        <span class="input-group-text">-->
-<!--                                            <i class="far fa-calendar-alt"></i>-->
-<!--                                        </span>-->
-<!--                                    </div>-->
-<!--                                    <input type="text" class="form-control" id="dateRange" placeholder="Date range">-->
-<!--                                </div>-->
-<!--                            </div>-->
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter">
                                     <option value="">All Statuses</option>
@@ -130,12 +120,36 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="customer">Customer</label>
-                                        <select class="form-control" id="customer" v-model="currentSale.customer.id" required>
-                                            <option value="">Select Customer</option>
-                                            <option v-for="customer in customers" :key="customer.id" :value="customer.id">
-                                                {{ customer.nama }}
-                                            </option>
-                                        </select>
+                                        <div class="dropdown">
+                                            <input 
+                                                type="text" 
+                                                class="form-control" 
+                                                id="customer" 
+                                                placeholder="Select Customer"
+                                                data-toggle="dropdown"
+                                                :value="getSelectedCustomerName()"
+                                                required
+                                            >
+                                            <div class="dropdown-menu w-100" style="max-height: 300px; overflow-y: auto;" @scroll="handleCustomerScroll">
+                                                <a 
+                                                    class="dropdown-item" 
+                                                    href="#" 
+                                                    v-for="customer in customers" 
+                                                    :key="customer.id" 
+                                                    @click.prevent="selectCustomer(customer)"
+                                                >
+                                                    {{ customer.nama }}
+                                                </a>
+                                                <div v-if="loadingCustomers" class="text-center py-2">
+                                                    <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                                        <span class="sr-only">Loading...</span>
+                                                    </div>
+                                                </div>
+                                                <div v-if="customers.length === 0 && !loadingCustomers" class="text-center py-2">
+                                                    No customers found
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -169,12 +183,14 @@
                                             <tbody>
                                                 <tr v-for="(item, index) in currentSale.details" :key="index">
                                                     <td>
-                                                        <select class="form-control" v-model="item.product.id" @change="updateItemPrice(index)">
-                                                            <option value="">Select Product</option>
-                                                            <option v-for="product in products" :key="product.id" :value="product.id">
-                                                                {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
-                                                            </option>
-                                                        </select>
+                                                        <div class="form-group mb-0">
+                                                            <select class="form-control" v-model="item.product.id" @change="updateItemPrice(index)" required>
+                                                                <option value="">Select Product</option>
+                                                                <option v-for="product in products" :key="product.id" :value="product.id">
+                                                                    {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
+                                                                </option>
+                                                            </select>
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <input type="number" class="form-control" v-model="item.quantity" @change="calculateSubtotal(index)" min="1">
@@ -303,6 +319,7 @@
                 </div>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -334,7 +351,15 @@ export default {
                 pageNumber: 0,
                 pageSize: 10
             },
+            customerPagination: {
+                totalPages: 0,
+                totalElements: 0,
+                pageNumber: 0,
+                pageSize: 1000
+            },
             loading: false,
+            loadingCustomers: false,
+            loadingProducts: false,
             error: null
         }
     },
@@ -396,7 +421,7 @@ export default {
         statusFilter: function() {
             // Reset to first page and fetch sales with new status filter
             this.changePage(1);
-        }
+        },
     },
     methods: {
         fetchSales(page = 0) {
@@ -501,25 +526,80 @@ export default {
                 });
         },
 
-        fetchCustomers() {
-            this.Api.get('/customers')
+        fetchCustomers(page = 0, append = false) {
+            this.loadingCustomers = true;
+
+            // Prepare params object with pagination
+            const params = {
+                page: page + 1, // Convert 0-based to 1-based for API
+                size: this.customerPagination.pageSize
+            };
+
+            // Convert params object to URL query string
+            const queryParams = new URLSearchParams();
+            queryParams.append('page', params.page);
+            queryParams.append('size', params.size);
+
+            this.Api.get(`/customers?${queryParams.toString()}`)
                 .then(response => {
-                    this.customers = response.data.content || response.data;
+                    if (response.data && response.data.content) {
+                        if (append) {
+                            // Append new customers to existing list
+                            this.customers = [...this.customers, ...response.data.content];
+                        } else {
+                            // Replace customers list
+                            this.customers = response.data.content;
+                        }
+
+                        // Update pagination data
+                        this.customerPagination = {
+                            totalPages: response.data.total_pages || 0,
+                            totalElements: response.data.total_elements || 0,
+                            pageNumber: response.data.number !== undefined ? response.data.number : page,
+                            pageSize: response.data.size || this.customerPagination.pageSize
+                        };
+                    } else {
+                        // Handle case where response is not paginated
+                        if (append) {
+                            this.customers = [...this.customers, ...(Array.isArray(response.data) ? response.data : [])];
+                        } else {
+                            this.customers = Array.isArray(response.data) ? response.data : [];
+                        }
+                        this.customerPagination.totalElements = this.customers.length;
+                        this.customerPagination.totalPages = 1;
+                    }
+
+                    this.loadingCustomers = false;
                 })
                 .catch(error => {
                     console.error('Error fetching customers:', error);
+                    this.loadingCustomers = false;
                 });
         },
 
         fetchProducts() {
-            this.Api.get('/product')
+            this.loadingProducts = true;
+
+            // Fetch all products without pagination
+            this.Api.get('/product?size=1000')
                 .then(response => {
                     this.products = response.data.content || response.data;
+                    this.loadingProducts = false;
                 })
                 .catch(error => {
                     console.error('Error fetching products:', error);
+                    this.loadingProducts = false;
                 });
         },
+
+
+        selectProduct(product, index) {
+            // Update the selected product in the current sale details
+            this.currentSale.details[index].product.id = product.id;
+            // Update the price and subtotal
+            this.updateItemPrice(index);
+        },
+
 
         changePage(page) {
             // page parameter is 1-based from UI, convert to 0-based for backend
@@ -907,7 +987,45 @@ export default {
 
                     this.loading = false;
                 });
-        }
+        },
+
+
+
+        getProductName(productId) {
+            const product = this.products.find(p => p.id === productId);
+            if (product) {
+                return `${product.name} (${product.size})`;
+            }
+            return 'Unknown Product';
+        },
+
+        getSelectedCustomerName() {
+            if (!this.currentSale.customer.id) return '';
+
+            const customer = this.customers.find(c => c.id === this.currentSale.customer.id);
+            if (customer) {
+                return `${customer.nama}`;
+            }
+            return 'Select Customer';
+        },
+
+        selectCustomer(customer) {
+            this.currentSale.customer.id = customer.id;
+        },
+
+        handleCustomerScroll(event) {
+            const target = event.target;
+            // Check if scrolled to bottom (with a small threshold)
+            if (target.scrollHeight - target.scrollTop - target.clientHeight < 50) {
+                // Check if we have more pages to load and we're not currently loading
+                if (!this.loadingCustomers && 
+                    this.customerPagination.pageNumber < this.customerPagination.totalPages - 1) {
+                    // Load next page and append results
+                    this.fetchCustomers(this.customerPagination.pageNumber + 1, true);
+                }
+            }
+        },
+
     }
 }
 </script>
@@ -915,5 +1033,24 @@ export default {
 <style scoped>
 .table th, .table td {
     vertical-align: middle;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Custom dropdown styles */
+.dropdown-menu {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
 }
 </style>
