@@ -47,9 +47,9 @@
                     <div class="icon">
                         <i class="fas fa-boxes"></i>
                     </div>
-                    <router-link to="/inventory" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                    </router-link>
+<!--                    <router-link to="/inventory" class="small-box-footer">-->
+<!--                        More info <i class="fas fa-arrow-circle-right"></i>-->
+<!--                    </router-link>-->
                 </div>
             </div>
             <div class="col-lg-3 col-6">
@@ -61,9 +61,9 @@
                     <div class="icon">
                         <i class="fas fa-truck-loading"></i>
                     </div>
-                    <router-link to="/incoming-stock" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                    </router-link>
+<!--                    <router-link to="/incoming-stock" class="small-box-footer">-->
+<!--                        More info <i class="fas fa-arrow-circle-right"></i>-->
+<!--                    </router-link>-->
                 </div>
             </div>
             <div class="col-lg-3 col-6">
@@ -75,9 +75,9 @@
                     <div class="icon">
                         <i class="fas fa-shipping-fast"></i>
                     </div>
-                    <router-link to="/outgoing-stock" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                    </router-link>
+<!--                    <router-link to="/outgoing-stock" class="small-box-footer">-->
+<!--                        More info <i class="fas fa-arrow-circle-right"></i>-->
+<!--                    </router-link>-->
                 </div>
             </div>
             <div class="col-lg-3 col-6">
@@ -89,9 +89,9 @@
                     <div class="icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <router-link to="/low-stock" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
-                    </router-link>
+<!--                    <router-link to="/low-stock" class="small-box-footer">-->
+<!--                        More info <i class="fas fa-arrow-circle-right"></i>-->
+<!--                    </router-link>-->
                 </div>
             </div>
         </div>
