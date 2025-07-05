@@ -1,6 +1,7 @@
 package id.co.butik.controller;
 
 import id.co.butik.dto.retur.ReturnRequest;
+import id.co.butik.dto.retur.StatusUpdateRequest;
 import id.co.butik.entity.OrderReturn;
 import id.co.butik.service.ReturnService;
 import id.co.butik.service.SaleReturnService;
@@ -48,5 +49,10 @@ public class OrderReturnController {
     @DeleteMapping({"/{id}", "/{id}/"})
     public String deleteSaleReturn(@PathVariable Long id) {
         return saleReturnService.deleteSaleReturn(id);
+    }
+
+    @PatchMapping({"/{id}/status", "/{id}/status/"})
+    public OrderReturn updateOrderReturnStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
+        return saleReturnService.updateOrderReturnStatus(id, request.getStatus());
     }
 }

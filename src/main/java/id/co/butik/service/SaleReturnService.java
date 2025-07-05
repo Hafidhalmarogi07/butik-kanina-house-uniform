@@ -1,6 +1,7 @@
 package id.co.butik.service;
 
 import id.co.butik.entity.OrderReturn;
+import id.co.butik.enums.ReturnStatus;
 import id.co.butik.repository.SaleReturnRepository;
 import id.co.butik.responseException.BadRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -43,5 +44,11 @@ public class SaleReturnService {
         saleReturnRepository.findById(id).orElseThrow(() -> new BadRequest("Sale Return not found"));
         saleReturnRepository.deleteById(id);
         return "{\"success\":true}";
+    }
+
+    public OrderReturn updateOrderReturnStatus(Long id, ReturnStatus status) {
+        OrderReturn orderReturn = getSaleReturnById(id);
+        orderReturn.setStatusReturn(status);
+        return saleReturnRepository.save(orderReturn);
     }
 }
