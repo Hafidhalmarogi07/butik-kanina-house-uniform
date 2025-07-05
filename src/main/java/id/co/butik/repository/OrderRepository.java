@@ -29,4 +29,6 @@ public interface OrderRepository extends PagingAndSortingRepository<Order, Long>
     @Query("SELECT o FROM Order o ORDER BY o.orderDate DESC")
     List<Order> findRecentOrder(Pageable pageable);
 
+    Order findOneByOrderNumber(String orderNumber);
+
 }

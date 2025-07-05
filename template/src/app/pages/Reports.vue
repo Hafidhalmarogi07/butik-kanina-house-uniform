@@ -4,30 +4,30 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Reports</h3>
+                        <h3 class="card-title">Laporan</h3>
                     </div>
                     <div class="card-body">
                         <div class="row mb-4">
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Report Type</label>
+                                    <label>Jenis Laporan</label>
                                     <select class="form-control" v-model="selectedReportType">
-                                        <option value="sales">Sales Report</option>
-                                        <option value="expenses">Expenses Report</option>
-                                        <option value="orders">Orders Report</option>
+                                        <option value="sales">Laporan Penjualan</option>
+                                        <option value="expenses">Laporan Pengeluaran</option>
+                                        <option value="orders">Laporan Pesanan</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-3">
                                 <div class="form-group">
-                                    <label>Period</label>
+                                    <label>Periode</label>
                                     <select class="form-control" v-model="selectedPeriod">
-                                        <option value="daily">Daily</option>
-                                        <option value="weekly">Weekly</option>
-                                        <option value="monthly">Monthly</option>
-                                        <option value="quarterly">Quarterly</option>
-                                        <option value="yearly">Yearly</option>
-                                        <option value="custom">Custom Range</option>
+                                        <option value="daily">Harian</option>
+                                        <option value="weekly">Mingguan</option>
+                                        <option value="monthly">Bulanan</option>
+                                        <option value="quarterly">Triwulan</option>
+                                        <option value="yearly">Tahunan</option>
+                                        <option value="custom">Rentang Kustom</option>
                                     </select>
                                 </div>
                             </div>
@@ -35,13 +35,13 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>Start Date</label>
+                                            <label>Tanggal Mulai</label>
                                             <input type="date" class="form-control" v-model="startDate">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label>End Date</label>
+                                            <label>Tanggal Akhir</label>
                                             <input type="date" class="form-control" v-model="endDate">
                                         </div>
                                     </div>
@@ -49,27 +49,27 @@
                             </div>
                             <div class="col-md-2 mb-3 d-flex align-items-end">
                                 <button type="button" class="btn btn-primary btn-block" @click="generateReport">
-                                    <i class="fas fa-chart-bar mr-1"></i> Generate Report
+                                    <i class="fas fa-chart-bar mr-1"></i> Buat Laporan
                                 </button>
                             </div>
                         </div>
 
                         <!-- Sales Report -->
                         <div v-if="selectedReportType === 'sales' && showReport" class="report-container">
-                          <h4>Sales Report - {{ formatPeriodTitle() }}</h4>
+                          <h4>Laporan Penjualan - {{ formatPeriodTitle() }}</h4>
                           <div class="card mt-4">
                                 <div class="card-header">
-                                    <h5 class="card-title">Recent Sales</h5>
+                                    <h5 class="card-title">Penjualan Terbaru</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Order ID</th>
-                                                    <th>Date</th>
-                                                    <th>Customer</th>
-                                                    <th>Items</th>
+                                                    <th>ID Pesanan</th>
+                                                    <th>Tanggal</th>
+                                                    <th>Pelanggan</th>
+                                                    <th>Item</th>
                                                     <th>Total</th>
                                                     <th>Status</th>
                                                 </tr>
@@ -92,23 +92,23 @@
 
                         <!-- Inventory Report -->
                         <div v-if="selectedReportType === 'inventory' && showReport" class="report-container">
-                            <h4>Inventory Report - {{ formatPeriodTitle() }}</h4>
+                            <h4>Laporan Inventaris - {{ formatPeriodTitle() }}</h4>
                             <div class="card">
                                 <div class="card-header">
-                                    <h5 class="card-title">Inventory Status</h5>
+                                    <h5 class="card-title">Status Inventaris</h5>
                                 </div>
                                 <div class="card-body">
                                     <div class="table-responsive">
                                         <table class="table table-bordered table-striped">
                                             <thead>
                                                 <tr>
-                                                    <th>Product ID</th>
-                                                    <th>Name</th>
-                                                    <th>Category</th>
-                                                    <th>Size</th>
-                                                    <th>Stock</th>
+                                                    <th>ID Produk</th>
+                                                    <th>Nama</th>
+                                                    <th>Kategori</th>
+                                                    <th>Ukuran</th>
+                                                    <th>Stok</th>
                                                     <th>Status</th>
-                                                    <th>Value</th>
+                                                    <th>Nilai</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -133,20 +133,20 @@
                         </div>
                       <!-- Order Report -->
                       <div v-if="selectedReportType === 'orders' && showReport" class="report-container">
-                        <h4>Order Report - {{ formatPeriodTitle() }}</h4>
+                        <h4>Laporan Pesanan - {{ formatPeriodTitle() }}</h4>
                         <div class="card mt-4">
                           <div class="card-header">
-                            <h5 class="card-title">Orders</h5>
+                            <h5 class="card-title">Pesanan</h5>
                           </div>
                           <div class="card-body">
                             <div class="table-responsive">
                               <table class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
-                                  <th>Order ID</th>
-                                  <th>Date</th>
-                                  <th>Customer</th>
-                                  <th>Items</th>
+                                  <th>ID Pesanan</th>
+                                  <th>Tanggal</th>
+                                  <th>Pelanggan</th>
+                                  <th>Item</th>
                                   <th>Total</th>
                                   <th>Status</th>
                                 </tr>
@@ -169,10 +169,10 @@
 
                       <!-- Expenses Report -->
                       <div v-if="selectedReportType === 'expenses' && showReport" class="report-container">
-                        <h4>Expenses Report - {{ formatPeriodTitle() }}</h4>
+                        <h4>Laporan Pengeluaran - {{ formatPeriodTitle() }}</h4>
                         <div class="card mt-4">
                           <div class="card-header">
-                            <h5 class="card-title">Expenses</h5>
+                            <h5 class="card-title">Pengeluaran</h5>
                           </div>
                           <div class="card-body">
                             <div class="table-responsive">
@@ -180,10 +180,10 @@
                                 <thead>
                                 <tr>
                                   <th>ID</th>
-                                  <th>Date</th>
-                                  <th>Category</th>
-                                  <th>Description</th>
-                                  <th>Amount</th>
+                                  <th>Tanggal</th>
+                                  <th>Kategori</th>
+                                  <th>Deskripsi</th>
+                                  <th>Jumlah</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -214,7 +214,7 @@
                         <!-- No report selected or generated yet -->
                         <div v-if="!showReport" class="text-center py-5">
                             <i class="fas fa-chart-bar fa-4x text-muted"></i>
-                            <p class="mt-3">Select a report type and period, then click "Generate Report" to view data</p>
+                            <p class="mt-3">Pilih jenis laporan dan periode, kemudian klik "Buat Laporan" untuk melihat data</p>
                         </div>
                     </div>
                     <div class="card-footer" v-if="showReport">
@@ -223,10 +223,10 @@
 <!--                                <i class="fas fa-print"></i> Print-->
 <!--                            </button>-->
                             <button type="button" class="btn btn-default" @click="exportPDF">
-                                <i class="fas fa-file-pdf"></i> Export PDF
+                                <i class="fas fa-file-pdf"></i> Ekspor PDF
                             </button>
                             <button type="button" class="btn btn-default" @click="exportExcel">
-                                <i class="fas fa-file-excel"></i> Export Excel
+                                <i class="fas fa-file-excel"></i> Ekspor Excel
                             </button>
                         </div>
                     </div>
@@ -315,22 +315,27 @@ export default {
           }
         },
         formatPeriodTitle() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.toLocaleString('id-ID', { month: 'long' });
+            const quarter = Math.floor(now.getMonth() / 3) + 1;
+
             switch(this.selectedPeriod) {
-                case 'daily': return 'Daily (Today)';
-                case 'weekly': return 'Weekly (Last 7 Days)';
-                case 'monthly': return 'Monthly (May 2023)';
-                case 'quarterly': return 'Quarterly (Q2 2023)';
-                case 'yearly': return 'Yearly (2023)';
-                case 'custom': return `${this.startDate} to ${this.endDate}`;
+                case 'daily': return 'Harian (Hari Ini)';
+                case 'weekly': return 'Mingguan (7 Hari Terakhir)';
+                case 'monthly': return `Bulanan (${month} ${year})`;
+                case 'quarterly': return `Triwulan (Q${quarter} ${year})`;
+                case 'yearly': return `Tahunan (${year})`;
+                case 'custom': return `${this.startDate} sampai ${this.endDate}`;
                 default: return '';
             }
         },
         getReportTitle() {
             switch(this.selectedReportType) {
-                case 'sales': return 'Sales Report';
-                case 'expenses': return 'Expenses Report';
-                case 'orders': return 'Orders Report';
-                default: return 'Report';
+                case 'sales': return 'Laporan Penjualan';
+                case 'expenses': return 'Laporan Pengeluaran';
+                case 'orders': return 'Laporan Pesanan';
+                default: return 'Laporan';
             }
         },
         getStatusClass(status) {
@@ -340,13 +345,18 @@ export default {
                 case 'Shipped': return 'badge badge-primary';
                 case 'Delivered': return 'badge badge-success';
                 case 'Cancelled': return 'badge badge-danger';
+                case 'Tertunda': return 'badge badge-warning';
+                case 'Diproses': return 'badge badge-info';
+                case 'Dikirim': return 'badge badge-primary';
+                case 'Terkirim': return 'badge badge-success';
+                case 'Dibatalkan': return 'badge badge-danger';
                 default: return 'badge badge-secondary';
             }
         },
         getStockStatus(stock) {
-            if (stock <= 5) return 'Low Stock';
-            if (stock <= 20) return 'Medium Stock';
-            return 'In Stock';
+            if (stock <= 5) return 'Stok Rendah';
+            if (stock <= 20) return 'Stok Sedang';
+            return 'Tersedia';
         },
         getStockStatusClass(stock) {
             if (stock <= 5) return 'badge badge-danger';

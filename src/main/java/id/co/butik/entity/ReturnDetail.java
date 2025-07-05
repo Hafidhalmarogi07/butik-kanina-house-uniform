@@ -18,7 +18,7 @@ public class ReturnDetail extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private SaleOrderReturn saleOrderReturn;
+    private OrderReturn orderReturn;
 
     @ManyToOne
     private Product product;
