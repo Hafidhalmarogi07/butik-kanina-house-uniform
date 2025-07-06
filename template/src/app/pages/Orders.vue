@@ -184,17 +184,17 @@
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Product</th>
-                                                    <th>Quantity</th>
-                                                    <th>Subtotal</th>
-                                                    <th>Action</th>
+                                                  <th>Produk</th>
+                                                  <th>Jumlah</th>
+                                                  <th>Subtotal</th>
+                                                  <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(item, index) in currentOrder.details" :key="index">
                                                     <td>
                                                         <select class="form-control" v-model="item.product_id" @change="updateItemPrice(index)">
-                                                            <option value="">Select Product</option>
+                                                            <option value="">Pilih Produk</option>
                                                             <option v-for="product in products" :key="product.id" :value="product.id">
                                                                 {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
                                                             </option>
@@ -215,7 +215,7 @@
                                                 <tr>
                                                     <td colspan="4">
                                                         <button type="button" class="btn btn-primary btn-sm" @click="addItem">
-                                                            <i class="fas fa-plus"></i> Add Item
+                                                            <i class="fas fa-plus"></i> Tambah Barang
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -227,16 +227,16 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <h5>Payments</h5>
+                                    <h5>Pembayaran</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Payment Date</th>
-                                                    <th>Amount</th>
-                                                    <th>Payment Method</th>
-                                                    <th>Notes</th>
-                                                    <th>Action</th>
+                                                  <th>Tanggal Pembayaran</th>
+                                                  <th>Jumlah</th>
+                                                  <th>Metode Pembayaran</th>
+                                                  <th>Catatan</th>
+                                                  <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -264,15 +264,15 @@
                                                     </td>
                                                 </tr>
                                             </tbody>
-                                            <tfoot>
-                                                <tr>
-                                                    <td colspan="5">
-                                                        <button type="button" class="btn btn-primary btn-sm" @click="addPayment">
-                                                            <i class="fas fa-plus"></i> Add Payment
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                            </tfoot>
+<!--                                            <tfoot>-->
+<!--                                                <tr>-->
+<!--                                                    <td colspan="5">-->
+<!--                                                        <button type="button" class="btn btn-primary btn-sm" @click="addPayment">-->
+<!--                                                            <i class="fas fa-plus"></i> Add Payment-->
+<!--                                                        </button>-->
+<!--                                                    </td>-->
+<!--                                                </tr>-->
+<!--                                            </tfoot>-->
                                         </table>
                                     </div>
                                 </div>
@@ -281,7 +281,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="notes">Notes</label>
+                                        <label for="notes">Catatan</label>
                                         <textarea class="form-control" id="notes" rows="3" v-model="currentOrder.notes"></textarea>
                                     </div>
                                 </div>
