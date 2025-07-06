@@ -22,9 +22,6 @@ public class UserProfile extends BaseEntity {
 
     private String fullName;
 
-    @Column(unique = true)
-    private String username;
-
     private String photoProfile;
 
     private String description;

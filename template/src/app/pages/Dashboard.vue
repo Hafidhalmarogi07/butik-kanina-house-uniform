@@ -6,13 +6,13 @@
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>{{ dashboardData.sales }}</h3>
-                        <p>Total Sales</p>
+                        <p>Total Penjualan</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
                     <router-link to="/sales" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info lebih lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -20,13 +20,13 @@
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>{{ dashboardData.orders }}</h3>
-                        <p>Orders</p>
+                        <p>Pesanan</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-shopping-bag"></i>
                     </div>
                     <router-link to="/orders" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info lebih lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -34,13 +34,13 @@
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>Rp {{ formatCurrency(dashboardData.revenue) }}</h3>
-                        <p>Revenue</p>
+                        <p>Pendapatan</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-money-bill-alt"></i>
                     </div>
                     <router-link to="/reports" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info lebih lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -48,26 +48,26 @@
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>Rp {{ formatCurrency(dashboardData.expenses) }}</h3>
-                        <p>Expenses</p>
+                        <p>Pengeluaran</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
                     <router-link to="/expenses" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info lebih lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
         </div>
 
         <div class="row">
-            <!-- Monthly Sales Chart -->
+            <!-- Grafik Penjualan Bulanan -->
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-bar mr-1"></i>
-                            Monthly Sales
+                            Penjualan Bulanan
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -92,7 +92,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-pie mr-1"></i>
-                            Product Categories
+                            Kategori Produk
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -115,7 +115,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header border-transparent">
-                        <h3 class="card-title">Recent Sales</h3>
+                        <h3 class="card-title">Penjualan Terbaru</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -130,10 +130,10 @@
                             <table class="table m-0">
                                 <thead>
                                     <tr>
-                                        <th>Invoice Number</th>
-                                        <th>Item</th>
+                                        <th>Nomor Faktur</th>
+                                        <th>Barang</th>
                                         <th>Status</th>
-                                        <th>Amount</th>
+                                        <th>Jumlah</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,15 +145,15 @@
                                     </tr>
                                     <!-- Fallback if no sales are available -->
                                     <tr v-if="recentSales.length === 0">
-                                        <td colspan="4" class="text-center">No recent sales available</td>
+                                        <td colspan="4" class="text-center">Tidak ada penjualan terbaru</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <router-link to="/sales" class="btn btn-sm btn-info float-left">Place New Order</router-link>
-                        <router-link to="/sales" class="btn btn-sm btn-secondary float-right">View All Sales</router-link>
+                        <router-link to="/sales" class="btn btn-sm btn-info float-left">Buat Pesanan Baru</router-link>
+                        <router-link to="/sales" class="btn btn-sm btn-secondary float-right">Lihat Semua Penjualan</router-link>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Top Products</h3>
+                        <h3 class="card-title">Produk Terlaris</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -189,13 +189,13 @@
                             <!-- Fallback if no products are available -->
                             <li v-if="topProducts.length === 0" class="item">
                                 <div class="product-info">
-                                    <span class="product-title">No products available</span>
+                                    <span class="product-title">Tidak ada produk tersedia</span>
                                 </div>
                             </li>
                         </ul>
                     </div>
                     <div class="card-footer text-center">
-                        <router-link to="/products" class="uppercase">View All Products</router-link>
+                        <router-link to="/products" class="uppercase">Lihat Semua Produk</router-link>
                     </div>
                 </div>
             </div>
@@ -231,7 +231,7 @@ export default {
         fetchDashboardData() {
             // Get the base URL from environment or use a default
 
-            // Fetch dashboard data from API
+            // Ambil data dasbor dari API
           this.Api.get(`/dashboard/inner`)
                 .then(response => {
                   if (response.data){
@@ -240,25 +240,25 @@ export default {
                 })
 
                 .catch(error => {
-                    console.error('Error fetching dashboard data:', error);
+                    console.error('Kesalahan mengambil data dasbor:', error);
                 });
         },
         fetchProductCategories() {
-            // Fetch product categories data from API
+            // Ambil data kategori produk dari API
             this.Api.get(`/dashboard/product-category`)
                 .then(response => {
                     if (response.data) {
                         this.productCategories = response.data;
-                        // Update the pie chart with the new data
+                        // Perbarui grafik pie dengan data baru
                         this.updatePieChart();
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching product categories data:', error);
+                    console.error('Kesalahan mengambil data kategori produk:', error);
                 });
         },
         fetchTopProducts() {
-            // Fetch top products data from API (limit to 4 products)
+            // Ambil data produk teratas dari API (batasi hingga 4 produk)
             this.Api.get(`/dashboard/top-products?limit=4`)
                 .then(response => {
                     if (response.data) {
@@ -266,11 +266,11 @@ export default {
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching top products data:', error);
+                    console.error('Kesalahan mengambil data produk teratas:', error);
                 });
         },
         fetchRecentSales() {
-            // Fetch recent sales data from API (limit to 5 sales)
+            // Ambil data penjualan terbaru dari API (batasi hingga 5 penjualan)
             this.Api.get(`/dashboard/recent-sales?limit=5`)
                 .then(response => {
                     if (response.data) {
@@ -278,25 +278,25 @@ export default {
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching recent sales data:', error);
+                    console.error('Kesalahan mengambil data penjualan terbaru:', error);
                 });
         },
         fetchMonthlySales() {
-            // Fetch monthly sales data from API
+            // Ambil data penjualan bulanan dari API
             this.Api.get(`/dashboard/monthly-sales`)
                 .then(response => {
                     if (response.data) {
                         this.monthlySales = response.data;
-                        // Update the sales chart with the new data
+                        // Perbarui grafik penjualan dengan data baru
                         this.updateSalesChart();
                     }
                 })
                 .catch(error => {
-                    console.error('Error fetching monthly sales data:', error);
+                    console.error('Kesalahan mengambil data penjualan bulanan:', error);
                 });
         },
         formatCurrency(value) {
-            // Format number to Indonesian currency format
+            // Format angka ke format mata uang Indonesia
             if (!value) return '0';
 
             return new Intl.NumberFormat('id-ID', {
@@ -305,39 +305,39 @@ export default {
             }).format(value);
         },
         getBadgeClass(index) {
-            // Return different badge classes based on index
+            // Mengembalikan kelas lencana berbeda berdasarkan indeks
             const badgeClasses = ['badge-warning', 'badge-info', 'badge-danger', 'badge-success', 'badge-primary'];
             return badgeClasses[index % badgeClasses.length];
         },
         getStatusBadgeClass(status) {
-            // Return badge class based on sale status
+            // Mengembalikan kelas lencana berdasarkan status penjualan
             if (!status) return 'badge-secondary';
 
             switch(status) {
-                case 'COMPLETED':
-                case 'SHIPPED':
+                case 'SELESAI':
+                case 'DIKIRIM':
                     return 'badge-success';
-                case 'PENDING':
+                case 'TERTUNDA':
                     return 'badge-warning';
-                case 'PROCESSING':
+                case 'DIPROSES':
                     return 'badge-info';
-                case 'CANCELLED':
+                case 'DIBATALKAN':
                     return 'badge-danger';
                 default:
                     return 'badge-primary';
             }
         },
         initCharts() {
-            // Sales Chart
+            // Grafik Penjualan
             if (document.getElementById('salesChart')) {
                 const salesChartCanvas = document.getElementById('salesChart').getContext('2d');
 
-                // Initial empty data
+                // Data kosong awal
                 const salesChartData = {
                     labels: [],
                     datasets: [
                         {
-                            label: 'Monthly Sales',
+                            label: 'Penjualan Bulanan',
                             backgroundColor: 'rgba(60,141,188,0.9)',
                             borderColor: 'rgba(60,141,188,0.8)',
                             pointRadius: false,
@@ -378,8 +378,8 @@ export default {
                 });
             }
 
-            // Initialize Pie Chart with empty data
-            // The actual data will be loaded by updatePieChart method
+            // Inisialisasi Grafik Pie dengan data kosong
+            // Data sebenarnya akan dimuat oleh metode updatePieChart
             this.initPieChart();
         },
 
@@ -387,10 +387,10 @@ export default {
             if (document.getElementById('pieChart')) {
                 const pieChartCanvas = document.getElementById('pieChart').getContext('2d');
 
-                // Default colors for pie chart segments
+                // Warna default untuk segmen grafik pie
                 const backgroundColors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de', '#6c757d', '#007bff', '#28a745', '#17a2b8'];
 
-                // Initial empty data
+                // Data kosong awal
                 const pieData = {
                     labels: [],
                     datasets: [
@@ -417,33 +417,33 @@ export default {
 
         updateSalesChart() {
             if (this.salesChart && this.monthlySales.length > 0) {
-                // Extract month names and sales amounts from the API response
+                // Ekstrak nama bulan dan jumlah penjualan dari respons API
                 const labels = this.monthlySales.map(item => item.month);
                 const data = this.monthlySales.map(item => item.items);
 
-                // Update chart data
+                // Perbarui data grafik
                 this.salesChart.data.labels = labels;
                 this.salesChart.data.datasets[0].data = data;
 
-                // Update the chart
+                // Perbarui grafik
                 this.salesChart.update();
             }
         },
 
         updatePieChart() {
             if (this.pieChart && this.productCategories.length > 0) {
-                // Extract category names and product counts from the API response
+                // Ekstrak nama kategori dan jumlah produk dari respons API
                 const labels = this.productCategories.map(category => category.category_name);
                 const data = this.productCategories.map(category => category.product_count);
 
-                // Update chart data
+                // Perbarui data grafik
                 this.pieChart.data.labels = labels;
                 this.pieChart.data.datasets[0].data = data;
 
-                // Ensure we have enough background colors
+                // Pastikan kita memiliki cukup warna latar belakang
                 const backgroundColors = ['#f56954', '#00a65a', '#f39c12', '#00c0ef', '#3c8dbc', '#d2d6de', '#6c757d', '#007bff', '#28a745', '#17a2b8'];
                 if (labels.length > backgroundColors.length) {
-                    // Generate additional colors if needed
+                    // Hasilkan warna tambahan jika diperlukan
                     for (let i = backgroundColors.length; i < labels.length; i++) {
                         const randomColor = '#' + Math.floor(Math.random()*16777215).toString(16);
                         backgroundColors.push(randomColor);
@@ -452,7 +452,7 @@ export default {
 
                 this.pieChart.data.datasets[0].backgroundColor = backgroundColors.slice(0, labels.length);
 
-                // Update the chart
+                // Perbarui grafik
                 this.pieChart.update();
             }
         }

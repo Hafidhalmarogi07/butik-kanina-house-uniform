@@ -42,7 +42,7 @@
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>{{ warehouseSummary.total_inventory }}</h3>
-                        <p>Total Inventory</p>
+                        <p>Total Inventaris</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-boxes"></i>
@@ -56,7 +56,7 @@
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>{{ warehouseSummary.incoming_stock }}</h3>
-                        <p>Incoming Stock</p>
+                        <p>Stok Masuk</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-truck-loading"></i>
@@ -70,7 +70,7 @@
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>{{ warehouseSummary.outgoing_stock }}</h3>
-                        <p>Outgoing Stock</p>
+                        <p>Stok Keluar</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-shipping-fast"></i>
@@ -84,7 +84,7 @@
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>{{ warehouseSummary.low_stock_items }}</h3>
-                        <p>Low Stock Items</p>
+                        <p>Barang Stok Rendah</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -103,7 +103,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-line mr-1"></i>
-                            Inventory Movement
+                            Pergerakan Inventaris
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -128,7 +128,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-warehouse mr-1"></i>
-                            Warehouse Capacity
+                            Kapasitas Gudang
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -151,7 +151,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header border-transparent">
-                        <h3 class="card-title">Recent Stock Movements</h3>
+                        <h3 class="card-title">Pergerakan Stok Terbaru</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -167,10 +167,10 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Item</th>
-                                        <th>Type</th>
-                                        <th>Quantity</th>
-                                        <th>Date</th>
+                                        <th>Barang</th>
+                                        <th>Tipe</th>
+                                        <th>Jumlah</th>
+                                        <th>Tanggal</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -214,8 +214,8 @@
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <router-link to="/stock-movement/create" class="btn btn-sm btn-info float-left">Add Stock Movement</router-link>
-                        <router-link to="/stock-movements" class="btn btn-sm btn-secondary float-right">View All Movements</router-link>
+                        <router-link to="/stock-movement/create" class="btn btn-sm btn-info float-left">Tambah Pergerakan Stok</router-link>
+                        <router-link to="/stock-movements" class="btn btn-sm btn-secondary float-right">Lihat Semua Pergerakan</router-link>
                     </div>
                 </div>
             </div>
@@ -224,7 +224,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Low Stock Items</h3>
+                        <h3 class="card-title">Barang Stok Rendah</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -287,7 +287,7 @@
                         </ul>
                     </div>
                     <div class="card-footer text-center">
-                        <router-link to="/products" class="uppercase">View All Product</router-link>
+                        <router-link to="/products" class="uppercase">Lihat Semua Produk</router-link>
                     </div>
                 </div>
             </div>
@@ -449,7 +449,7 @@ export default {
                     labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
                     datasets: [
                         {
-                            label: 'Incoming Stock',
+                            label: 'Stok Masuk',
                             backgroundColor: 'rgba(40,167,69,0.9)',
                             borderColor: 'rgba(40,167,69,0.8)',
                             pointRadius: false,
@@ -460,7 +460,7 @@ export default {
                             data: [65, 59, 80, 81, 56, 55, 40]
                         },
                         {
-                            label: 'Outgoing Stock',
+                            label: 'Stok Keluar',
                             backgroundColor: 'rgba(255,193,7,0.9)',
                             borderColor: 'rgba(255,193,7,0.8)',
                             pointRadius: false,
@@ -505,8 +505,8 @@ export default {
                 const capacityChartCanvas = document.getElementById('capacityChart').getContext('2d');
                 const capacityData = {
                     labels: [
-                        'Used Space',
-                        'Available Space'
+                        'Ruang Terpakai',
+                        'Ruang Tersedia'
                     ],
                     datasets: [
                         {

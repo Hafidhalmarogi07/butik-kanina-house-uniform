@@ -146,7 +146,6 @@ public class DatabaseSeeder implements ApplicationRunner {
             UserProfile oldUserProfile = userProfileRepository.findFirstByEmail(username);
             if (null == oldUserProfile) {
                 oldUserProfile = new UserProfile();
-                oldUserProfile.setUsername(username);
                 oldUserProfile.setEmail(username);
                 String[] name = username.split("@");
                 oldUserProfile.setFullName(name[0]);

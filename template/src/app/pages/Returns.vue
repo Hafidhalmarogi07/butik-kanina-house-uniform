@@ -4,10 +4,10 @@
       <div class="col-12">
         <div class="card">
           <div class="card-header">
-            <h3 class="card-title">Return List</h3>
+            <h3 class="card-title">Daftar Pengembalian</h3>
             <div class="card-tools">
               <button type="button" class="btn btn-primary" @click="showNewReturnModal">
-                <i class="fas fa-plus"></i> Create Return
+                <i class="fas fa-plus"></i> Buat Pengembalian
               </button>
             </div>
           </div>
@@ -15,7 +15,7 @@
             <div class="row mb-3">
               <div class="col-md-3">
                 <div class="input-group">
-                  <input type="text" class="form-control" placeholder="Search returns..." v-model="searchQuery">
+                  <input type="text" class="form-control" placeholder="Cari pengembalian..." v-model="searchQuery">
                   <div class="input-group-append">
                     <button class="btn btn-default" type="button">
                       <i class="fas fa-search"></i>
@@ -25,11 +25,11 @@
               </div>
               <div class="col-md-3">
                 <select class="form-control" v-model="statusFilter">
-                  <option value="">All Statuses</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="APPROVED">Approved</option>
-                  <option value="REJECTED">Rejected</option>
-                  <option value="COMPLETED">Completed</option>
+                  <option value="">Semua Status</option>
+                  <option value="PENDING">Tertunda</option>
+                  <option value="APPROVED">Disetujui</option>
+                  <option value="REJECTED">Ditolak</option>
+                  <option value="COMPLETED">Selesai</option>
                 </select>
               </div>
             </div>
@@ -37,14 +37,14 @@
               <table class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                  <th>Order #</th>
-                  <th>Return Date</th>
-                  <th>Reason</th>
-                  <th>Items</th>
-                  <th>Total Refund</th>
-                  <th>Return Type</th>
+                  <th>Pesanan #</th>
+                  <th>Tanggal Pengembalian</th>
+                  <th>Alasan</th>
+                  <th>Barang</th>
+                  <th>Total Pengembalian Dana</th>
+                  <th>Jenis Pengembalian</th>
                   <th>Status</th>
-                  <th>Actions</th>
+                  <th>Tindakan</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -97,7 +97,7 @@
               </li>
             </ul>
             <div v-else class="text-center">
-              <p>No returns found</p>
+              <p>Tidak ada pengembalian ditemukan</p>
             </div>
           </div>
         </div>
@@ -109,7 +109,7 @@
       <div class="modal-dialog modal-xl">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="newReturnModalLabel">New Return</h5>
+            <h5 class="modal-title" id="newReturnModalLabel">Pengembalian Baru</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -119,16 +119,16 @@
               <div class="row">
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label for="orderNumber">Order Number</label>
+                    <label for="orderNumber">Nomor Pesanan</label>
                     <input type="text" class="form-control" id="orderNumber" v-model="currentReturn.order_number" required>
                   </div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-group">
-                    <label for="returnType">Return Type</label>
+                    <label for="returnType">Jenis Pengembalian</label>
                     <select class="form-control" id="returnType" v-model="currentReturn.return_type" required>
-                      <option value="REFUND">Refund</option>
-                      <option value="EXCHANGE">Exchange</option>
+                      <option value="REFUND">Pengembalian Dana</option>
+                      <option value="EXCHANGE">Penukaran</option>
                     </select>
                   </div>
                 </div>
@@ -136,7 +136,7 @@
               <div class="row">
                 <div class="col-md-12">
                   <div class="form-group">
-                    <label for="reason">Reason</label>
+                    <label for="reason">Alasan</label>
                     <textarea class="form-control" id="reason" rows="3" v-model="currentReturn.reason" required></textarea>
                   </div>
                 </div>
@@ -144,22 +144,22 @@
 
               <div class="row mb-3">
                 <div class="col-12">
-                  <h5>Items</h5>
+                  <h5>Barang</h5>
                   <div class="table-responsive">
                     <table class="table table-bordered">
                       <thead>
                       <tr>
-                        <th>Product</th>
-                        <th>Quantity</th>
-                        <th>Reason</th>
-                        <th>Action</th>
+                        <th>Produk</th>
+                        <th>Jumlah</th>
+                        <th>Alasan</th>
+                        <th>Tindakan</th>
                       </tr>
                       </thead>
                       <tbody>
                       <tr v-for="(item, index) in currentReturn.items" :key="index">
                         <td>
                           <select class="form-control" v-model="item.product_id" required>
-                            <option value="">Select Product</option>
+                            <option value="">Pilih Produk</option>
                             <option v-for="product in products" :key="product.id" :value="product.id">
                               {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
                             </option>
@@ -182,7 +182,7 @@
                       <tr>
                         <td colspan="4">
                           <button type="button" class="btn btn-primary btn-sm" @click="addItem">
-                            <i class="fas fa-plus"></i> Add Item
+                            <i class="fas fa-plus"></i> Tambah Barang
                           </button>
                         </td>
                       </tr>
@@ -193,10 +193,10 @@
               </div>
 
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary" :disabled="loading">
                   <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  Create Return
+                  Buat Pengembalian
                 </button>
               </div>
             </form>
@@ -210,7 +210,7 @@
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="returnDetailsModalLabel">Return Details</h5>
+            <h5 class="modal-title" id="returnDetailsModalLabel">Detail Pengembalian</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -218,28 +218,28 @@
           <div class="modal-body" v-if="selectedReturn">
             <div class="row mb-3">
               <div class="col-md-6">
-                <p><strong>Order #:</strong> {{ selectedReturn.order ? selectedReturn.order.order_number : '' }}</p>
-                <p><strong>Return Date:</strong> {{ formatDate(selectedReturn.return_date) }}</p>
-                <p><strong>Return Type:</strong> {{ selectedReturn.return_type }}</p>
+                <p><strong>Pesanan #:</strong> {{ selectedReturn.order ? selectedReturn.order.order_number : '' }}</p>
+                <p><strong>Tanggal Pengembalian:</strong> {{ formatDate(selectedReturn.return_date) }}</p>
+                <p><strong>Jenis Pengembalian:</strong> {{ selectedReturn.return_type }}</p>
                 <p><strong>Status:</strong> <span :class="getStatusClass(selectedReturn.status_return)">{{ selectedReturn.status_return }}</span></p>
               </div>
               <div class="col-md-6">
                 <p><strong>Admin:</strong> {{ selectedReturn.admin ? selectedReturn.admin.full_name : '' }}</p>
-                <p><strong>Reason:</strong> {{ selectedReturn.reason }}</p>
-                <p><strong>Total Refund:</strong> {{ formatCurrency(selectedReturn.total_refund) }}</p>
+                <p><strong>Alasan:</strong> {{ selectedReturn.reason }}</p>
+                <p><strong>Total Pengembalian Dana:</strong> {{ formatCurrency(selectedReturn.total_refund) }}</p>
               </div>
             </div>
 
-            <h6>Items</h6>
+            <h6>Barang</h6>
             <div class="table-responsive">
               <table class="table table-bordered">
                 <thead>
                 <tr>
-                  <th>Product</th>
-                  <th>Size</th>
-                  <th>Price</th>
-                  <th>Quantity</th>
-                  <th>Note</th>
+                  <th>Produk</th>
+                  <th>Ukuran</th>
+                  <th>Harga</th>
+                  <th>Jumlah</th>
+                  <th>Catatan</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -255,7 +255,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
           </div>
         </div>
       </div>
@@ -266,7 +266,7 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="updateStatusModalLabel">Update Return Status</h5>
+            <h5 class="modal-title" id="updateStatusModalLabel">Perbarui Status Pengembalian</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -276,17 +276,17 @@
               <div class="form-group">
                 <label for="returnStatus">Status</label>
                 <select class="form-control" id="returnStatus" v-model="newStatus" required>
-                  <option value="PENDING">Pending</option>
-                  <option value="APPROVED">Approved</option>
-                  <option value="REJECTED">Rejected</option>
-                  <option value="COMPLETED">Completed</option>
+                  <option value="PENDING">Tertunda</option>
+                  <option value="APPROVED">Disetujui</option>
+                  <option value="REJECTED">Ditolak</option>
+                  <option value="COMPLETED">Selesai</option>
                 </select>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                 <button type="submit" class="btn btn-primary" :disabled="loading">
                   <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                  Update Status
+                  Perbarui Status
                 </button>
               </div>
             </form>
@@ -300,20 +300,20 @@
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="deleteReturnModalLabel">Confirm Delete</h5>
+            <h5 class="modal-title" id="deleteReturnModalLabel">Konfirmasi Hapus</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
-            <p>Are you sure you want to delete this return for order #{{ returnToDelete && returnToDelete.order ? returnToDelete.order.order_number : '' }}?</p>
-            <p class="text-danger">This action cannot be undone.</p>
+            <p>Apakah Anda yakin ingin menghapus pengembalian untuk pesanan #{{ returnToDelete && returnToDelete.order ? returnToDelete.order.order_number : '' }}?</p>
+            <p class="text-danger">Tindakan ini tidak dapat dibatalkan.</p>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
             <button type="button" class="btn btn-danger" @click="deleteReturn" :disabled="loading">
               <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              Delete
+              Hapus
             </button>
           </div>
         </div>
@@ -490,13 +490,13 @@ export default {
             if (error.response) {
               // The request was made and the server responded with a status code
               // that falls out of the range of 2xx
-              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load returns'}`;
+              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat pengembalian'}`;
             } else if (error.request) {
               // The request was made but no response was received
-              this.error = 'No response from server. Please check your connection.';
+              this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
             } else {
               // Something happened in setting up the request that triggered an Error
-              this.error = 'Failed to load returns: ' + error.message;
+              this.error = 'Gagal memuat pengembalian: ' + error.message;
             }
 
             this.loading = false;
@@ -585,7 +585,7 @@ export default {
       // Validate form
       if (!this.currentReturn.order_number || !this.currentReturn.reason ||
           this.currentReturn.items.some(item => !item.product_id || !item.reason)) {
-        alert('Please fill in all required fields');
+        alert('Silakan isi semua kolom yang diperlukan');
         return;
       }
 
@@ -619,11 +619,11 @@ export default {
 
             // Provide more specific error message if available
             if (error.response) {
-              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to create return'}`;
+              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal membuat pengembalian'}`;
             } else if (error.request) {
-              this.error = 'No response from server. Please check your connection.';
+              this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
             } else {
-              this.error = 'Failed to create return: ' + error.message;
+              this.error = 'Gagal membuat pengembalian: ' + error.message;
             }
 
             this.loading = false;
@@ -665,11 +665,11 @@ export default {
 
             // Provide more specific error message if available
             if (error.response) {
-              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to update status'}`;
+              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memperbarui status'}`;
             } else if (error.request) {
-              this.error = 'No response from server. Please check your connection.';
+              this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
             } else {
-              this.error = 'Failed to update status: ' + error.message;
+              this.error = 'Gagal memperbarui status: ' + error.message;
             }
 
             this.loading = false;
@@ -705,11 +705,11 @@ export default {
 
             // Provide more specific error message if available
             if (error.response) {
-              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to delete return'}`;
+              this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal menghapus pengembalian'}`;
             } else if (error.request) {
-              this.error = 'No response from server. Please check your connection.';
+              this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
             } else {
-              this.error = 'Failed to delete return: ' + error.message;
+              this.error = 'Gagal menghapus pengembalian: ' + error.message;
             }
 
             this.loading = false;

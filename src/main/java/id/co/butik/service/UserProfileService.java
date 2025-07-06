@@ -94,7 +94,7 @@ public class UserProfileService {
         }
 
         User user = new User();
-        user.setUsername(userProfileDto.getUsername());
+        user.setUsername(userProfileDto.getEmail());
         user.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
         user.setEmail(userProfileDto.getEmail());
         user.setEnabled(true);
@@ -103,7 +103,6 @@ public class UserProfileService {
 
         // Create user profile
         UserProfile profile = new UserProfile();
-        profile.setUsername(userProfileDto.getUsername());
         profile.setEmail(userProfileDto.getEmail());
         profile.setFullName(userProfileDto.getFullName());
         profile.setAddress(userProfileDto.getAddress());
@@ -193,7 +192,7 @@ public class UserProfileService {
         UserProfile profile = getUserProfileById(id);
 
         // Delete associated user if exists
-        User user = userRepository.findOneByUsername(profile.getUsername());
+        User user = userRepository.findOneByUsername(profile.getEmail());
         if (user != null) {
             userRepository.delete(user);
         }

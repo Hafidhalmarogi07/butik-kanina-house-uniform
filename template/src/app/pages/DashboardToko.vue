@@ -6,13 +6,13 @@
                 <div class="small-box bg-info">
                     <div class="inner">
                         <h3>{{ dashboardData.sales }}</h3>
-                        <p>Today's Sales</p>
+                        <p>Penjualan Hari Ini</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-shopping-cart"></i>
                     </div>
                     <router-link to="/daily-sales" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info Lebih Lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -20,13 +20,13 @@
                 <div class="small-box bg-success">
                     <div class="inner">
                         <h3>{{ dashboardData.orders }}</h3>
-                        <p>New Orders</p>
+                        <p>Pesanan Baru</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-shopping-bag"></i>
                     </div>
                     <router-link to="/new-orders" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info Lebih Lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -34,13 +34,13 @@
                 <div class="small-box bg-warning">
                     <div class="inner">
                         <h3>{{ dashboardData.orders_pending }}</h3>
-                        <p>Pending Orders</p>
+                        <p>Pesanan Tertunda</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-clock"></i>
                     </div>
                     <router-link to="/pending-orders" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info Lebih Lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -48,13 +48,13 @@
                 <div class="small-box bg-danger">
                     <div class="inner">
                         <h3>Rp {{ formatCurrency(dashboardData.revenue) }}</h3>
-                        <p>Today's Revenue</p>
+                        <p>Pendapatan Hari Ini</p>
                     </div>
                     <div class="icon">
                         <i class="fas fa-money-bill-alt"></i>
                     </div>
                     <router-link to="/revenue" class="small-box-footer">
-                        More info <i class="fas fa-arrow-circle-right"></i>
+                        Info Lebih Lanjut <i class="fas fa-arrow-circle-right"></i>
                     </router-link>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-line mr-1"></i>
-                            Daily Sales
+                            Penjualan Harian
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -92,7 +92,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-credit-card mr-1"></i>
-                            Payment Methods
+                            Metode Pembayaran
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
@@ -115,7 +115,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header border-transparent">
-                        <h3 class="card-title">Recent Orders</h3>
+                        <h3 class="card-title">Pesanan Terbaru</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -130,10 +130,10 @@
                             <table class="table m-0">
                                 <thead>
                                     <tr>
-                                        <th>Order ID</th>
-                                        <th>Customer</th>
+                                        <th>ID Pesanan</th>
+                                        <th>Pelanggan</th>
                                         <th>Status</th>
-                                        <th>Amount</th>
+                                        <th>Jumlah</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -145,15 +145,15 @@
                                 </tr>
                                 <!-- Fallback if no sales are available -->
                                 <tr v-if="recentOrders.length === 0">
-                                  <td colspan="4" class="text-center">No recent sales available</td>
+                                  <td colspan="4" class="text-center">Tidak ada penjualan terbaru</td>
                                 </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
                     <div class="card-footer clearfix">
-                        <router-link to="/orders" class="btn btn-sm btn-info float-left">Create New Order</router-link>
-                        <router-link to="/orders" class="btn btn-sm btn-secondary float-right">View All Orders</router-link>
+                        <router-link to="/orders" class="btn btn-sm btn-info float-left">Buat Pesanan Baru</router-link>
+                        <router-link to="/orders" class="btn btn-sm btn-secondary float-right">Lihat Semua Pesanan</router-link>
                     </div>
                 </div>
             </div>
@@ -162,7 +162,7 @@
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Best Selling Products</h3>
+                        <h3 class="card-title">Produk Terlaris</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
                                 <i class="fas fa-minus"></i>
@@ -187,13 +187,13 @@
                         <!-- Fallback if no products are available -->
                         <li v-if="topProducts.length === 0" class="item">
                           <div class="product-info">
-                            <span class="product-title">No products available</span>
+                            <span class="product-title">Tidak ada produk tersedia</span>
                           </div>
                         </li>
                       </ul>
                     </div>
                     <div class="card-footer text-center">
-                        <router-link to="/products" class="uppercase">View All Products</router-link>
+                        <router-link to="/products" class="uppercase">Lihat Semua Produk</router-link>
                     </div>
                 </div>
             </div>
@@ -239,7 +239,7 @@ export default {
             })
 
             .catch(error => {
-              console.error('Error fetching dashboard data:', error);
+              console.error('Kesalahan mengambil data dashboard:', error);
             });
       },
       fetchTopProducts() {
@@ -251,7 +251,7 @@ export default {
               }
             })
             .catch(error => {
-              console.error('Error fetching top products data:', error);
+              console.error('Kesalahan mengambil data produk terlaris:', error);
             });
       },
       fetchRecentOrders() {
@@ -263,7 +263,7 @@ export default {
               }
             })
             .catch(error => {
-              console.error('Error fetching recent sales data:', error);
+              console.error('Kesalahan mengambil data penjualan terbaru:', error);
             });
       },
       getBadgeClass(index) {
@@ -309,7 +309,7 @@ export default {
               }
             })
             .catch(error => {
-              console.error('Error fetching daily sales data:', error);
+              console.error('Kesalahan mengambil data penjualan harian:', error);
               this.initCharts(); // Initialize charts even if there's an error
             });
       },
@@ -319,10 +319,10 @@ export default {
                 const dailySalesChartCanvas = document.getElementById('dailySalesChart').getContext('2d');
 
                 const dailySalesChartData = {
-                    labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+                    labels: ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'],
                     datasets: [
                         {
-                            label: 'Sales',
+                            label: 'Penjualan',
                             backgroundColor: 'rgba(60,141,188,0.9)',
                             borderColor: 'rgba(60,141,188,0.8)',
                             pointRadius: true,
@@ -367,10 +367,10 @@ export default {
                 const paymentChartCanvas = document.getElementById('paymentChart').getContext('2d');
                 const paymentData = {
                     labels: [
-                        'Cash',
-                        'Credit Card',
-                        'Debit Card',
-                        'Bank Transfer',
+                        'Tunai',
+                        'Kartu Kredit',
+                        'Kartu Debit',
+                        'Transfer Bank',
                         'E-Wallet'
                     ],
                     datasets: [

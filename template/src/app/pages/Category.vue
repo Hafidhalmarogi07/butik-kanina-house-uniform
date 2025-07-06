@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Category List</h3>
+                        <h3 class="card-title">Daftar Kategori</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add Category
+                                <i class="fas fa-plus"></i> Tambah Kategori
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search categories..." 
+                                    <input type="text" class="form-control" placeholder="Cari kategori..." 
                                            v-model="searchQuery" 
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -31,8 +31,8 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Actions</th>
+                                        <th>Nama</th>
+                                        <th>Tindakan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -57,7 +57,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -75,7 +75,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No categories found</p>
+                            <p>Tidak ada kategori ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -87,7 +87,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="categoryModalLabel">{{ isEditing ? 'Edit Category' : 'Add New Category' }}</h5>
+                        <h5 class="modal-title" id="categoryModalLabel">{{ isEditing ? 'Edit Kategori' : 'Tambah Kategori Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -95,12 +95,12 @@
                     <div class="modal-body">
                         <form @submit.prevent="saveCategory">
                             <div class="form-group">
-                                <label for="categoryName">Category Name</label>
+                                <label for="categoryName">Nama Kategori</label>
                                 <input type="text" class="form-control" id="categoryName" v-model="currentCategory.name" required>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -113,17 +113,17 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this category? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus kategori ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -266,19 +266,19 @@ export default {
                     this.loading = false;
                 })
                 .catch(error => {
-                    console.error('Error fetching categories:', error);
+                    console.error('Kesalahan mengambil kategori:', error);
 
                     // Provide more specific error message if available
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load categories'}`;
+                        this.error = `Kesalahan ${error.response.status}: ${error.response.data.message || 'Gagal memuat kategori'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        this.error = 'No response from server. Please check your connection.';
+                        this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        this.error = 'Failed to load categories: ' + error.message;
+                        this.error = 'Gagal memuat kategori: ' + error.message;
                     }
 
                     this.loading = false;
@@ -323,8 +323,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error deleting category:', error);
-                        this.error = 'Failed to delete category';
+                        console.error('Kesalahan menghapus kategori:', error);
+                        this.error = 'Gagal menghapus kategori';
                         this.loading = false;
                     });
             }
@@ -344,8 +344,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error updating category:', error);
-                        this.error = 'Failed to update category';
+                        console.error('Kesalahan memperbarui kategori:', error);
+                        this.error = 'Gagal memperbarui kategori';
                         this.loading = false;
                     });
             } else {
@@ -357,8 +357,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error adding category:', error);
-                        this.error = 'Failed to add category';
+                        console.error('Kesalahan menambahkan kategori:', error);
+                        this.error = 'Gagal menambahkan kategori';
                         this.loading = false;
                     });
             }

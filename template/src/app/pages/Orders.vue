@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Order List</h3>
+                        <h3 class="card-title">Daftar Pesanan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showNewOrderModal">
-                                <i class="fas fa-plus"></i> Create Order
+                                <i class="fas fa-plus"></i> Buat Pesanan
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search orders..." v-model="searchQuery">
+                                    <input type="text" class="form-control" placeholder="Cari pesanan..." v-model="searchQuery">
                                     <div class="input-group-append">
                                         <button class="btn btn-default" type="button">
                                             <i class="fas fa-search"></i>
@@ -35,11 +35,11 @@
 <!--                            </div>-->
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter">
-                                    <option value="">All Statuses</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="CONFIRMED">Confirmed</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="">Semua Status</option>
+                                    <option value="PENDING">Tertunda</option>
+                                    <option value="CONFIRMED">Dikonfirmasi</option>
+                                    <option value="COMPLETED">Selesai</option>
+                                    <option value="CANCELLED">Dibatalkan</option>
                                 </select>
                             </div>
                         </div>
@@ -47,14 +47,14 @@
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Order #</th>
-                                        <th>Date</th>
-                                        <th>Customer</th>
-                                        <th>Items</th>
+                                        <th>Pesanan #</th>
+                                        <th>Tanggal</th>
+                                        <th>Pelanggan</th>
+                                        <th>Item</th>
                                         <th>Total</th>
-                                        <th>Paid</th>
+                                        <th>Dibayar</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -98,7 +98,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -116,7 +116,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No orders found</p>
+                            <p>Tidak ada pesanan ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -128,7 +128,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="newOrderModalLabel">New Order</h5>
+                        <h5 class="modal-title" id="newOrderModalLabel">Pesanan Baru</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -138,9 +138,9 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="customer">Customer</label>
+                                        <label for="customer">Pelanggan</label>
                                         <select class="form-control" id="customer" v-model="currentOrder.customer_id" required>
-                                            <option value="">Select Customer</option>
+                                            <option value="">Pilih Pelanggan</option>
                                             <option v-for="customer in customers" :key="customer.id" :value="customer.id">
                                                 {{ customer.nama }}
                                             </option>
@@ -149,7 +149,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="orderDate">Order Date</label>
+                                        <label for="orderDate">Tanggal Pesanan</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -164,7 +164,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="dueDate">Due Date</label>
+                                        <label for="dueDate">Tanggal Jatuh Tempo</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">

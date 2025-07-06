@@ -9,19 +9,19 @@
                     </a>
                 </div>
                 <div class="card-body login-card-body">
-                <p class="login-box-msg">You forgot your password? Here you can easily retrieve a new password.</p>
+                <p class="login-box-msg">Lupa kata sandi? Di sini Anda dapat dengan mudah mendapatkan kata sandi baru.</p>
 
                 <div class="alert alert-danger alert-dismissible" v-if="errorRequest">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                     <h5>
                         <i class="icon fa fa-ban"></i>
-                        Requesting new password failed!
+                        Gagal meminta kata sandi baru!
                     </h5>
                     <p>{{ this.errorRequest }}</p>
                 </div>
                 <form @submit.prevent="submit" method="post">
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control" autocomplete="off" v-model="form.email" placeholder="Email" :disabled="loading" required>
+                        <input type="email" class="form-control" autocomplete="off" v-model="form.email" placeholder="Surel" :disabled="loading" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
@@ -33,7 +33,7 @@
                             <!-- <button type="submit" class="btn btn-primary btn-block">Request new password</button> -->
                             <button type="submit" class="btn btn-secondary btn-block btn-flat" :disabled="loading">
                                 <i class="fas fa-spinner fa-spin" v-if="loading"></i>
-                                {{ loading ? 'Requesting ...' : 'Request New Password' }}
+                                {{ loading ? 'Meminta ...' : 'Minta Kata Sandi Baru' }}
                             </button>
                         </div>
                         <!-- /.col -->
@@ -44,7 +44,7 @@
                             <div class="modal-content">
                                 <!-- Modal Header -->
                                 <div class="modal-header">
-                                    <h4 class="modal-title">Form Reset Password</h4>
+                                    <h4 class="modal-title">Formulir Atur Ulang Kata Sandi</h4>
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                                 </div>
                                 <!-- Modal body -->
@@ -53,7 +53,7 @@
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
                                         <h5>
                                             <i class="icon fa fa-ban"></i>
-                                            Reset password failed!
+                                            Gagal mengatur ulang kata sandi!
                                         </h5>
                                         <p>{{ this.error }}</p>
                                     </div>
@@ -62,11 +62,11 @@
                                             <div class="row">
                                                 <div class="col-md-12">
                                                     <div class="form-group">
-                                                        <label>OTP</label>
+                                                        <label>Kode OTP</label>
                                                         <input type="number" class="form-control" v-model="formreset.otp" :disabled="loading" required>
                                                     </div>
                                                     <div class="form-group">
-                                                        <label>New Password</label>
+                                                        <label>Kata Sandi Baru</label>
                                                         <input type="password" class="form-control" v-model="formreset.password" :disabled="loading" required>
                                                     </div>
                                                 </div>
@@ -75,21 +75,21 @@
                                         <div class="card-footer">
                                             <button type="submit" class="btn btn-primary" :disabled="loading">
                                                 <i class="fas fa-spinner fa-spin" v-if="loading"></i>
-                                                {{ loading ? 'Updating ...' : 'Update' }}
+                                                {{ loading ? 'Memperbarui ...' : 'Perbarui' }}
                                             </button>
                                         </div>
                                     </form>
                                 </div>
                                 <!-- Modal footer -->
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                 <p class="mt-3 mb-1">
-                    <router-link :to="{name: 'login'}">Login</router-link>
+                    <router-link :to="{name: 'login'}">Masuk</router-link>
                 </p>
                 <!-- <p class="mb-0">
                     <router-link :to="{name: 'register'}" class="text-center">Register a new membership</router-link>
@@ -130,7 +130,7 @@ export default {
             this.Api.forgot('/forgot_password/request',this.form)
             .then(res => {
                 this.loading = false
-                alert("Please check your email");
+                alert("Silakan periksa email Anda");
                 $('#myModal1').modal('show');
             }).catch(err => {
                 this.loading = false
@@ -141,7 +141,7 @@ export default {
             this.loading = true
             this.Api.reset('/forgot_password/reset', this.formreset).then(res => {
                 this.loading = false
-                alert("Reset password success");
+                alert("Berhasil mengatur ulang kata sandi");
                 $('#myModal1').modal('hide');
                 this.$router.push(this.prevRoute)
             }).catch(err => {

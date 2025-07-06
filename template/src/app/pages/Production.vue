@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Production List</h3>
+                        <h3 class="card-title">Daftar Produksi</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add Production
+                                <i class="fas fa-plus"></i> Tambah Produksi
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search production..." 
+                                    <input type="text" class="form-control" placeholder="Cari produksi..." 
                                            v-model="searchQuery" 
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -27,11 +27,11 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter" @change="handleSearch">
-                                    <option value="">All Statuses</option>
-                                    <option value="WAITING">Waiting</option>
-                                    <option value="IN_PROGRESS">In Progress</option>
-                                    <option value="FINISHED">Finished</option>
-                                    <option value="CANCELED">Canceled</option>
+                                    <option value="">Semua Status</option>
+                                    <option value="WAITING">Menunggu</option>
+                                    <option value="IN_PROGRESS">Dalam Proses</option>
+                                    <option value="FINISHED">Selesai</option>
+                                    <option value="CANCELED">Dibatalkan</option>
                                 </select>
                             </div>
                         </div>
@@ -40,13 +40,13 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Product</th>
-                                        <th>Quantity</th>
-                                        <th>Start Date</th>
-                                        <th>End Date</th>
+                                        <th>Produk</th>
+                                        <th>Jumlah</th>
+                                        <th>Tanggal Mulai</th>
+                                        <th>Tanggal Selesai</th>
                                         <th>Status</th>
-                                        <th>Progress</th>
-                                        <th>Actions</th>
+                                        <th>Progres</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -89,7 +89,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -107,7 +107,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No productions found</p>
+                            <p>Tidak ada produksi ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -119,7 +119,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="productionModalLabel">{{ isEditing ? 'Edit Production' : 'Add New Production' }}</h5>
+                        <h5 class="modal-title" id="productionModalLabel">{{ isEditing ? 'Edit Produksi' : 'Tambah Produksi Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -129,35 +129,35 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="productionProduct">Product</label>
+                                        <label for="productionProduct">Produk</label>
                                         <div class="position-relative">
                                             <select class="form-control" id="productionProduct" v-model="currentProduction.product.id" 
                                                     required @scroll="handleProductScroll" ref="productSelect">
                                                 <option v-for="product in products" :key="product.id" :value="product.id">
                                                     {{ product.name }} ({{ product.size }})
                                                 </option>
-                                                <option v-if="productPagination.loading" value="" disabled>Loading more products...</option>
-                                                <option v-if="!productPagination.hasMore && products.length > 0" value="" disabled>No more products</option>
+                                                <option v-if="productPagination.loading" value="" disabled>Memuat produk lainnya...</option>
+                                                <option v-if="!productPagination.hasMore && products.length > 0" value="" disabled>Tidak ada produk lagi</option>
                                             </select>
                                             <div v-if="productPagination.loading" class="position-absolute" style="right: 10px; top: 10px;">
                                                 <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                    <span class="sr-only">Loading...</span>
+                                                    <span class="sr-only">Memuat...</span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productionQuantity">Quantity</label>
+                                        <label for="productionQuantity">Jumlah</label>
                                         <input type="number" class="form-control" id="productionQuantity" v-model="currentProduction.quantity" min="1" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="productionStartDate">Start Date</label>
+                                        <label for="productionStartDate">Tanggal Mulai</label>
                                         <input type="date" class="form-control" id="productionStartDate" v-model="currentProduction.start_date" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productionEndDate">End Date</label>
+                                        <label for="productionEndDate">Tanggal Selesai</label>
                                         <input type="date" class="form-control" id="productionEndDate" v-model="currentProduction.end_date" required>
                                     </div>
                                 </div>
@@ -167,27 +167,27 @@
                                     <div class="form-group">
                                         <label for="productionStatus">Status</label>
                                         <select class="form-control" id="productionStatus" v-model="currentProduction.status" required>
-                                            <option value="WAITING">Waiting</option>
-                                            <option value="IN_PROGRESS">In Progress</option>
-                                            <option value="FINISHED">Finished</option>
-                                            <option value="CANCELED">Canceled</option>
+                                            <option value="WAITING">Menunggu</option>
+                                            <option value="IN_PROGRESS">Dalam Proses</option>
+                                            <option value="FINISHED">Selesai</option>
+                                            <option value="CANCELED">Dibatalkan</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="productionProgress">Progress (%)</label>
+                                        <label for="productionProgress">Progres (%)</label>
                                         <input type="number" class="form-control" id="productionProgress" v-model="currentProduction.progress" min="0" max="100" required>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="productionDescription">Description</label>
+                                <label for="productionDescription">Deskripsi</label>
                                 <textarea class="form-control" id="productionDescription" rows="3" v-model="currentProduction.description"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -200,7 +200,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="viewProductionModalLabel">Production Details</h5>
+                        <h5 class="modal-title" id="viewProductionModalLabel">Detail Produksi</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -209,15 +209,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>ID:</strong> {{ currentProduction.id }}</p>
-                                <p><strong>Product:</strong> {{ currentProduction.product ? currentProduction.product.name : '' }}</p>
-                                <p><strong>Category:</strong> {{ currentProduction.product && currentProduction.product.category ? currentProduction.product.category.name : '' }}</p>
-                                <p><strong>Quantity:</strong> {{ currentProduction.quantity }}</p>
-                                <p><strong>Start Date:</strong> {{ formatDate(currentProduction.start_date) }}</p>
-                                <p><strong>End Date:</strong> {{ formatDate(currentProduction.end_date) }}</p>
+                                <p><strong>Produk:</strong> {{ currentProduction.product ? currentProduction.product.name : '' }}</p>
+                                <p><strong>Kategori:</strong> {{ currentProduction.product && currentProduction.product.category ? currentProduction.product.category.name : '' }}</p>
+                                <p><strong>Jumlah:</strong> {{ currentProduction.quantity }}</p>
+                                <p><strong>Tanggal Mulai:</strong> {{ formatDate(currentProduction.start_date) }}</p>
+                                <p><strong>Tanggal Selesai:</strong> {{ formatDate(currentProduction.end_date) }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Status:</strong> <span :class="getStatusClass(currentProduction.status)">{{ formatStatus(currentProduction.status) }}</span></p>
-                                <p><strong>Progress:</strong></p>
+                                <p><strong>Progres:</strong></p>
                                 <div class="progress">
                                     <div class="progress-bar" :class="getProgressBarClass(currentProduction.status)" role="progressbar" 
                                         :style="{width: currentProduction.progress + '%'}" 
@@ -225,14 +225,14 @@
                                         {{ currentProduction.progress }}%
                                     </div>
                                 </div>
-                                <p class="mt-3"><strong>Description:</strong> {{ currentProduction.description || 'No description' }}</p>
-                                <p><strong>Created:</strong> {{ formatDateTime(currentProduction.created) }}</p>
-                                <p><strong>Updated:</strong> {{ formatDateTime(currentProduction.updated) }}</p>
+                                <p class="mt-3"><strong>Deskripsi:</strong> {{ currentProduction.description || 'Tidak ada deskripsi' }}</p>
+                                <p><strong>Dibuat:</strong> {{ formatDateTime(currentProduction.created) }}</p>
+                                <p><strong>Diperbarui:</strong> {{ formatDateTime(currentProduction.updated) }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>
@@ -243,17 +243,17 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this production record? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus catatan produksi ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -451,13 +451,13 @@ export default {
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load productions'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat produksi'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        this.error = 'No response from server. Please check your connection.';
+                        this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        this.error = 'Failed to load productions: ' + error.message;
+                        this.error = 'Gagal memuat produksi: ' + error.message;
                     }
 
                     this.loading = false;
@@ -530,10 +530,10 @@ export default {
 
         formatStatus(status) {
             switch(status) {
-                case 'WAITING': return 'Waiting';
-                case 'IN_PROGRESS': return 'In Progress';
-                case 'FINISHED': return 'Finished';
-                case 'CANCELED': return 'Canceled';
+                case 'WAITING': return 'Menunggu';
+                case 'IN_PROGRESS': return 'Dalam Proses';
+                case 'FINISHED': return 'Selesai';
+                case 'CANCELED': return 'Dibatalkan';
                 default: return status;
             }
         },
@@ -633,7 +633,7 @@ export default {
                     })
                     .catch(error => {
                         console.error('Error deleting production:', error);
-                        this.error = 'Failed to delete production';
+                        this.error = 'Gagal menghapus produksi';
                         this.loading = false;
                     });
             }
@@ -753,7 +753,7 @@ export default {
                     })
                     .catch(error => {
                         console.error('Error updating production:', error);
-                        this.error = 'Failed to update production';
+                        this.error = 'Gagal memperbarui produksi';
                         this.loading = false;
                     });
             } else {
@@ -767,7 +767,7 @@ export default {
                     })
                     .catch(error => {
                         console.error('Error adding production:', error);
-                        this.error = 'Failed to add production';
+                        this.error = 'Gagal menambahkan produksi';
                         this.loading = false;
                     });
             }

@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Customer List</h3>
+                        <h3 class="card-title">Daftar Pelanggan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add Customer
+                                <i class="fas fa-plus"></i> Tambah Pelanggan
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search customers..." 
+                                    <input type="text" class="form-control" placeholder="Cari pelanggan..." 
                                            v-model="searchQuery" 
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -27,9 +27,9 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="typeFilter">
-                                    <option value="">All Types</option>
-                                    <option value="INDIVIDU">Individual</option>
-                                    <option value="INSTANSI">Institution</option>
+                                    <option value="">Semua Tipe</option>
+                                    <option value="INDIVIDU">Individu</option>
+                                    <option value="INSTANSI">Instansi</option>
                                 </select>
                             </div>
                         </div>
@@ -38,12 +38,12 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Type</th>
-                                        <th>Phone</th>
-                                        <th>Address</th>
-                                        <th>Total Orders</th>
-                                        <th>Actions</th>
+                                        <th>Nama</th>
+                                        <th>Tipe</th>
+                                        <th>Telepon</th>
+                                        <th>Alamat</th>
+                                        <th>Total Pesanan</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -74,7 +74,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -92,7 +92,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No customers found</p>
+                            <p>Tidak ada pelanggan ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -104,7 +104,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="customerModalLabel">{{ isEditing ? 'Edit Customer' : 'Add New Customer' }}</h5>
+                        <h5 class="modal-title" id="customerModalLabel">{{ isEditing ? 'Edit Pelanggan' : 'Tambah Pelanggan Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -114,35 +114,35 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="customerName">Name</label>
+                                        <label for="customerName">Nama</label>
                                         <input type="text" class="form-control" id="customerName" v-model="currentCustomer.nama" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="customerType">Type</label>
+                                        <label for="customerType">Tipe</label>
                                         <select class="form-control" id="customerType" v-model="currentCustomer.tipe" required>
-                                            <option value="INDIVIDU">Individual</option>
-                                            <option value="INSTANSI">Institution</option>
+                                            <option value="INDIVIDU">Individu</option>
+                                            <option value="INSTANSI">Instansi</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="customerPhone">Phone</label>
+                                        <label for="customerPhone">Telepon</label>
                                         <input type="tel" class="form-control" id="customerPhone" v-model="currentCustomer.phone_number" required>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="customerAddress">Address</label>
+                                        <label for="customerAddress">Alamat</label>
                                         <textarea class="form-control" id="customerAddress" rows="3" v-model="currentCustomer.alamat" required></textarea>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="customerNotes">Notes</label>
+                                <label for="customerNotes">Catatan</label>
                                 <textarea class="form-control" id="customerNotes" rows="2" v-model="currentCustomer.notes"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -156,17 +156,17 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this customer? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus pelanggan ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -337,19 +337,19 @@ export default {
                     this.loading = false;
                 })
                 .catch(error => {
-                    console.error('Error fetching customers:', error);
+                    console.error('Kesalahan mengambil pelanggan:', error);
 
                     // Provide more specific error message if available
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load customers'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat pelanggan'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        this.error = 'No response from server. Please check your connection.';
+                        this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        this.error = 'Failed to load customers: ' + error.message;
+                        this.error = 'Gagal memuat pelanggan: ' + error.message;
                     }
 
                     this.loading = false;

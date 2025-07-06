@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Expenses List</h3>
+                        <h3 class="card-title">Daftar Pengeluaran</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add Expense
+                                <i class="fas fa-plus"></i> Tambah Pengeluaran
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search expenses..." 
+                                    <input type="text" class="form-control" placeholder="Cari pengeluaran..." 
                                            v-model="searchQuery"
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="categoryFilter">
-                                    <option value="">All Categories</option>
+                                    <option value="">Semua Kategori</option>
                                     <option v-for="type in expenseTypes" :key="type" :value="type">
                                         {{ type }}
                                     </option>
@@ -35,25 +35,25 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="monthFilter">
-                                    <option value="">All Months</option>
-                                    <option value="01">January</option>
-                                    <option value="02">February</option>
-                                    <option value="03">March</option>
+                                    <option value="">Semua Bulan</option>
+                                    <option value="01">Januari</option>
+                                    <option value="02">Februari</option>
+                                    <option value="03">Maret</option>
                                     <option value="04">April</option>
-                                    <option value="05">May</option>
-                                    <option value="06">June</option>
-                                    <option value="07">July</option>
-                                    <option value="08">August</option>
+                                    <option value="05">Mei</option>
+                                    <option value="06">Juni</option>
+                                    <option value="07">Juli</option>
+                                    <option value="08">Agustus</option>
                                     <option value="09">September</option>
-                                    <option value="10">October</option>
+                                    <option value="10">Oktober</option>
                                     <option value="11">November</option>
-                                    <option value="12">December</option>
+                                    <option value="12">Desember</option>
                                 </select>
                             </div>
                         </div>
                         <div v-if="loading" class="text-center my-4">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -64,12 +64,12 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Date</th>
-                                        <th>Type</th>
-                                        <th>Description</th>
-                                        <th>Amount</th>
-                                        <th>Payment Method</th>
-                                        <th>Actions</th>
+                                        <th>Tanggal</th>
+                                        <th>Tipe</th>
+                                        <th>Deskripsi</th>
+                                        <th>Jumlah</th>
+                                        <th>Metode Pembayaran</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -110,7 +110,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -128,7 +128,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No expenses found</p>
+                            <p>Tidak ada pengeluaran ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -140,7 +140,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="expenseModalLabel">{{ isEditing ? 'Edit Expense' : 'Add New Expense' }}</h5>
+                        <h5 class="modal-title" id="expenseModalLabel">{{ isEditing ? 'Edit Pengeluaran' : 'Tambah Pengeluaran Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -150,13 +150,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="expenseDate">Date</label>
+                                        <label for="expenseDate">Tanggal</label>
                                         <input type="date" class="form-control" id="expenseDate" v-model="currentExpense.date" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="expenseType">Type</label>
+                                        <label for="expenseType">Tipe</label>
                                         <select class="form-control" id="expenseType" v-model="currentExpense.type" required>
-                                            <option value="">Select Type</option>
+                                            <option value="">Pilih Tipe</option>
                                             <option v-for="type in expenseTypes" :key="type" :value="type">
                                                 {{ type }}
                                             </option>
@@ -165,7 +165,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="expenseAmount">Amount</label>
+                                        <label for="expenseAmount">Jumlah</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Rp</span>
@@ -174,9 +174,9 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="expensePaymentMethod">Payment Method</label>
+                                        <label for="expensePaymentMethod">Metode Pembayaran</label>
                                         <select class="form-control" id="expensePaymentMethod" v-model="currentExpense.payment_method" required>
-                                            <option value="">Select Payment Method</option>
+                                            <option value="">Pilih Metode Pembayaran</option>
                                             <option v-for="method in paymentMethods" :key="method" :value="method">
                                                 {{ method }}
                                             </option>
@@ -185,18 +185,18 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="expenseDescription">Description</label>
+                                <label for="expenseDescription">Deskripsi</label>
                                 <textarea class="form-control" id="expenseDescription" rows="3" v-model="currentExpense.description" required></textarea>
                             </div>
                             <div class="form-group">
-                                <label for="expenseNote">Additional Notes</label>
+                                <label for="expenseNote">Catatan Tambahan</label>
                                 <textarea class="form-control" id="expenseNote" rows="2" v-model="currentExpense.note"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Save
+                                    Simpan
                                 </button>
                             </div>
                         </form>
@@ -210,7 +210,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="viewExpenseModalLabel">Expense Details</h5>
+                        <h5 class="modal-title" id="viewExpenseModalLabel">Detail Pengeluaran</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -219,21 +219,21 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>ID:</strong> {{ currentExpense.id }}</p>
-                                <p><strong>Date:</strong> {{ currentExpense.date }}</p>
-                                <p><strong>Type:</strong> <span :class="getCategoryClass(currentExpense.type)">{{ currentExpense.type }}</span></p>
-                                <p><strong>Description:</strong> {{ currentExpense.description }}</p>
+                                <p><strong>Tanggal:</strong> {{ currentExpense.date }}</p>
+                                <p><strong>Tipe:</strong> <span :class="getCategoryClass(currentExpense.type)">{{ currentExpense.type }}</span></p>
+                                <p><strong>Deskripsi:</strong> {{ currentExpense.description }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Amount:</strong> Rp {{ currentExpense.amount ? currentExpense.amount.toLocaleString() : 0 }}</p>
-                                <p><strong>Payment Method:</strong> {{ currentExpense.payment_method }}</p>
-                                <p><strong>Additional Notes:</strong> {{ currentExpense.note || 'No additional notes' }}</p>
-                                <p><strong>Created:</strong> {{ currentExpense.created || 'N/A' }}</p>
-                                <p><strong>Updated:</strong> {{ currentExpense.updated || 'N/A' }}</p>
+                                <p><strong>Jumlah:</strong> Rp {{ currentExpense.amount ? currentExpense.amount.toLocaleString() : 0 }}</p>
+                                <p><strong>Metode Pembayaran:</strong> {{ currentExpense.payment_method }}</p>
+                                <p><strong>Catatan Tambahan:</strong> {{ currentExpense.note || 'Tidak ada catatan tambahan' }}</p>
+                                <p><strong>Dibuat:</strong> {{ currentExpense.created || 'N/A' }}</p>
+                                <p><strong>Diperbarui:</strong> {{ currentExpense.updated || 'N/A' }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>
@@ -244,19 +244,19 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this expense record? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus catatan pengeluaran ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-danger" @click="confirmDelete" :disabled="loading">
                             <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Delete
+                            Hapus
                         </button>
                     </div>
                 </div>
@@ -469,7 +469,7 @@ export default {
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load expenses'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat pengeluaran'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
                         this.error = 'No response from server. Please check your connection.';

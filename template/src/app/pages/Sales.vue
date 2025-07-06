@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Sales List</h3>
+                        <h3 class="card-title">Daftar Penjualan</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-success" @click="showNewSaleModal">
-                                <i class="fas fa-plus"></i> New Sale
+                                <i class="fas fa-plus"></i> Penjualan Baru
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search sales..." v-model="searchQuery">
+                                    <input type="text" class="form-control" placeholder="Cari penjualan..." v-model="searchQuery">
                                     <div class="input-group-append">
                                         <button class="btn btn-default" type="button">
                                             <i class="fas fa-search"></i>
@@ -25,10 +25,10 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="statusFilter">
-                                    <option value="">All Statuses</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="">Semua Status</option>
+                                    <option value="COMPLETED">Selesai</option>
+                                    <option value="PENDING">Tertunda</option>
+                                    <option value="CANCELLED">Dibatalkan</option>
                                 </select>
                             </div>
                         </div>
@@ -36,13 +36,13 @@
                             <table class="table table-bordered table-striped">
                                 <thead>
                                     <tr>
-                                        <th>Invoice #</th>
-                                        <th>Date</th>
-                                        <th>Customer</th>
-                                        <th>Items</th>
+                                        <th>Faktur #</th>
+                                        <th>Tanggal</th>
+                                        <th>Pelanggan</th>
+                                        <th>Item</th>
                                         <th>Total</th>
                                         <th>Status</th>
-                                        <th>Actions</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,7 +79,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -97,7 +97,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No sales found</p>
+                            <p>Tidak ada penjualan ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -109,7 +109,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="newSaleModalLabel">New Sale</h5>
+                        <h5 class="modal-title" id="newSaleModalLabel">Penjualan Baru</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -119,13 +119,13 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="customer">Customer</label>
+                                        <label for="customer">Pelanggan</label>
                                         <div class="dropdown">
                                             <input 
                                                 type="text" 
                                                 class="form-control" 
                                                 id="customer" 
-                                                placeholder="Select Customer"
+                                                placeholder="Pilih Pelanggan"
                                                 data-toggle="dropdown"
                                                 :value="getSelectedCustomerName()"
                                                 required
@@ -142,11 +142,11 @@
                                                 </a>
                                                 <div v-if="loadingCustomers" class="text-center py-2">
                                                     <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                                        <span class="sr-only">Loading...</span>
+                                                        <span class="sr-only">Memuat...</span>
                                                     </div>
                                                 </div>
                                                 <div v-if="customers.length === 0 && !loadingCustomers" class="text-center py-2">
-                                                    No customers found
+                                                    Tidak ada pelanggan ditemukan
                                                 </div>
                                             </div>
                                         </div>
@@ -154,7 +154,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="saleDate">Date</label>
+                                        <label for="saleDate">Tanggal</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -169,15 +169,15 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <h5>Items</h5>
+                                    <h5>Barang</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Product</th>
-                                                    <th>Quantity</th>
+                                                    <th>Produk</th>
+                                                    <th>Jumlah</th>
                                                     <th>Subtotal</th>
-                                                    <th>Action</th>
+                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -185,7 +185,7 @@
                                                     <td>
                                                         <div class="form-group mb-0">
                                                             <select class="form-control" v-model="item.product.id" @change="updateItemPrice(index)" required>
-                                                                <option value="">Select Product</option>
+                                                                <option value="">Pilih Produk</option>
                                                                 <option v-for="product in products" :key="product.id" :value="product.id">
                                                                     {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
                                                                 </option>
@@ -207,7 +207,7 @@
                                                 <tr>
                                                     <td colspan="4">
                                                         <button type="button" class="btn btn-primary btn-sm" @click="addItem">
-                                                            <i class="fas fa-plus"></i> Add Item
+                                                            <i class="fas fa-plus"></i> Tambah Barang
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -220,7 +220,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="notes">Notes</label>
+                                        <label for="notes">Catatan</label>
                                         <textarea class="form-control" id="notes" rows="3" v-model="currentSale.notes"></textarea>
                                     </div>
                                 </div>
@@ -237,10 +237,10 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-success" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Complete Sale
+                                    Selesaikan Penjualan
                                 </button>
                             </div>
                         </form>
@@ -254,7 +254,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="saleDetailsModalLabel">Sale Details</h5>
+                        <h5 class="modal-title" id="saleDetailsModalLabel">Detail Penjualan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -262,26 +262,26 @@
                     <div class="modal-body" v-if="selectedSale">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>Invoice #:</strong> {{ selectedSale.invoice_number }}</p>
-                                <p><strong>Date:</strong> {{ formatDate(selectedSale.date) }}</p>
+                                <p><strong>Faktur #:</strong> {{ selectedSale.invoice_number }}</p>
+                                <p><strong>Tanggal:</strong> {{ formatDate(selectedSale.date) }}</p>
                                 <p><strong>Status:</strong> <span :class="getStatusClass(selectedSale.status)">{{ selectedSale.status }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Customer:</strong> {{ selectedSale.customer ? selectedSale.customer.nama : '' }}</p>
+                                <p><strong>Pelanggan:</strong> {{ selectedSale.customer ? selectedSale.customer.nama : '' }}</p>
                                 <p><strong>Total:</strong> {{ formatCurrency(selectedSale.total) }}</p>
                                 <p><strong>Admin:</strong> {{ selectedSale.admin ? selectedSale.admin.full_name : '' }}</p>
                             </div>
                         </div>
 
-                        <h6>Items</h6>
+                        <h6>Barang</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th>Size</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
+                                        <th>Produk</th>
+                                        <th>Ukuran</th>
+                                        <th>Harga</th>
+                                        <th>Jumlah</th>
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
@@ -305,15 +305,15 @@
 
                         <div class="row mt-3" v-if="selectedSale.notes">
                             <div class="col-12">
-                                <p><strong>Notes:</strong></p>
+                                <p><strong>Catatan:</strong></p>
                                 <p>{{ selectedSale.notes }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                         <button type="button" class="btn btn-primary" @click="printInvoice(selectedSale)">
-                            <i class="fas fa-print"></i> Print Invoice
+                            <i class="fas fa-print"></i> Cetak Faktur
                         </button>
                     </div>
                 </div>
@@ -758,24 +758,24 @@ export default {
                 </head>
                 <body>
                     <div class="invoice-header">
-                        <div class="invoice-title">INVOICE</div>
+                        <div class="invoice-title">FAKTUR</div>
                         <div>Butik Kanina House Uniform</div>
                     </div>
 
                     <div class="invoice-details">
-                        <div><strong>Invoice #:</strong> ${sale.invoice_number}</div>
-                        <div><strong>Date:</strong> ${formattedDate}</div>
-                        <div><strong>Customer:</strong> ${sale.customer ? sale.customer.nama : ''}</div>
+                        <div><strong>Faktur #:</strong> ${sale.invoice_number}</div>
+                        <div><strong>Tanggal:</strong> ${formattedDate}</div>
+                        <div><strong>Pelanggan:</strong> ${sale.customer ? sale.customer.nama : ''}</div>
                         <div><strong>Status:</strong> ${sale.status}</div>
                     </div>
 
                     <table>
                         <thead>
                             <tr>
-                                <th>Product</th>
-                                <th>Size</th>
-                                <th>Price</th>
-                                <th>Quantity</th>
+                                <th>Produk</th>
+                                <th>Ukuran</th>
+                                <th>Harga</th>
+                                <th>Jumlah</th>
                                 <th>Subtotal</th>
                             </tr>
                         </thead>
@@ -798,13 +798,13 @@ export default {
 
                     ${sale.notes ? `
                     <div class="notes">
-                        <strong>Notes:</strong>
+                        <strong>Catatan:</strong>
                         <p>${sale.notes}</p>
                     </div>
                     ` : ''}
 
                     <div style="margin-top: 50px; text-align: center;">
-                        <p>Thank you for your business!</p>
+                        <p>Terima kasih atas kunjungan Anda!</p>
                     </div>
                 </body>
                 </html>
@@ -946,7 +946,7 @@ export default {
             }
 
             // Set the modal title to indicate we're editing
-            document.getElementById('newSaleModalLabel').textContent = 'Edit Sale';
+            document.getElementById('newSaleModalLabel').textContent = 'Edit Penjualan';
 
             // Show the modal
             $('#newSaleModal').modal('show');
@@ -954,7 +954,7 @@ export default {
 
         deleteSale(sale) {
             // Confirm before deleting
-            if (!confirm(`Are you sure you want to delete sale ${sale.invoice_number}?`)) {
+            if (!confirm(`Apakah Anda yakin ingin menghapus penjualan ${sale.invoice_number}?`)) {
                 return;
             }
 
@@ -996,7 +996,7 @@ export default {
             if (product) {
                 return `${product.name} (${product.size})`;
             }
-            return 'Unknown Product';
+            return 'Produk Tidak Dikenal';
         },
 
         getSelectedCustomerName() {
@@ -1006,7 +1006,7 @@ export default {
             if (customer) {
                 return `${customer.nama}`;
             }
-            return 'Select Customer';
+            return 'Pilih Pelanggan';
         },
 
         selectCustomer(customer) {

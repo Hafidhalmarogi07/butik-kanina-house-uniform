@@ -49,14 +49,13 @@ public class UserService {
     public UserProfile createUser(UserProfileDto userProfileDto) {
         List<Role> role = roleRepository.findByName(userProfileDto.getRole());
         User user = new User();
-        user.setUsername(userProfileDto.getUsername());
+        user.setUsername(userProfileDto.getEmail());
         user.setPassword(passwordEncoder.encode(userProfileDto.getPassword()));
         user.setEnabled(true);
         user.setRoles(role);
         userRepository.save(user);
 
         UserProfile profile = new UserProfile();
-        profile.setUsername(userProfileDto.getUsername());
         profile.setEmail(userProfileDto.getEmail());
         profile.setFullName(userProfileDto.getFullName());
         profile.setAddress(userProfileDto.getAddress());

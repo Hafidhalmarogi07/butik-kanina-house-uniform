@@ -64,7 +64,7 @@ public class SaleReturnService {
         orderReturn.setStatusReturn(status);
 
         // If returnType is REFUND and status is being updated to APPROVED
-        if (orderReturn.getReturnType() == ReturnType.REFUND && status == ReturnStatus.APPROVED) {
+        if (orderReturn.getReturnType() == ReturnType.REFUND && status == ReturnStatus.COMPLETED) {
             // Add to expense
             Expense expense = new Expense();
             expense.setDate(java.time.LocalDate.now());

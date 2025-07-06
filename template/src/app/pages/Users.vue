@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">User Management</h3>
+                        <h3 class="card-title">Manajemen Pengguna</h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add User
+                                <i class="fas fa-plus"></i> Tambah Pengguna
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search users..." 
+                                    <input type="text" class="form-control" placeholder="Cari pengguna..." 
                                            v-model="searchQuery" 
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -27,10 +27,10 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="roleFilter">
-                                    <option value="">All Roles</option>
+                                    <option value="">Semua Peran</option>
                                     <option value="ROLE_SUPERADMIN">Super Admin</option>
-                                    <option value="ROLE_ADMIN_TOKO">Store Admin</option>
-                                    <option value="ROLE_ADMIN_GUDANG">Warehouse Admin</option>
+                                    <option value="ROLE_ADMIN_TOKO">Admin Toko</option>
+                                    <option value="ROLE_ADMIN_GUDANG">Admin Gudang</option>
                                 </select>
                             </div>
                         </div>
@@ -39,27 +39,25 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Name</th>
-                                        <th>Username</th>
+                                        <th>Nama</th>
                                         <th>Email</th>
-                                        <th>Role</th>
+                                        <th>Peran</th>
                                         <th>Status</th>
-                                        <th>Last Login</th>
-                                        <th>Actions</th>
+                                        <th>Login Terakhir</th>
+                                        <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="user in filteredUsers" :key="user.id">
                                         <td>{{ user.id }}</td>
                                         <td>{{ user.full_name }}</td>
-                                        <td>{{ user.username }}</td>
                                         <td>{{ user.email }}</td>
                                         <td>
                                             <span :class="getRoleClass(user.role)">{{ formatRole(user.role) }}</span>
                                         </td>
                                         <td>
                                             <span :class="getStatusClass(user.status)">
-                                                {{ user.status ? 'Active' : 'Inactive' }}
+                                                {{ user.status ? 'Aktif' : 'Tidak Aktif' }}
                                             </span>
                                         </td>
                                         <td>{{ user.updated }}</td>
@@ -89,7 +87,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -107,7 +105,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No users found</p>
+                            <p>Tidak ada pengguna ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -119,7 +117,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="userModalLabel">{{ isEditing ? 'Edit User' : 'Add New User' }}</h5>
+                        <h5 class="modal-title" id="userModalLabel">{{ isEditing ? 'Edit Pengguna' : 'Tambah Pengguna Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -129,42 +127,38 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="userName">Full Name</label>
+                                        <label for="userName">Nama Lengkap</label>
                                         <input type="text" class="form-control" id="userName" v-model="currentUser.full_name" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="userUsername">Username</label>
-                                        <input type="text" class="form-control" id="userUsername" v-model="currentUser.username" required>
                                     </div>
                                     <div class="form-group">
                                         <label for="userEmail">Email</label>
                                         <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="userPhone">Phone Number</label>
+                                        <label for="userPhone">Nomor Telepon</label>
                                         <input type="tel" class="form-control" id="userPhone" v-model="currentUser.phone_number">
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="userRole">Role</label>
+                                        <label for="userRole">Peran</label>
                                         <select class="form-control" id="userRole" v-model="currentUser.role" required>
                                             <option value="ROLE_SUPERADMIN">Super Admin</option>
-                                            <option value="ROLE_ADMIN_TOKO">Store Admin</option>
-                                            <option value="ROLE_ADMIN_GUDANG">Warehouse Admin</option>
+                                            <option value="ROLE_ADMIN_TOKO">Admin Toko</option>
+                                            <option value="ROLE_ADMIN_GUDANG">Admin Gudang</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="userJobTitle">Job Title</label>
+                                        <label for="userJobTitle">Jabatan</label>
                                         <input type="text" class="form-control" id="userJobTitle" v-model="currentUser.job_tittle">
                                     </div>
                                     <div class="form-group">
-                                        <label for="userPassword">Password</label>
+                                        <label for="userPassword">Kata Sandi</label>
                                         <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!isEditing">
-                                        <small class="form-text text-muted" v-if="isEditing">Leave blank to keep current password</small>
+                                        <small class="form-text text-muted" v-if="isEditing">Biarkan kosong untuk mempertahankan kata sandi saat ini</small>
                                     </div>
                                     <div class="form-group">
-                                        <label for="userConfirmPassword">Confirm Password</label>
+                                        <label for="userConfirmPassword">Konfirmasi Kata Sandi</label>
                                         <input type="password" class="form-control" id="userConfirmPassword" v-model="confirmPassword" :required="!isEditing">
                                     </div>
                                 </div>
@@ -172,11 +166,11 @@
                             <div class="row">
                                 <div class="col-md-12">
                                     <div class="form-group">
-                                        <label for="userAddress">Address</label>
+                                        <label for="userAddress">Alamat</label>
                                         <textarea class="form-control" id="userAddress" rows="2" v-model="currentUser.address"></textarea>
                                     </div>
                                     <div class="form-group">
-                                        <label for="userDescription">Description</label>
+                                        <label for="userDescription">Deskripsi</label>
                                         <textarea class="form-control" id="userDescription" rows="2" v-model="currentUser.description"></textarea>
                                     </div>
                                 </div>
@@ -184,12 +178,12 @@
                             <div class="form-group">
                                 <div class="custom-control custom-switch">
                                     <input type="checkbox" class="custom-control-input" id="userActive" v-model="currentUser.status">
-                                    <label class="custom-control-label" for="userActive">Active</label>
+                                    <label class="custom-control-label" for="userActive">Aktif</label>
                                 </div>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary" :disabled="!isFormValid">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary" :disabled="!isFormValid">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -202,7 +196,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="viewUserModalLabel">User Details</h5>
+                        <h5 class="modal-title" id="viewUserModalLabel">Detail Pengguna</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -211,28 +205,27 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <p><strong>ID:</strong> {{ currentUser.id }}</p>
-                                <p><strong>Full Name:</strong> {{ currentUser.full_name }}</p>
-                                <p><strong>Username:</strong> {{ currentUser.username }}</p>
+                                <p><strong>Nama Lengkap:</strong> {{ currentUser.full_name }}</p>
                                 <p><strong>Email:</strong> {{ currentUser.email }}</p>
-                                <p><strong>Phone:</strong> {{ currentUser.phone_number || 'Not provided' }}</p>
-                                <p><strong>Job Title:</strong> {{ currentUser.job_tittle || 'Not provided' }}</p>
+                                <p><strong>Telepon:</strong> {{ currentUser.phone_number || 'Tidak ada' }}</p>
+                                <p><strong>Jabatan:</strong> {{ currentUser.job_tittle || 'Tidak ada' }}</p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Role:</strong> <span :class="getRoleClass(currentUser.role)">{{ formatRole(currentUser.role) }}</span></p>
-                                <p><strong>Status:</strong> <span :class="getStatusClass(currentUser.status)">{{ currentUser.status ? 'Active' : 'Inactive' }}</span></p>
-                                <p><strong>Created:</strong> {{ currentUser.created }}</p>
-                                <p><strong>Updated:</strong> {{ currentUser.updated }}</p>
-                                <p><strong>Address:</strong> {{ currentUser.address || 'Not provided' }}</p>
+                                <p><strong>Peran:</strong> <span :class="getRoleClass(currentUser.role)">{{ formatRole(currentUser.role) }}</span></p>
+                                <p><strong>Status:</strong> <span :class="getStatusClass(currentUser.status)">{{ currentUser.status ? 'Aktif' : 'Tidak Aktif' }}</span></p>
+                                <p><strong>Dibuat:</strong> {{ currentUser.created }}</p>
+                                <p><strong>Diperbarui:</strong> {{ currentUser.updated }}</p>
+                                <p><strong>Alamat:</strong> {{ currentUser.address || 'Tidak ada' }}</p>
                             </div>
                         </div>
 
                         <div class="mt-4" v-if="currentUser.description">
-                            <h6>Description</h6>
+                            <h6>Deskripsi</h6>
                             <p>{{ currentUser.description }}</p>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>
@@ -243,17 +236,17 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this user? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -272,7 +265,6 @@ export default {
             currentUser: {
                 id: null,
                 full_name: '',
-                username: '',
                 email: '',
                 role: 'ROLE_ADMIN_TOKO',
                 status: true,
@@ -328,7 +320,7 @@ export default {
             return pages;
         },
         isFormValid() {
-            if (!this.currentUser.full_name || !this.currentUser.username || !this.currentUser.email || !this.currentUser.role) {
+            if (!this.currentUser.full_name || !this.currentUser.email || !this.currentUser.role) {
                 return false;
             }
 
@@ -446,19 +438,19 @@ export default {
                     this.loading = false;
                 })
                 .catch(error => {
-                    console.error('Error fetching users:', error);
+                    console.error('Kesalahan mengambil pengguna:', error);
 
                     // Provide more specific error message if available
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load users'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat pengguna'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        this.error = 'No response from server. Please check your connection.';
+                        this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        this.error = 'Failed to load users: ' + error.message;
+                        this.error = 'Gagal memuat pengguna: ' + error.message;
                     }
 
                     this.loading = false;
@@ -476,8 +468,8 @@ export default {
         formatRole(role) {
             switch(role) {
                 case 'ROLE_SUPERADMIN': return 'Super Admin';
-                case 'ROLE_ADMIN_TOKO': return 'Store Admin';
-                case 'ROLE_ADMIN_GUDANG': return 'Warehouse Admin';
+                case 'ROLE_ADMIN_TOKO': return 'Admin Toko';
+                case 'ROLE_ADMIN_GUDANG': return 'Admin Gudang';
                 default: return role;
             }
         },
@@ -497,7 +489,6 @@ export default {
             this.currentUser = {
                 id: null,
                 full_name: '',
-                username: '',
                 email: '',
                 role: 'ROLE_ADMIN_TOKO',
                 status: true,
@@ -547,8 +538,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error deleting user:', error);
-                        this.error = 'Failed to delete user';
+                        console.error('Kesalahan menghapus pengguna:', error);
+                        this.error = 'Gagal menghapus pengguna';
                         this.loading = false;
                     });
             }
@@ -568,8 +559,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error updating user:', error);
-                        this.error = 'Failed to update user';
+                        console.error('Kesalahan memperbarui pengguna:', error);
+                        this.error = 'Gagal memperbarui pengguna';
                         this.loading = false;
                     });
             } else {
@@ -581,8 +572,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error adding user:', error);
-                        this.error = 'Failed to add user';
+                        console.error('Kesalahan menambahkan pengguna:', error);
+                        this.error = 'Gagal menambahkan pengguna';
                         this.loading = false;
                     });
             }

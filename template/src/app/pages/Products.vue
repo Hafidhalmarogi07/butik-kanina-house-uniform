@@ -4,10 +4,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Product List</h3>
+                        <h3 class="card-title">Daftar Produk</h3>
                         <div class="card-tools" v-if="!isAdminToko">
                             <button type="button" class="btn btn-primary" @click="showAddModal">
-                                <i class="fas fa-plus"></i> Add Product
+                                <i class="fas fa-plus"></i> Tambah Produk
                             </button>
                         </div>
                     </div>
@@ -15,7 +15,7 @@
                         <div class="row mb-3">
                             <div class="col-md-3">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" placeholder="Search products..." 
+                                    <input type="text" class="form-control" placeholder="Cari produk..." 
                                            v-model="searchQuery" 
                                            @keyup.enter="handleSearch">
                                     <div class="input-group-append">
@@ -27,7 +27,7 @@
                             </div>
                             <div class="col-md-3">
                                 <select class="form-control" v-model="categoryFilter">
-                                    <option value="">All Categories</option>
+                                    <option value="">Semua Kategori</option>
                                     <option v-for="category in categories" :key="category.id" :value="category.id.toString()">
                                         {{ category.name }}
                                     </option>
@@ -39,13 +39,13 @@
                                 <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Image</th>
-                                        <th>Name</th>
-                                        <th>Category</th>
-                                        <th>Size</th>
-                                        <th>Stock</th>
-                                        <th>Price</th>
-                                        <th v-if="!isAdminToko">Actions</th>
+                                        <th>Gambar</th>
+                                        <th>Nama</th>
+                                        <th>Kategori</th>
+                                        <th>Ukuran</th>
+                                        <th>Stok</th>
+                                        <th>Harga</th>
+                                        <th v-if="!isAdminToko">Aksi</th>
                                         <th v-else></th>
                                     </tr>
                                 </thead>
@@ -81,7 +81,7 @@
                     <div class="card-footer clearfix">
                         <div v-if="loading" class="text-center">
                             <div class="spinner-border text-primary" role="status">
-                                <span class="sr-only">Loading...</span>
+                                <span class="sr-only">Memuat...</span>
                             </div>
                         </div>
                         <div v-else-if="error" class="alert alert-danger">
@@ -99,7 +99,7 @@
                             </li>
                         </ul>
                         <div v-else class="text-center">
-                            <p>No products found</p>
+                            <p>Tidak ada produk ditemukan</p>
                         </div>
                     </div>
                 </div>
@@ -111,7 +111,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="productModalLabel">{{ isEditing ? 'Edit Product' : 'Add New Product' }}</h5>
+                        <h5 class="modal-title" id="productModalLabel">{{ isEditing ? 'Edit Produk' : 'Tambah Produk Baru' }}</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -121,11 +121,11 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="productName">Product Name</label>
+                                        <label for="productName">Nama Produk</label>
                                         <input type="text" class="form-control" id="productName" v-model="currentProduct.name" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productCategory">Category</label>
+                                        <label for="productCategory">Kategori</label>
                                         <select class="form-control" id="productCategory" v-model="currentProduct.category.id" required>
                                             <option v-for="category in categories" :key="category.id" :value="category.id">
                                                 {{ category.name }}
@@ -133,7 +133,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productSize">Size</label>
+                                        <label for="productSize">Ukuran</label>
                                         <select class="form-control" id="productSize" v-model="currentProduct.size" required>
                                             <option value="S">S</option>
                                             <option value="M">M</option>
@@ -145,11 +145,11 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="productStock">Stock</label>
+                                        <label for="productStock">Stok</label>
                                         <input type="number" class="form-control" id="productStock" v-model="currentProduct.stock" min="0" required>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productPrice">Price</label>
+                                        <label for="productPrice">Harga</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Rp</span>
@@ -158,28 +158,28 @@
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label for="productImage">Product Image</label>
+                                        <label for="productImage">Gambar Produk</label>
                                         <div class="input-group">
                                             <div class="custom-file">
                                                 <input type="file" class="custom-file-input" id="productImage" @change="handleImageUpload">
                                                 <label class="custom-file-label" for="productImage">
-                                                    {{ currentProduct.image_url ? 'Image selected' : 'Choose file' }}
+                                                    {{ currentProduct.image_url ? 'Gambar dipilih' : 'Pilih file' }}
                                                 </label>
                                             </div>
                                         </div>
                                         <small class="form-text text-muted" v-if="isEditing && currentProduct.image_url">
-                                            Current image will be kept if no new image is selected
+                                            Gambar saat ini akan dipertahankan jika tidak ada gambar baru yang dipilih
                                         </small>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="productDescription">Description</label>
+                                <label for="productDescription">Deskripsi</label>
                                 <textarea class="form-control" id="productDescription" rows="3" v-model="currentProduct.description"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Save</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -192,17 +192,17 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        Are you sure you want to delete this product? This action cannot be undone.
+                        Apakah Anda yakin ingin menghapus produk ini? Tindakan ini tidak dapat dibatalkan.
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                        <button type="button" class="btn btn-danger" @click="confirmDelete">Delete</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                        <button type="button" class="btn btn-danger" @click="confirmDelete">Hapus</button>
                     </div>
                 </div>
             </div>
@@ -393,19 +393,19 @@ export default {
                     this.loading = false;
                 })
                 .catch(error => {
-                    console.error('Error fetching products:', error);
+                    console.error('Kesalahan mengambil produk:', error);
 
                     // Provide more specific error message if available
                     if (error.response) {
                         // The request was made and the server responded with a status code
                         // that falls out of the range of 2xx
-                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Failed to load products'}`;
+                        this.error = `Error ${error.response.status}: ${error.response.data.message || 'Gagal memuat produk'}`;
                     } else if (error.request) {
                         // The request was made but no response was received
-                        this.error = 'No response from server. Please check your connection.';
+                        this.error = 'Tidak ada respons dari server. Silakan periksa koneksi Anda.';
                     } else {
                         // Something happened in setting up the request that triggered an Error
-                        this.error = 'Failed to load products: ' + error.message;
+                        this.error = 'Gagal memuat produk: ' + error.message;
                     }
 
                     this.loading = false;
@@ -426,7 +426,7 @@ export default {
                     this.categories = response.data.content || response.data;
                 })
                 .catch(error => {
-                    console.error('Error fetching categories:', error);
+                    console.error('Kesalahan mengambil kategori:', error);
                 });
         },
 
@@ -486,8 +486,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error deleting product:', error);
-                        this.error = 'Failed to delete product';
+                        console.error('Kesalahan menghapus produk:', error);
+                        this.error = 'Gagal menghapus produk';
                         this.loading = false;
                     });
             }
@@ -508,8 +508,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error updating product:', error);
-                        this.error = 'Failed to update product';
+                        console.error('Kesalahan memperbarui produk:', error);
+                        this.error = 'Gagal memperbarui produk';
                         this.loading = false;
                     });
             } else {
@@ -521,8 +521,8 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Error adding product:', error);
-                        this.error = 'Failed to add product';
+                        console.error('Kesalahan menambahkan produk:', error);
+                        this.error = 'Gagal menambahkan produk';
                         this.loading = false;
                     });
             }
