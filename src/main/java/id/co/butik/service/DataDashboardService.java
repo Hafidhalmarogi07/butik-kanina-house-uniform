@@ -275,7 +275,7 @@ public class DataDashboardService {
 
             // For demonstration purposes, generate some sample data
             // In a real application, this would come from actual database queries
-            long incomingStock = 40 + (int)(Math.random() * 40); // Random value between 40-80
+            long incomingStock = 100 + (int)(Math.random() * 40); // Random value between 40-80
             long outgoingStock = 30 + (int)(Math.random() * 50); // Random value between 30-80
 
             movementData.add(new InventoryMovementDto(monthName, incomingStock, outgoingStock));
@@ -290,7 +290,7 @@ public class DataDashboardService {
     public WarehouseCapacityDto getWarehouseCapacity(HttpServletRequest request) {
         // For demonstration, we'll assume a fixed warehouse capacity of 1000 items
         // In a real application, this would come from a configuration or database
-        long totalCapacity = 1000;
+        long totalCapacity = 50000;
 
         // Calculate used space (sum of all product stocks)
         long usedSpace = StreamSupport.stream(productRepository.findAll().spliterator(), false)

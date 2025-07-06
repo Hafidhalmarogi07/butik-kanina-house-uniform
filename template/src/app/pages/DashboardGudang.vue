@@ -236,52 +236,21 @@
                     </div>
                     <div class="card-body p-0">
                         <ul class="products-list product-list-in-card pl-2 pr-2">
-                            <li class="item">
+                            <li v-for="(item, index) in lowStockItems" :key="index" class="item">
                                 <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
+                                    <img :src="item.image_url || '@assets/no-image.png'" alt="Product Image" class="img-size-50">
                                 </div>
                                 <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Uniform Set
-                                        <span class="badge badge-danger float-right">5 left</span></a>
+                                    <a href="javascript:void(0)" class="product-title">{{ item.product_name }}
+                                        <span :class="['badge float-right', item.current_stock <= 5 ? 'badge-danger' : 'badge-warning']">{{ item.current_stock }} left</span></a>
                                     <span class="product-description">
-                                        Complete school uniform set with shirt, pants/skirt, and tie
+                                        {{ item.product_description || 'No description available' }}
                                     </span>
                                 </div>
                             </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Shirt
-                                        <span class="badge badge-warning float-right">10 left</span></a>
-                                    <span class="product-description">
-                                        White school shirt with embroidered logo
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Tie
-                                        <span class="badge badge-danger float-right">3 left</span></a>
-                                    <span class="product-description">
-                                        School tie with logo
-                                    </span>
-                                </div>
-                            </li>
-                            <li class="item">
-                                <div class="product-img">
-                                    <img src="@assets/no-image.png" alt="Product Image" class="img-size-50">
-                                </div>
-                                <div class="product-info">
-                                    <a href="javascript:void(0)" class="product-title">School Skirt
-                                        <span class="badge badge-warning float-right">8 left</span></a>
-                                    <span class="product-description">
-                                        Pleated grey school skirt
-                                    </span>
+                            <li v-if="lowStockItems.length === 0" class="item">
+                                <div class="product-info text-center">
+                                    <span>No low stock items found</span>
                                 </div>
                             </li>
                         </ul>
@@ -307,8 +276,8 @@ export default {
             },
             inventoryMovement: [],
             warehouseCapacity: {
-                usedSpace: 0,
-                availableSpace: 0
+                used_space: 0,
+                available_space: 0
             },
             recentStockMovements: [],
             lowStockItems: [],
@@ -499,7 +468,8 @@ export default {
                     options: inventoryChartOptions
                 });
             }
-
+        },
+        initCapacityChart() {
             // Warehouse Capacity Chart
             if (document.getElementById('capacityChart')) {
                 const capacityChartCanvas = document.getElementById('capacityChart').getContext('2d');
@@ -509,8 +479,8 @@ export default {
                         'Ruang Tersedia'
                     ],
                     datasets: [
-                        {
-                            data: [70, 30],
+                        {   
+                            data: [this.warehouseCapacity.used_space, this.warehouseCapacity.available_space],
                             backgroundColor: ['#17a2b8', '#e9ecef'],
                         }
                     ]
