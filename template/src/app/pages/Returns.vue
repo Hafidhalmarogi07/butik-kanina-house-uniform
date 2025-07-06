@@ -647,7 +647,7 @@ export default {
       };
 
       // Make the API call to update the return status
-      this.Api.post(`/order-returns/${this.returnToUpdateStatus.id}/status`, statusRequest)
+      this.Api.put(`/order-returns/${this.returnToUpdateStatus.id}/status`, statusRequest)
           .then(response => {
             // Update the return in the list
             const index = this.returns.findIndex(r => r.id === this.returnToUpdateStatus.id);

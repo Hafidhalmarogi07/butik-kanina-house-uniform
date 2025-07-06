@@ -51,7 +51,7 @@ public class OrderReturnController {
         return saleReturnService.deleteSaleReturn(id);
     }
 
-    @PatchMapping({"/{id}/status", "/{id}/status/"})
+    @PutMapping({"/{id}/status", "/{id}/status/"})
     public OrderReturn updateOrderReturnStatus(@PathVariable Long id, @RequestBody StatusUpdateRequest request) {
         return saleReturnService.updateOrderReturnStatus(id, request.getStatus());
     }
