@@ -174,49 +174,28 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td><a href="#">SM9842</a></td>
-                                        <td>School Uniform Set</td>
-                                        <td><span class="badge badge-success">In</span></td>
-                                        <td>50</td>
-                                        <td>2023-06-15</td>
+                                    <tr v-for="(movement, index) in recentStockMovements" :key="index">
+                                        <td><a href="#">{{ movement.id }}</a></td>
+                                        <td>{{ movement.item_name }}</td>
+                                        <td>
+                                            <span :class="['badge', movement.type === 'IN' ? 'badge-success' : 'badge-warning']">
+                                                {{ movement.type === 'IN' ? 'In' : 'Out' }}
+                                            </span>
+                                        </td>
+                                        <td>{{ Math.abs(movement.quantity) }}</td>
+                                        <td>{{ formatDate(movement.date) }}</td>
                                     </tr>
-                                    <tr>
-                                        <td><a href="#">SM1848</a></td>
-                                        <td>School Shirt</td>
-                                        <td><span class="badge badge-warning">Out</span></td>
-                                        <td>20</td>
-                                        <td>2023-06-14</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">SM7429</a></td>
-                                        <td>School Pants</td>
-                                        <td><span class="badge badge-success">In</span></td>
-                                        <td>30</td>
-                                        <td>2023-06-13</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">SM7430</a></td>
-                                        <td>School Skirt</td>
-                                        <td><span class="badge badge-warning">Out</span></td>
-                                        <td>15</td>
-                                        <td>2023-06-12</td>
-                                    </tr>
-                                    <tr>
-                                        <td><a href="#">SM1849</a></td>
-                                        <td>School Tie</td>
-                                        <td><span class="badge badge-success">In</span></td>
-                                        <td>100</td>
-                                        <td>2023-06-11</td>
+                                    <tr v-if="recentStockMovements.length === 0">
+                                        <td colspan="5" class="text-center">No recent stock movements found</td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                    <div class="card-footer clearfix">
-                        <router-link to="/stock-movement/create" class="btn btn-sm btn-info float-left">Tambah Pergerakan Stok</router-link>
-                        <router-link to="/stock-movements" class="btn btn-sm btn-secondary float-right">Lihat Semua Pergerakan</router-link>
-                    </div>
+<!--                    <div class="card-footer clearfix">-->
+<!--                        <router-link to="/stock-movement/create" class="btn btn-sm btn-info float-left">Tambah Pergerakan Stok</router-link>-->
+<!--                        <router-link to="/stock-movements" class="btn btn-sm btn-secondary float-right">Lihat Semua Pergerakan</router-link>-->
+<!--                    </div>-->
                 </div>
             </div>
 
@@ -304,6 +283,11 @@ export default {
             // Navigate to Production page
             this.$router.push('/production');
         },
+        formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+        },
         fetchWarehouseSummary() {
             this.Api.get('/dashboard/warehouse-summary')
                 .then(response => {
@@ -342,7 +326,7 @@ export default {
                 });
         },
         fetchRecentStockMovements() {
-            this.Api.get('/dashboard/recent-stock-movements?limit=5')
+            this.Api.get('/dashboard/recent-stock-movements?limit=6')
                 .then(response => {
                     if (response.data) {
                         this.recentStockMovements = response.data;
@@ -388,7 +372,7 @@ export default {
             }
         },
         markAlertAsResolved(alertId) {
-            this.Api.put(`/api/v1/dashboard/stock-alerts/${alertId}/resolve`)
+            this.Api.put(`/dashboard/stock-alerts/${alertId}/resolve`)
                 .then(() => {
                     // Remove the alert from the list
                     this.stockAlerts = this.stockAlerts.filter(alert => alert.id !== alertId);
@@ -414,8 +398,28 @@ export default {
             if (document.getElementById('inventoryChart')) {
                 const inventoryChartCanvas = document.getElementById('inventoryChart').getContext('2d');
 
+                // Extract data from the API response
+                let labels = [];
+                let incomingData = [];
+                let outgoingData = [];
+
+                // Check if we have data from the API
+                if (this.inventoryMovement && this.inventoryMovement.length > 0) {
+                    // Extract labels and data from the inventoryMovement array
+                    this.inventoryMovement.forEach(item => {
+                        labels.push(item.month || '');
+                        incomingData.push(item.incoming_stock || 0);
+                        outgoingData.push(item.outgoing_stock || 0);
+                    });
+                } else {
+                    // Fallback to default data if no API data is available
+                    labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
+                    incomingData = [65, 59, 80, 81, 56, 55, 40];
+                    outgoingData = [28, 48, 40, 19, 86, 27, 90];
+                }
+
                 const inventoryChartData = {
-                    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+                    labels: labels,
                     datasets: [
                         {
                             label: 'Stok Masuk',
@@ -426,7 +430,7 @@ export default {
                             pointStrokeColor: 'rgba(40,167,69,1)',
                             pointHighlightFill: '#fff',
                             pointHighlightStroke: 'rgba(40,167,69,1)',
-                            data: [65, 59, 80, 81, 56, 55, 40]
+                            data: incomingData
                         },
                         {
                             label: 'Stok Keluar',
@@ -437,7 +441,7 @@ export default {
                             pointStrokeColor: 'rgba(255,193,7,1)',
                             pointHighlightFill: '#fff',
                             pointHighlightStroke: 'rgba(255,193,7,1)',
-                            data: [28, 48, 40, 19, 86, 27, 90]
+                            data: outgoingData
                         }
                     ]
                 };

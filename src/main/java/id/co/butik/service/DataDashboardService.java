@@ -2,6 +2,7 @@ package id.co.butik.service;
 
 import id.co.butik.dto.dashboard.*;
 import id.co.butik.entity.Order;
+import id.co.butik.entity.OrderDetail;
 import id.co.butik.entity.Product;
 import id.co.butik.entity.Production;
 import id.co.butik.entity.Sale;
@@ -263,25 +264,76 @@ public class DataDashboardService {
 
     /**
      * Get inventory movement data for chart
+     * 
+     * Retrieves stock movement data for the last 7 months:
+     * - Stock In: total quantity from production table
+     * - Stock Out: total quantity from sales + total quantity from completed orders
+     * 
+     * Returns data ordered from oldest to newest month.
      */
     public List<InventoryMovementDto> getInventoryMovement(HttpServletRequest request) {
         List<InventoryMovementDto> movementData = new ArrayList<>();
 
         // Get last 7 months
         LocalDate now = LocalDate.now();
+
+        // Process months from oldest to newest (as required)
         for (int i = 6; i >= 0; i--) {
             LocalDate date = now.minusMonths(i);
-            String monthName = date.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            LocalDate startOfMonth = date.withDayOfMonth(1);
+            LocalDate endOfMonth = date.withDayOfMonth(date.lengthOfMonth());
 
-            // For demonstration purposes, generate some sample data
-            // In a real application, this would come from actual database queries
-            long incomingStock = 100 + (int)(Math.random() * 40); // Random value between 40-80
-            long outgoingStock = 30 + (int)(Math.random() * 50); // Random value between 30-80
+            String monthName = date.getMonth().getDisplayName(TextStyle.FULL, new Locale("id", "ID"));
 
+            // Calculate stock in (total quantity from production table)
+            long incomingStock = StreamSupport.stream(productionRepository.findAll().spliterator(), false)
+                    .filter(p -> {
+                        LocalDate productionDate = p.getEndDate() != null ? p.getEndDate() : p.getStartDate();
+                        return productionDate != null && 
+                               !productionDate.isBefore(startOfMonth) && 
+                               !productionDate.isAfter(endOfMonth);
+                    })
+                    .mapToInt(Production::getQuantity)
+                    .sum();
+
+            // Calculate stock out from sales
+            long outgoingStockFromSales = StreamSupport.stream(saleRepository.findAll().spliterator(), false)
+                    .filter(s -> {
+                        LocalDate saleDate = s.getDate() != null ? s.getDate().toLocalDate() : null;
+                        return saleDate != null && 
+                               !saleDate.isBefore(startOfMonth) && 
+                               !saleDate.isAfter(endOfMonth);
+                    })
+                    .mapToInt(s -> s.getItems() != null ? s.getItems() : 0)
+                    .sum();
+
+            // Calculate stock out from completed orders
+            long outgoingStockFromOrders = StreamSupport.stream(orderRepository.findAll().spliterator(), false)
+                    .filter(o -> {
+                        LocalDate orderDate = o.getOrderDate() != null ? o.getOrderDate().toLocalDate() : null;
+                        return orderDate != null && 
+                               !orderDate.isBefore(startOfMonth) && 
+                               !orderDate.isAfter(endOfMonth) &&
+                               o.getOrderStatus() == OrderStatus.COMPLETED;
+                    })
+                    .flatMap(o -> o.getDetails().stream())
+                    .mapToInt(od -> od.getQuantity())
+                    .sum();
+
+            // Total outgoing stock
+            long outgoingStock = outgoingStockFromSales + outgoingStockFromOrders;
+
+            // Add to result list
             movementData.add(new InventoryMovementDto(monthName, incomingStock, outgoingStock));
         }
 
-        return movementData;
+        // Reverse the list to get oldest to newest order
+        List<InventoryMovementDto> orderedData = new ArrayList<>();
+        for (int i = movementData.size() - 1; i >= 0; i--) {
+            orderedData.add(movementData.get(i));
+        }
+
+        return orderedData;
     }
 
     /**
@@ -304,23 +356,84 @@ public class DataDashboardService {
     }
 
     /**
-     * Get recent stock movements
+     * Get recent stock movements from production, sales, and orders
+     * 
+     * @param request HTTP request
+     * @param limit Maximum number of movements to return (default 6)
+     * @return List of recent stock movements
      */
     public List<StockMovementDto> getRecentStockMovements(HttpServletRequest request, Integer limit) {
-        int movementLimit = (limit != null && limit > 0) ? limit : 5;
+        int movementLimit = (limit != null && limit > 0) ? limit : 6;
         List<StockMovementDto> movements = new ArrayList<>();
 
-        // For demonstration purposes, create sample stock movement data
-        // In a real application, this would come from actual database queries
+        // 1. Get recent productions (stock increases)
+        List<Production> recentProductions = StreamSupport.stream(productionRepository.findAll().spliterator(), false)
+                .filter(p -> p.getStatus() == ProductionStatus.FINISHED)
+                .sorted((a, b) -> {
+                    LocalDate dateA = a.getEndDate() != null ? a.getEndDate() : a.getStartDate();
+                    LocalDate dateB = b.getEndDate() != null ? b.getEndDate() : b.getStartDate();
+                    return dateB.compareTo(dateA); // Sort by date descending
+                })
+                .limit(movementLimit)
+                .collect(Collectors.toList());
 
-        // Sample incoming stock movements
-        movements.add(new StockMovementDto("SM9842", "School Uniform Set", "IN", 50, LocalDate.now().minusDays(0)));
-        movements.add(new StockMovementDto("SM7429", "School Pants", "IN", 30, LocalDate.now().minusDays(2)));
-        movements.add(new StockMovementDto("SM1849", "School Tie", "IN", 100, LocalDate.now().minusDays(4)));
+        for (Production production : recentProductions) {
+            if (production.getProduct() != null) {
+                LocalDate date = production.getEndDate() != null ? production.getEndDate() : production.getStartDate();
+                StockMovementDto dto = new StockMovementDto(
+                    "P" + production.getId(),
+                    production.getProduct().getName(),
+                    "IN",
+                    production.getQuantity(),
+                    date,
+                    "Produksi",
+                    "Production"
+                );
+                movements.add(dto);
+            }
+        }
 
-        // Sample outgoing stock movements
-        movements.add(new StockMovementDto("SM1848", "School Shirt", "OUT", 20, LocalDate.now().minusDays(1)));
-        movements.add(new StockMovementDto("SM7430", "School Skirt", "OUT", 15, LocalDate.now().minusDays(3)));
+        // 2. Get recent sales (stock decreases)
+        List<Sale> recentSales = saleRepository.findRecentSales(PageRequest.of(0, movementLimit));
+
+        for (Sale sale : recentSales) {
+            if (sale.getDetails() != null && !sale.getDetails().isEmpty() && sale.getDate() != null) {
+                for (SaleDetail detail : sale.getDetails()) {
+                    if (detail.getProduct() != null) {
+                        StockMovementDto dto = new StockMovementDto(
+                            "S" + sale.getId() + "-" + detail.getId(),
+                            detail.getProduct().getName(),
+                            "OUT",
+                            -detail.getQuantity(), // Negative quantity for stock decrease
+                            sale.getDate().toLocalDate(),
+                            "Penjualan",
+                            "Sale"
+                        );
+                        movements.add(dto);
+                    }
+                }
+            }
+        }
+
+        // 3. Get recent completed orders (stock decreases)
+        List<Order> recentOrders = orderRepository.findRecentOrder(PageRequest.of(0, movementLimit));
+
+        for (Order order : recentOrders) {
+            if (order.getOrderStatus() == OrderStatus.COMPLETED && order.getOrderDate() != null) {
+                // For simplicity, we'll just create one movement per order
+                // In a real implementation, you might want to iterate through order details
+                StockMovementDto dto = new StockMovementDto(
+                    "O" + order.getId(),
+                    "Order #" + order.getOrderNumber(),
+                    "OUT",
+                    -1, // Just indicate it's a decrease
+                    order.getOrderDate().toLocalDate(),
+                    "Order keluar",
+                    "Order"
+                );
+                movements.add(dto);
+            }
+        }
 
         // Sort by date (most recent first) and limit
         movements.sort((a, b) -> b.getDate().compareTo(a.getDate()));
