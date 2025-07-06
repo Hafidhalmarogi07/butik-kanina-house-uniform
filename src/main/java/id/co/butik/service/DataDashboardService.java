@@ -424,7 +424,7 @@ public class DataDashboardService {
                 // In a real implementation, you might want to iterate through order details
                 StockMovementDto dto = new StockMovementDto(
                     "O" + order.getId(),
-                    "Order #" + order.getOrderNumber(),
+                    order.getDetails().get(0).getProduct().getName(),
                     "OUT",
                     -1, // Just indicate it's a decrease
                     order.getOrderDate().toLocalDate(),
@@ -451,60 +451,23 @@ public class DataDashboardService {
         int itemLimit = (limit != null && limit > 0) ? limit : 5;
         List<LowStockItemDto> lowStockItems = new ArrayList<>();
 
-        // Get unresolved stock alerts
-        List<StockAlert> stockAlerts = stockAlertRepository.findByResolvedFalse();
+        // Get all products sorted by stock (ascending) to get products with lowest stock first
+        List<Product> products = StreamSupport.stream(productRepository.findAll().spliterator(), false)
+                .sorted((a, b) -> Integer.compare(a.getStock(), b.getStock()))
+                .limit(itemLimit)
+                .collect(Collectors.toList());
 
-        for (StockAlert alert : stockAlerts) {
-            Product product = alert.getProduct();
-            if (product != null) {
-                LowStockItemDto dto = new LowStockItemDto(
-                    product.getId(),
-                    product.getName(),
-                    product.getDescription(),
-                    product.getImageUrl() != null ? PropertiesUtils.CDN_BASEURL + product.getImageUrl() : null,
-                    alert.getCurrentStock(),
-                    product.getSellingPrice()
-                );
-                lowStockItems.add(dto);
-            }
-        }
-
-        // If we don't have enough items from stock alerts, add products with low stock
-        if (lowStockItems.size() < itemLimit) {
-            // Get all products sorted by stock (ascending)
-            List<Product> products = StreamSupport.stream(productRepository.findAll().spliterator(), false)
-                    .sorted((a, b) -> Integer.compare(a.getStock(), b.getStock()))
-                    .collect(Collectors.toList());
-
-            for (Product product : products) {
-                // Skip products that are already in the list
-                if (lowStockItems.stream().anyMatch(item -> item.getProductId().equals(product.getId()))) {
-                    continue;
-                }
-
-                // Add products with stock less than 10 (arbitrary threshold)
-                if (product.getStock() < 10) {
-                    LowStockItemDto dto = new LowStockItemDto(
-                        product.getId(),
-                        product.getName(),
-                        product.getDescription(),
-                        product.getImageUrl() != null ? PropertiesUtils.CDN_BASEURL + product.getImageUrl() : null,
-                        product.getStock(),
-                        product.getSellingPrice()
-                    );
-                    lowStockItems.add(dto);
-
-                    // Stop if we have enough items
-                    if (lowStockItems.size() >= itemLimit) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // Limit the results
-        if (lowStockItems.size() > itemLimit) {
-            lowStockItems = lowStockItems.subList(0, itemLimit);
+        // Convert products to DTOs
+        for (Product product : products) {
+            LowStockItemDto dto = new LowStockItemDto(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getImageUrl() != null ? PropertiesUtils.CDN_BASEURL + product.getImageUrl() : null,
+                product.getStock(),
+                product.getSellingPrice()
+            );
+            lowStockItems.add(dto);
         }
 
         return lowStockItems;
