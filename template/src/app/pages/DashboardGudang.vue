@@ -103,7 +103,7 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-chart-line mr-1"></i>
-                            Pergerakan Inventaris
+                            Pergerakan Stok Barang
                         </h3>
                         <div class="card-tools">
                             <button type="button" class="btn btn-tool" data-card-widget="collapse">
