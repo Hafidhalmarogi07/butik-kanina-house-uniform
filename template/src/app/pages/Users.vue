@@ -25,14 +25,14 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-3">
+                            <!-- <div class="col-md-3">
                                 <select class="form-control" v-model="roleFilter">
                                     <option value="">Semua Peran</option>
                                     <option value="ROLE_SUPERADMIN">Super Admin</option>
                                     <option value="ROLE_ADMIN_TOKO">Admin Toko</option>
                                     <option value="ROLE_ADMIN_GUDANG">Admin Gudang</option>
                                 </select>
-                            </div>
+                            </div> -->
                         </div>
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped">
@@ -380,16 +380,7 @@ export default {
                 }
             }
 
-            // Add role filter if present
-            if (this.roleFilter) {
-                // If we already have filters, add AND operator
-                if (filters.length > 0) {
-                    filters.push(["and"]);
-                }
-
-                // Add filter for role equals roleFilter
-                filters.push(["role", "=", this.roleFilter]);
-            }
+            
 
             // Add filters to params if any
             if (filters.length > 0) {
@@ -398,6 +389,12 @@ export default {
 
             // Convert params object to URL query string
             const queryParams = new URLSearchParams();
+            // Add role filter if present
+            if (this.roleFilter) {
+            
+                // Add filter for role equals roleFilter
+                queryParams.append("role", this.roleFilter);
+            }
 
             // Add pagination parameters
             // Convert 0-based page to 1-based page for API

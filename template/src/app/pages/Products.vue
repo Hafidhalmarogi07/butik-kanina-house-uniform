@@ -248,7 +248,7 @@ export default {
         isAdminToko() {
             // Check if user has ROLE_ADMIN_TOKO role
             if (this.$store && this.$store.state && this.$store.state.user && this.$store.state.user.roles) {
-                return this.$store.state.user.roles.some(role => role.name === 'ROLE_ADMIN_TOKO');
+                return this.$store.state.user.roles.some(role => role.name === 'ROLE_ADMIN_TOKO' || role.name ==='ROLE_SUPERADMIN');
             }
             return false;
         },

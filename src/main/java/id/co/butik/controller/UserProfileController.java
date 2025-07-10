@@ -25,8 +25,8 @@ public class UserProfileController {
     @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN"})
     @GetMapping({"", "/"})
     public Page<UserProfile> getAllUserProfiles(@RequestParam Map<String, String> params, HttpServletRequest request) {
-        PageableSpec<UserProfile> pageableSpec = SpecificationUtils.of(params);
-        return userProfileService.getUserProfiles(pageableSpec.getSpecification(), pageableSpec.getPageable(), request);
+        
+        return userProfileService.getUserProfiles(params, request);
     }
 
     @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN"})

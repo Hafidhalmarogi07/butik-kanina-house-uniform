@@ -8,16 +8,20 @@ import id.co.butik.repository.RoleRepository;
 import id.co.butik.repository.UserProfileRepository;
 import id.co.butik.repository.UserRepository;
 import id.co.butik.responseException.BadRequest;
+import id.co.butik.util.PageableSpec;
+import id.co.butik.util.SpecificationUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -43,9 +47,10 @@ public class UserProfileService {
      * @param pageable      the pagination information
      * @return a page of user profiles
      */
-    public Page<UserProfile> getUserProfiles(Specification<UserProfile> specification, Pageable pageable, HttpServletRequest request) {
+    public Page<UserProfile> getUserProfiles(Map<String, String> params, HttpServletRequest request) {
+        PageableSpec<UserProfile> pageableSpec = SpecificationUtils.of(params);
         Specification<UserProfile> spec = (root, criteriaQuery, criteriaBuilder) -> criteriaBuilder.notEqual(root.get("email"), request.getRemoteUser());
-        Page<UserProfile> userProfilePage = userProfileRepository.findAll(specification.and(spec), pageable);
+        Page<UserProfile> userProfilePage = userProfileRepository.findAll(pageableSpec.getSpecification().and(spec), pageableSpec.getPageable());
         userProfilePage.getContent().forEach(userProfile -> {
             User user = userRepository.findOneByUsername(userProfile.getEmail());
             userProfile.setStatus(user.isEnabled());
