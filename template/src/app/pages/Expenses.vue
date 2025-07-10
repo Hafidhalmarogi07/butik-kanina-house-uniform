@@ -413,7 +413,7 @@ export default {
                     filters.push(["and"]);
                 }
                 // Add filter for date containing month
-                filters.push(["date", "like", `%-${this.monthFilter}-%`]);
+                filters.push(["date", "like", `-${this.monthFilter}-`]);
             }
 
             // Add filters to params if any
