@@ -123,26 +123,36 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                        <div v-if="error" class="alert alert-warning">{{ error }}</div>
                         <form @submit.prevent="saveUser">
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="userName">Nama Lengkap</label>
-                                        <input type="text" class="form-control" id="userName" v-model="currentUser.full_name" required>
+                                        <div class="input-container">
+                                            <input type="text" class="form-control" id="userName" v-model="currentUser.full_name" :class="{ 'is-invalid': errors.full_name }">
+                                            <div class="invalid-tooltip" v-if="errors.full_name">{{ errors.full_name }}</div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userEmail">Email</label>
-                                        <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" required>
+                                        <div class="input-container">
+                                            <input type="email" class="form-control" id="userEmail" v-model="currentUser.email" :class="{ 'is-invalid': errors.email }">
+                                            <div class="invalid-tooltip" v-if="errors.email">{{ errors.email }}</div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userPhone">Nomor Telepon</label>
-                                        <input type="tel" class="form-control" id="userPhone" v-model="currentUser.phone_number">
+                                        <div class="input-container">
+                                            <input type="tel" class="form-control" id="userPhone" v-model="currentUser.phone_number" :class="{ 'is-invalid': errors.phone_number }">
+                                            <div class="invalid-tooltip" v-if="errors.phone_number">{{ errors.phone_number }}</div>
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="userRole">Peran</label>
-                                        <select class="form-control" id="userRole" v-model="currentUser.role" required>
+                                        <select class="form-control" id="userRole" v-model="currentUser.role">
                                             <option value="ROLE_SUPERADMIN">Super Admin</option>
                                             <option value="ROLE_ADMIN_TOKO">Admin Toko</option>
                                             <option value="ROLE_ADMIN_GUDANG">Admin Gudang</option>
@@ -154,12 +164,18 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="userPassword">Kata Sandi</label>
-                                        <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :required="!isEditing">
-                                        <small class="form-text text-muted" v-if="isEditing">Biarkan kosong untuk mempertahankan kata sandi saat ini</small>
+                                        <div class="input-container">
+                                            <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :class="{ 'is-invalid': errors.password }">
+                                            <small class="form-text text-muted" v-if="isEditing">Biarkan kosong untuk mempertahankan kata sandi saat ini</small>
+                                            <div class="invalid-tooltip" v-if="errors.password">{{ errors.password }}</div>
+                                        </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="userConfirmPassword">Konfirmasi Kata Sandi</label>
-                                        <input type="password" class="form-control" id="userConfirmPassword" v-model="confirmPassword" :required="!isEditing">
+                                        <div class="input-container">
+                                            <input type="password" class="form-control" id="userConfirmPassword" v-model="confirmPassword" :class="{ 'is-invalid': errors.confirmPassword }">
+                                            <div class="invalid-tooltip" v-if="errors.confirmPassword">{{ errors.confirmPassword }}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -183,7 +199,7 @@
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                                <button type="submit" class="btn btn-primary" :disabled="!isFormValid">Simpan</button>
+                                <button type="submit" class="btn btn-primary">Simpan</button>
                             </div>
                         </form>
                     </div>
@@ -287,12 +303,13 @@ export default {
                 pageSize: 10
             },
             loading: false,
-            error: null
+            error: null,
+            errors: {}
         }
     },
     computed: {
         filteredUsers() {
-            // Since filtering is now done on the server side, 
+            // Since filtering is now done on the server side,
             // we simply return the users array
             return this.users;
         },
@@ -318,21 +335,6 @@ export default {
             }
 
             return pages;
-        },
-        isFormValid() {
-            if (!this.currentUser.full_name || !this.currentUser.email || !this.currentUser.role) {
-                return false;
-            }
-
-            if (!this.isEditing && (!this.currentUser.password || this.currentUser.password !== this.confirmPassword)) {
-                return false;
-            }
-
-            if (this.isEditing && this.currentUser.password && this.currentUser.password !== this.confirmPassword) {
-                return false;
-            }
-
-            return true;
         }
     },
     mounted() {
@@ -353,9 +355,72 @@ export default {
         roleFilter: function() {
             // Reset to first page and fetch users with new role filter
             this.changePage(1);
-        }
+        },
+       'currentUser.full_name'() {
+           this.validateFullName();
+       },
+       'currentUser.email'() {
+           this.validateEmail();
+       },
+       'currentUser.phone_number'() {
+           this.validatePhoneNumber();
+       },
+       'currentUser.password'() {
+           this.validatePassword();
+       },
+       confirmPassword() {
+           this.validateConfirmPassword();
+       }
     },
     methods: {
+       validateFullName() {
+           if (!this.currentUser.full_name) {
+               this.$set(this.errors, 'full_name', 'Nama lengkap harus diisi.');
+           } else {
+               this.$delete(this.errors, 'full_name');
+           }
+       },
+       validateEmail() {
+           if (!this.currentUser.email) {
+               this.$set(this.errors, 'email', 'Email harus diisi.');
+           } else if (!/\S+@\S+\.\S+/.test(this.currentUser.email)) {
+               this.$set(this.errors, 'email', 'Format email tidak valid.');
+           } else {
+               this.$delete(this.errors, 'email');
+           }
+       },
+       validatePhoneNumber() {
+           if (!this.currentUser.phone_number) {
+               this.$set(this.errors, 'phone_number', 'Nomor telepon harus diisi.');
+           } else if (!/^\d+$/.test(this.currentUser.phone_number)) {
+               this.$set(this.errors, 'phone_number', 'Nomor telepon harus berupa angka.');
+           } else {
+               this.$delete(this.errors, 'phone_number');
+           }
+       },
+       validatePassword() {
+           if (!this.isEditing || this.currentUser.password) {
+               if (!this.currentUser.password) {
+                   this.$set(this.errors, 'password', 'Kata sandi harus diisi.');
+               } else if (this.currentUser.password.length < 8) {
+                   this.$set(this.errors, 'password', 'Kata sandi minimal 8 karakter.');
+               } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(this.currentUser.password)) {
+                   this.$set(this.errors, 'password', 'Kata sandi harus mengandung huruf dan angka.');
+               } else {
+                   this.$delete(this.errors, 'password');
+               }
+           } else {
+               this.$delete(this.errors, 'password');
+           }
+           this.validateConfirmPassword();
+       },
+       validateConfirmPassword() {
+           if (this.currentUser.password !== this.confirmPassword) {
+               this.$set(this.errors, 'confirmPassword', 'Konfirmasi kata sandi tidak cocok.');
+           } else {
+               this.$delete(this.errors, 'confirmPassword');
+           }
+       },
         fetchUsers(page = 0) {
             this.loading = true;
 
@@ -499,6 +564,8 @@ export default {
                 address: null
             };
             this.confirmPassword = '';
+            this.error = null;
+            this.errors = {};
             $('#userModal').modal('show');
         },
         viewUser(user) {
@@ -509,6 +576,8 @@ export default {
             this.isEditing = true;
             this.currentUser = { ...user, password: '' };
             this.confirmPassword = '';
+            this.error = null;
+            this.errors = {};
             $('#userModal').modal('show');
         },
         toggleUserStatus(user) {
@@ -541,7 +610,57 @@ export default {
                     });
             }
         },
+        validateForm() {
+            this.errors = {};
+            let isValid = true;
+
+            if (!this.currentUser.full_name) {
+                this.errors.full_name = 'Nama lengkap harus diisi.';
+                isValid = false;
+            }
+
+            if (!this.currentUser.email) {
+                this.errors.email = 'Email harus diisi.';
+                isValid = false;
+            } else if (!/\S+@\S+\.\S+/.test(this.currentUser.email)) {
+                this.errors.email = 'Format email tidak valid.';
+                isValid = false;
+            }
+
+            if (!this.currentUser.phone_number) {
+                this.errors.phone_number = 'Nomor telepon harus diisi.';
+                isValid = false;
+            } else if (!/^\d+$/.test(this.currentUser.phone_number)) {
+                this.errors.phone_number = 'Nomor telepon harus berupa angka.';
+                isValid = false;
+            }
+
+            if (!this.isEditing || this.currentUser.password) {
+                if (!this.currentUser.password) {
+                    this.errors.password = 'Kata sandi harus diisi.';
+                    isValid = false;
+                } else if (this.currentUser.password.length < 8) {
+                    this.errors.password = 'Kata sandi minimal 8 karakter.';
+                    isValid = false;
+                } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(this.currentUser.password)) {
+                    this.errors.password = 'Kata sandi harus mengandung huruf dan angka.';
+                    isValid = false;
+                }
+
+                if (this.currentUser.password !== this.confirmPassword) {
+                    this.errors.confirmPassword = 'Konfirmasi kata sandi tidak cocok.';
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        },
+
         saveUser() {
+            if (!this.validateForm()) {
+                return;
+            }
+
             this.loading = true;
 
             if (this.isEditing) {
@@ -557,7 +676,11 @@ export default {
                     })
                     .catch(error => {
                         console.error('Kesalahan memperbarui pengguna:', error);
-                        this.error = 'Gagal memperbarui pengguna';
+                        if (error.response && error.response.data && error.response.data.message) {
+                            this.error = error.response.data.message;
+                        } else {
+                            this.error = 'Gagal memperbarui pengguna';
+                        }
                         this.loading = false;
                     });
             } else {
@@ -570,7 +693,11 @@ export default {
                     })
                     .catch(error => {
                         console.error('Kesalahan menambahkan pengguna:', error);
-                        this.error = 'Gagal menambahkan pengguna';
+                        if (error.response && error.response.data && error.response.data.message) {
+                            this.error = error.response.data.message;
+                        } else {
+                            this.error = 'Gagal menambahkan pengguna';
+                        }
                         this.loading = false;
                     });
             }
@@ -592,5 +719,25 @@ export default {
 <style scoped>
 .table th, .table td {
     vertical-align: middle;
+}
+.input-container {
+    position: relative;
+}
+.invalid-tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 5;
+    display: block;
+    padding: .25rem .5rem;
+    margin-top: .1rem;
+    font-size: .875rem;
+    line-height: 1.5;
+    color: #fff;
+    background-color: #fd7e14;
+    border-radius: .25rem;
+}
+.form-control.is-invalid {
+    border-color: #fd7e14;
 }
 </style>
