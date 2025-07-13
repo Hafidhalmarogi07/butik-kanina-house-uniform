@@ -11,5 +11,6 @@ public interface StockAlertRepository extends PagingAndSortingRepository<StockAl
     boolean existsByProductAndReasonAndResolvedFalse(Product product, String reason);
     List<StockAlert> findByResolvedFalse();
     List<StockAlert> findByProductAndReasonAndResolvedFalse(Product product, String reason);
+    List<StockAlert> findByProductAndResolvedFalse(Product product);
 
 }

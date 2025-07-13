@@ -83,19 +83,22 @@ public class ProductionService {
     }
 
     public void updateStockAlertAfterProduction(Product product, int producedQty) {
-        List<StockAlert> alerts = stockAlertRepository.findByProductAndReasonAndResolvedFalse(product, "ORDER_DEFICIT");
+        List<StockAlert> alerts = stockAlertRepository.findByProductAndResolvedFalse(product);
+        if(null != alerts){
+            for (StockAlert alert : alerts) {
 
-        for (StockAlert alert : alerts) {
-            int remaining = alert.getNeededQuantity() - producedQty;
+                int remaining = alert.getNeededQuantity() - producedQty;
+            
 
-            if (remaining <= 0) {
-                alert.setNeededQuantity(0);
-                alert.setResolved(true);
-            } else {
-                alert.setNeededQuantity(remaining);
+                if (remaining <= 0) {
+                    alert.setNeededQuantity(0);
+                    alert.setResolved(true);
+                } else {
+                    alert.setNeededQuantity(remaining);
+                }
+
+                stockAlertRepository.save(alert);
             }
-
-            stockAlertRepository.save(alert);
         }
     }
 }
