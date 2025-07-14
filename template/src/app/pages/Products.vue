@@ -154,7 +154,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Rp</span>
                                             </div>
-                                            <input type="number" class="form-control" id="productPrice" v-model="currentProduct.selling_price" min="0" required>
+                                            <input type="number" class="form-control" id="productPrice" v-model="currentProduct.selling_price" min="1" required>
                                         </div>
                                     </div>
                                     <div class="form-group">

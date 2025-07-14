@@ -201,7 +201,7 @@
                                                         </select>
                                                     </td>
                                                     <td>
-                                                        <input type="number" class="form-control" v-model="item.quantity" @change="calculateSubtotal(index)" min="1">
+                                                        <input type="number" class="form-control" v-model="item.quantity" @change="calculateSubtotal(index)" min="1" required>
                                                     </td>
                                                     <td>{{ formatCurrency(item.subtotal) }}</td>
                                                     <td>
