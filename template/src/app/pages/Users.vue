@@ -159,10 +159,6 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="userJobTitle">Jabatan</label>
-                                        <input type="text" class="form-control" id="userJobTitle" v-model="currentUser.job_tittle">
-                                    </div>
-                                    <div class="form-group">
                                         <label for="userPassword">Kata Sandi</label>
                                         <div class="input-container">
                                             <input type="password" class="form-control" id="userPassword" v-model="currentUser.password" :class="{ 'is-invalid': errors.password }">
@@ -224,7 +220,6 @@
                                 <p><strong>Nama Lengkap:</strong> {{ currentUser.full_name }}</p>
                                 <p><strong>Email:</strong> {{ currentUser.email }}</p>
                                 <p><strong>Telepon:</strong> {{ currentUser.phone_number || 'Tidak ada' }}</p>
-                                <p><strong>Jabatan:</strong> {{ currentUser.job_tittle || 'Tidak ada' }}</p>
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Peran:</strong> <span :class="getRoleClass(currentUser.role)">{{ formatRole(currentUser.role) }}</span></p>
@@ -289,7 +284,6 @@ export default {
                 updated: '',
                 photo_profile: null,
                 description: null,
-                job_tittle: null,
                 phone_number: null,
                 address: null
             },
@@ -559,7 +553,6 @@ export default {
                 updated: '',
                 photo_profile: null,
                 description: null,
-                job_tittle: null,
                 phone_number: null,
                 address: null
             };

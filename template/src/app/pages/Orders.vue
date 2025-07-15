@@ -1094,6 +1094,15 @@ export default {
                 return;
             }
 
+            const totalAmount = this.calculateTotal();
+            const totalPaid = this.currentOrder.payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+            const minimumPayment = totalAmount * 0.20;
+
+            if (totalPaid < minimumPayment) {
+                alert(`Jumlah pembayaran minimal adalah 20% dari total harga (${this.formatCurrency(minimumPayment)})`);
+                return;
+            }
+
             this.loading = true;
 
             // Prepare the request payload
@@ -1548,6 +1557,15 @@ export default {
             // Validate form
             if (!this.editingOrder.customer_id || this.editingOrder.details.some(item => !item.product_id)) {
                 alert('Please fill in all required fields');
+                return;
+            }
+
+            const totalAmount = this.calculateEditTotal();
+            const totalPaid = this.editingOrder.payments.reduce((sum, payment) => sum + Number(payment.amount), 0);
+            const minimumPayment = totalAmount * 0.20;
+
+            if (totalPaid < minimumPayment) {
+                alert(`Jumlah pembayaran minimal adalah 20% dari total harga (${this.formatCurrency(minimumPayment)})`);
                 return;
             }
 
