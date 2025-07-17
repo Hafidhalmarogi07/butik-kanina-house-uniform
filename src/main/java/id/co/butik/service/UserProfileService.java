@@ -8,6 +8,8 @@ import id.co.butik.repository.RoleRepository;
 import id.co.butik.repository.UserProfileRepository;
 import id.co.butik.repository.UserRepository;
 import id.co.butik.responseException.BadRequest;
+import id.co.butik.service.email.EmailSender;
+import id.co.butik.service.email.EmailService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -31,13 +33,15 @@ public class UserProfileService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public UserProfileService(UserProfileRepository userProfileRepository, UserRepository userRepository,
-                              RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+                              RoleRepository roleRepository, PasswordEncoder passwordEncoder,  EmailService emailService) {
         this.userProfileRepository = userProfileRepository;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailService = emailService;
     }
 
     /**
@@ -114,7 +118,7 @@ public class UserProfileService {
         profile.setPhoneNumber(userProfileDto.getPhoneNumber());
         profile.setDescription(userProfileDto.getDescription());
         profile.setJobTittle(userProfileDto.getJobTittle());
-
+        emailService.sendRegisterUser(userProfileDto.getFullName(), userProfileDto.getEmail(), userProfileDto.getPassword());
         return userProfileRepository.save(profile);
     }
 

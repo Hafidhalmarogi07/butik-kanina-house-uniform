@@ -3,6 +3,7 @@ package id.co.butik.controller;
 import id.co.butik.dto.UserProfileDto;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.service.UserProfileService;
+import id.co.butik.service.email.EmailService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
 import org.springframework.data.domain.Page;
@@ -18,8 +19,11 @@ public class UserProfileController {
 
     private final UserProfileService userProfileService;
 
-    public UserProfileController(UserProfileService userProfileService) {
+    private final EmailService emailService;
+
+    public UserProfileController(UserProfileService userProfileService, EmailService emailService) {
         this.userProfileService = userProfileService;
+        this.emailService = emailService;
     }
 
     @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN"})
@@ -39,6 +43,12 @@ public class UserProfileController {
     @PostMapping({"", "/"})
     public UserProfile createUserProfile(@RequestBody UserProfileDto userProfileDto) {
         return userProfileService.createUserProfile(userProfileDto);
+    }
+
+    @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN"})
+    @PostMapping({"/sendEmail", "/sendEmail/"})
+    public Map<String, Boolean> sendEmail(@RequestBody UserProfileDto userProfileDto) {
+        return emailService.sendRegisterUser(userProfileDto.getFullName(), userProfileDto.getEmail(), userProfileDto.getPassword());
     }
 
     @Secured({"ROLE_SUPERADMIN", "ROLE_ADMIN"})

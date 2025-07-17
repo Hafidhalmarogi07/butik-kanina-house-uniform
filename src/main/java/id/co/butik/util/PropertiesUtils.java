@@ -28,6 +28,8 @@ public class PropertiesUtils {
 
     public static String CDN_BASEURL;
 
+    public static String BASE_URL;
+
     public static Boolean SECURITY_JWT_ENABLED;
 
     public static String SERVER_SERVLET_CONTEXT_PATH;
@@ -47,6 +49,14 @@ public class PropertiesUtils {
     public static String SPRING_MAIL_SENDER_MAIL;
 
     public static String SOCKET_IO_URL;
+
+    public static String SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH;
+
+    public static String SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE;
+
+    public static String SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRE;
+
+    public static String SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_ENABLE;
 
     @Value("${tz:-}")
     public void setT(String value) {
@@ -103,6 +113,12 @@ public class PropertiesUtils {
         PropertiesUtils.CDN_BASEURL = value;
     }
 
+    @Value("${base.url:-}")
+    public void setBaseUrl(String value) {
+        PropertiesUtils.BASE_URL = value;
+    }
+
+
     @Value("${security.jwt.enabled:-}")
     public void setSecurityJwtEnabled(Boolean value) {
         PropertiesUtils.SECURITY_JWT_ENABLED = value;
@@ -147,4 +163,17 @@ public class PropertiesUtils {
     public void setSpringMailSenderMail(String value) {
         PropertiesUtils.SPRING_MAIL_SENDER_MAIL = value;
     }
+
+    @Value("${spring.mail.properties.mail.smtp.auth:-}")
+    public void setSpringMailPropertiesMailSmtpAuth(String value) {PropertiesUtils.SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH = value;}
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.enable:-}")
+    public void setSpringMailPropertiesMailSmtpStarttlsEnable(String value) {PropertiesUtils.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE = value;}
+
+    @Value("${spring.mail.properties.mail.smtp.starttls.required:-}")
+    public void setSpringMailPropertiesMailSmtpStarttlsRequired(String value) {PropertiesUtils.SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_REQUIRE= value;}
+
+    @Value("${spring.mail.properties.mail.smtp.ssl.enable:-}")
+    public void setSpringMailPropertiesMailSmtpSslEnable(String value) {PropertiesUtils.SPRING_MAIL_PROPERTIES_MAIL_SMTP_SSL_ENABLE = value;}
+
 }
