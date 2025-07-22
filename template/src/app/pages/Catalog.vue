@@ -141,7 +141,6 @@
                 </div>
                 <div class="card-body">
                   <h4 class="product-name">{{ product.name }}</h4>
-                  <p class="product-description">{{ product.description }}</p>
                   <p class="product-size"><small>Size: {{ product.size }}</small></p>
                   <p class="product-price">Rp {{ formatPrice(product.selling_price) }}</p>
                   <p class="product-stock" v-if="product.stock !== undefined">
@@ -407,7 +406,7 @@ export default {
 /* Product Grid */
 .product-grid {
   display: grid;
-  grid-template-columns: repeat(1, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -452,7 +451,7 @@ export default {
 }
 
 .card-body {
-  padding: 20px;
+  padding: 15px;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -461,7 +460,7 @@ export default {
 .product-name {
   font-size: 1.25rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   color: #333;
   line-height: 1.3;
 }
@@ -480,7 +479,7 @@ export default {
 
 .product-size {
   color: #777;
-  margin-bottom: 8px;
+  margin-bottom: 5px;
   font-size: 0.9rem;
 }
 
@@ -488,8 +487,8 @@ export default {
   font-weight: 700;
   color: #28a745;
   font-size: 1.4rem;
-  margin-top: auto;
-  margin-bottom: 8px;
+  margin-top: 4px;
+  margin-bottom: 5px;
 }
 
 .product-stock {
@@ -499,15 +498,16 @@ export default {
 }
 
 .card-footer {
-  padding: 15px 20px;
+  padding: 7px 15px;
   background-color: white;
   border-top: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .btn-success {
-  padding: 10px 15px;
+  padding: 6px 10px;
   font-weight: 600;
-  border-radius: 8px;
+  font-size: 0.9rem;
+  border-radius: 6px;
   transition: all 0.3s ease;
 }
 
@@ -649,21 +649,15 @@ export default {
 }
 
 /* Responsive Styles */
-@media (min-width: 576px) {
+@media (max-width: 575px) {
+  .product-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991px) {
   .product-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 992px) {
-  .product-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-@media (min-width: 1200px) {
-  .product-grid {
-    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -681,7 +675,7 @@ export default {
   }
 
   .card-body {
-    padding: 15px;
+    padding: 14px;
   }
 
   .product-name {
