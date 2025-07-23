@@ -117,6 +117,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                      <div v-if="error" class="alert alert-warning">{{ error }}</div>
                         <form @submit.prevent="saveProduct">
                             <div class="row">
                                 <div class="col-md-6">
@@ -451,6 +452,7 @@ export default {
                 description: '',
                 image_url: null
             };
+            this.error = null;
             $('#productModal').modal('show');
         },
 
