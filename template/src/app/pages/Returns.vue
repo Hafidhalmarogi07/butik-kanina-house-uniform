@@ -128,7 +128,7 @@
                     <label for="returnType">Jenis Pengembalian</label>
                     <select class="form-control" id="returnType" v-model="currentReturn.return_type" required>
                       <option value="REFUND">Pengembalian Dana</option>
-                      <option value="EXCHANGE">Penukaran</option>
+                      <option value="REPLACEMENT">Penukaran</option>
                     </select>
                   </div>
                 </div>
