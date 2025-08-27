@@ -22,10 +22,16 @@ public class CategoryService {
     }
 
     public Category getCategoryById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new BadRequest("Category white id not found "));
+        return categoryRepository.findById(id).orElseThrow(() -> new BadRequest("Category with id not found "));
     }
 
     public Category createCategory(Category category) {
+        String normalizedName = category.getName().trim().toLowerCase();
+        if (categoryRepository.existsByNameIgnoreCase(normalizedName)) {
+            throw new IllegalArgumentException("Category with name '" + category.getName() + "' already exists.");
+        }
+
+        category.setName(normalizedName);
         return categoryRepository.save(category);
     }
 
@@ -33,7 +39,10 @@ public class CategoryService {
         Category oldCategory = getCategoryById(id);
         oldCategory.setName(category.getName());
         oldCategory.setDescription(category.getDescription());
-        return categoryRepository.save(oldCategory);
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(category.getName(), id)) {
+            throw new IllegalArgumentException("Category with name '" + category.getName() + "' already exists.");
+        }
+            return categoryRepository.save(oldCategory);
     }
 
     public String deleteCategory(Long id) {

@@ -6,8 +6,12 @@ import id.co.butik.service.CategoryService;
 import id.co.butik.util.PageableSpec;
 import id.co.butik.util.SpecificationUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -33,12 +37,13 @@ public class CategoryController {
     }
 
     @PostMapping({"", "/"})
-    public Category createCategory(@RequestBody Category category) {
+    public Category createCategory( @Valid @RequestBody Category category) {
         return categoryService.createCategory(category);
     }
 
+
     @PutMapping({"/{id}", "/{id}/"})
-    public Category updateCategory(@PathVariable Long id, @RequestBody Category category) {
+    public Category updateCategory(@PathVariable Long id,  @Valid  @RequestBody Category category) {
         return categoryService.updateCategory(id, category);
     }
 
@@ -47,5 +52,20 @@ public class CategoryController {
         return categoryService.deleteCategory(id);
     }
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationErrors(MethodArgumentNotValidException ex) {
+        Map<String, String> errors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                errors.put(error.getField(), error.getDefaultMessage()));
+        return errors;
+    }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleIllegalArgument(IllegalArgumentException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return error;
+    }
 }

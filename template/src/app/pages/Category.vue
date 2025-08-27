@@ -93,6 +93,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
+                      <div v-if="error" class="alert alert-warning">{{ error }}</div>
                         <form @submit.prevent="saveCategory">
                             <div class="form-group">
                                 <label for="categoryName">Nama Kategori</label>
@@ -298,6 +299,7 @@ export default {
                 id: null,
                 name: ''
             };
+          this.error = null;
             $('#categoryModal').modal('show');
         },
         editCategory(category) {
@@ -344,8 +346,13 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
+                      if (error.response && error.response.data && error.response.data.error) {
+                        console.log('Kesalahan menambahkan kategori 2:', error);
+                        this.error = error.response.data.error;
+                      } else {
                         console.error('Kesalahan memperbarui kategori:', error);
                         this.error = 'Gagal memperbarui kategori';
+                      }
                         this.loading = false;
                     });
             } else {
@@ -357,8 +364,14 @@ export default {
                         this.loading = false;
                     })
                     .catch(error => {
-                        console.error('Kesalahan menambahkan kategori:', error);
+                      console.log('Kesalahan menambahkan kategori 1:', error);
+                      if (error.response && error.response.data && error.response.data.error) {
+                        console.log('Kesalahan menambahkan kategori 2:', error);
+                        this.error = error.response.data.error;
+                      } else {
+                        console.log('Kesalahan menambahkan kategori 3:', error);
                         this.error = 'Gagal menambahkan kategori';
+                      }
                         this.loading = false;
                     });
             }
