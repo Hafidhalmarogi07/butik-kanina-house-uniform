@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -203,10 +204,12 @@ public class UserProfileService {
         // Delete associated user if exists
         User user = userRepository.findOneByUsername(profile.getEmail());
         if (user != null) {
-            userRepository.delete(user);
+            user.setEnabled(false);
+            userRepository.save(user);
         }
-
-        userProfileRepository.deleteById(id);
+        profile.setStatus(false);
+        profile.setDeleted(new Date());
+        userProfileRepository.save(profile);
         return "{\"success\":true}";
     }
 }

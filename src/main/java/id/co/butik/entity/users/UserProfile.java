@@ -4,6 +4,7 @@ package id.co.butik.entity.users;
 import id.co.butik.util.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 
@@ -11,6 +12,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "user_profile")
 @Data
+@Where(clause = "deleted IS NULL")
 public class UserProfile extends BaseEntity {
 
     @Id
