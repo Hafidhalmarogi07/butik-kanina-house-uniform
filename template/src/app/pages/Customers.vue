@@ -115,7 +115,12 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="customerName">Nama</label>
-                                        <input type="text" class="form-control" id="customerName" v-model="currentCustomer.nama" required>
+                                        <input type="text" class="form-control" id="customerName" v-model="currentCustomer.nama" 
+                                               :class="{'is-invalid': validationErrors.nama}" required>
+                                        <div class="invalid-feedback" v-if="validationErrors.nama">
+                                            {{ validationErrors.nama }}
+                                        </div>
+                                        <small class="form-text text-muted">Nama hanya boleh berisi huruf dan spasi.</small>
                                     </div>
                                     <div class="form-group">
                                         <label for="customerType">Tipe</label>
@@ -126,7 +131,12 @@
                                     </div>
                                     <div class="form-group">
                                         <label for="customerPhone">Telepon</label>
-                                        <input type="tel" class="form-control" id="customerPhone" v-model="currentCustomer.phone_number" required>
+                                        <input type="tel" class="form-control" id="customerPhone" v-model="currentCustomer.phone_number" 
+                                               :class="{'is-invalid': validationErrors.phone_number}" required>
+                                        <div class="invalid-feedback" v-if="validationErrors.phone_number">
+                                            {{ validationErrors.phone_number }}
+                                        </div>
+                                        <small class="form-text text-muted">Format: +62/62/0 diikuti 9-12 digit angka. Spasi dan tanda hubung diperbolehkan.</small>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -192,6 +202,10 @@ export default {
                 notes: '',
                 recentOrders: []
             },
+            validationErrors: {
+                nama: '',
+                phone_number: ''
+            },
             customerToDelete: null,
             customers: [],
             pagination: {
@@ -255,6 +269,37 @@ export default {
         }
     },
     methods: {
+        validateName(name) {
+            // Validate that name only contains letters and spaces
+            // Include Indonesian characters (accented letters)
+            const nameRegex = /^[A-Za-zÀ-ÖØ-öø-ÿ\s]+$/;
+            if (!nameRegex.test(name)) {
+                this.validationErrors.nama = 'Nama hanya boleh berisi huruf dan spasi';
+                return false;
+            }
+            this.validationErrors.nama = '';
+            return true;
+        },
+
+        validatePhoneNumber(phoneNumber) {
+            // Validate Indonesian phone number format
+            // Indonesian phone numbers typically start with +62 or 0
+            // followed by 9-12 digits
+            // Allow spaces and dashes for readability
+
+            // First, remove any spaces or dashes
+            const cleanedNumber = phoneNumber.replace(/[\s-]/g, '');
+
+            // Then validate the cleaned number
+            const phoneRegex = /^(\+62|62|0)[0-9]{9,12}$/;
+            if (!phoneRegex.test(cleanedNumber)) {
+                this.validationErrors.phone_number = 'Nomor telepon tidak valid. Format: +62/62/0 diikuti 9-12 digit';
+                return false;
+            }
+            this.validationErrors.phone_number = '';
+            return true;
+        },
+
         fetchCustomers(page = 0) {
             this.loading = true;
 
@@ -381,6 +426,9 @@ export default {
 
         showAddModal() {
             this.isEditing = false;
+            // Reset validation errors
+            this.validationErrors.nama = '';
+            this.validationErrors.phone_number = '';
             this.currentCustomer = {
                 id: null,
                 nama: '',
@@ -396,6 +444,9 @@ export default {
 
         editCustomer(customer) {
             this.isEditing = true;
+            // Reset validation errors
+            this.validationErrors.nama = '';
+            this.validationErrors.phone_number = '';
             this.currentCustomer = JSON.parse(JSON.stringify(customer));
             $('#customerModal').modal('show');
         },
@@ -427,7 +478,23 @@ export default {
         },
 
         saveCustomer() {
+            // Reset validation errors
+            this.validationErrors.nama = '';
+            this.validationErrors.phone_number = '';
+
+            // Set loading state
             this.loading = true;
+
+            // Validate input fields
+            const isNameValid = this.validateName(this.currentCustomer.nama);
+            const isPhoneValid = this.validatePhoneNumber(this.currentCustomer.phone_number);
+
+            // Only proceed if all validations pass
+            if (!isNameValid || !isPhoneValid) {
+                // Don't proceed with API call if validation fails
+                this.loading = false;
+                return;
+            }
 
             if (this.isEditing) {
                 // Update existing customer

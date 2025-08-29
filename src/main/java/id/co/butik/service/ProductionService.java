@@ -45,6 +45,7 @@ public class ProductionService {
             production.setProduct(productRepository.findById(production.getProduct().getId()).orElseThrow(() -> new BadRequest("Product not found ")));
         }
         if(ProductionStatus.FINISHED.equals(production.getStatus())) {
+            production.setProgress(100);
             Product oldProduct = production.getProduct();
             if (oldProduct == null) throw new AssertionError();
             oldProduct.setStock(oldProduct.getStock() + production.getQuantity());
@@ -61,9 +62,14 @@ public class ProductionService {
                 oldProduction.setProduct(productRepository.findById(production.getProduct().getId()).orElseThrow(() -> new BadRequest("Product not found ")));
             }
             if(ProductionStatus.FINISHED.equals(production.getStatus())) {
+                production.setProgress(100);
                 Product oldProduct = oldProduction.getProduct();
                 if (oldProduct == null) throw new AssertionError();
-                oldProduct.setStock(oldProduct.getStock() + production.getQuantity());
+                if(oldProduction.getStatus().equals(ProductionStatus.FINISHED)) {
+                    oldProduct.setStock(oldProduct.getStock() - oldProduction.getQuantity() + production.getQuantity());
+                }else {
+                    oldProduct.setStock(oldProduct.getStock() + production.getQuantity());
+                }
                 productRepository.save(oldProduct);
                 updateStockAlertAfterProduction(oldProduct, production.getQuantity());
             }
