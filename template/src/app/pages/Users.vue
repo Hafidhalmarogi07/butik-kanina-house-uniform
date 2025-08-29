@@ -370,6 +370,8 @@ export default {
        validateFullName() {
            if (!this.currentUser.full_name) {
                this.$set(this.errors, 'full_name', 'Nama lengkap harus diisi.');
+           } else if (!/^[A-Za-z\s]+$/.test(this.currentUser.full_name)) {
+               this.$set(this.errors, 'full_name', 'Nama lengkap hanya boleh berisi huruf dan spasi.');
            } else {
                this.$delete(this.errors, 'full_name');
            }
@@ -386,8 +388,8 @@ export default {
        validatePhoneNumber() {
            if (!this.currentUser.phone_number) {
                this.$set(this.errors, 'phone_number', 'Nomor telepon harus diisi.');
-           } else if (!/^\d+$/.test(this.currentUser.phone_number)) {
-               this.$set(this.errors, 'phone_number', 'Nomor telepon harus berupa angka.');
+           } else if (!/^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(this.currentUser.phone_number)) {
+               this.$set(this.errors, 'phone_number', 'Format nomor telepon Indonesia tidak valid. Contoh: 081234567890 atau +6281234567890');
            } else {
                this.$delete(this.errors, 'phone_number');
            }
@@ -439,7 +441,7 @@ export default {
                 }
             }
 
-            
+
 
             // Add filters to params if any
             if (filters.length > 0) {
@@ -450,7 +452,7 @@ export default {
             const queryParams = new URLSearchParams();
             // Add role filter if present
             if (this.roleFilter) {
-            
+
                 // Add filter for role equals roleFilter
                 queryParams.append("role", this.roleFilter);
             }
@@ -610,6 +612,9 @@ export default {
             if (!this.currentUser.full_name) {
                 this.errors.full_name = 'Nama lengkap harus diisi.';
                 isValid = false;
+            } else if (!/^[A-Za-z\s]+$/.test(this.currentUser.full_name)) {
+                this.errors.full_name = 'Nama lengkap hanya boleh berisi huruf dan spasi.';
+                isValid = false;
             }
 
             if (!this.currentUser.email) {
@@ -623,8 +628,8 @@ export default {
             if (!this.currentUser.phone_number) {
                 this.errors.phone_number = 'Nomor telepon harus diisi.';
                 isValid = false;
-            } else if (!/^\d+$/.test(this.currentUser.phone_number)) {
-                this.errors.phone_number = 'Nomor telepon harus berupa angka.';
+            } else if (!/^(\+62|62|0)8[1-9][0-9]{6,10}$/.test(this.currentUser.phone_number)) {
+                this.errors.phone_number = 'Format nomor telepon Indonesia tidak valid. Contoh: 081234567890 atau +6281234567890';
                 isValid = false;
             }
 
