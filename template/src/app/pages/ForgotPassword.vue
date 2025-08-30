@@ -112,6 +112,7 @@ export default {
             email: null
         },
         formreset : {
+            email: null,
             otp: null,
             password: null
         },
@@ -127,10 +128,12 @@ export default {
     methods: {
         submit() {
             this.loading = true
-            this.Api.forgot('/forgot_password/request',this.form)
+            this.Api.forgot('/forgot-password/request',this.form)
             .then(res => {
                 this.loading = false
                 alert("Silakan periksa email Anda");
+                // Set the email in formreset to the email from the first form
+                this.formreset.email = this.form.email;
                 $('#myModal1').modal('show');
             }).catch(err => {
                 this.loading = false
@@ -139,7 +142,7 @@ export default {
         },
         reset(){
             this.loading = true
-            this.Api.reset('/forgot_password/reset', this.formreset).then(res => {
+            this.Api.reset('/forgot-password/reset', this.formreset).then(res => {
                 this.loading = false
                 alert("Berhasil mengatur ulang kata sandi");
                 $('#myModal1').modal('hide');

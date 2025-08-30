@@ -260,7 +260,7 @@ export default class Api extends Object {
                 'Content-type': 'multipart/form-data'
             }
         }
-        return axios.post(env.api.oauth + path, data, headers)
+        return axios.post(env.api.base + path, data, headers)
     }
 
     reset(path, data) {
@@ -270,6 +270,6 @@ export default class Api extends Object {
                 'Content-type': 'multipart/form-data'
             }
         }
-        return axios.post(env.api.oauth + path, data, headers)
+        return axios.post(env.api.base + path, data, headers)
     }
 }

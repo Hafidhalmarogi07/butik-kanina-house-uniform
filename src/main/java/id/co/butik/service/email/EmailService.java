@@ -46,6 +46,24 @@ public class EmailService {
             map.put("success", false);
         }
         return map;
+    }
 
+    /**
+     * Send password reset email with OTP
+     * @param email the recipient email
+     * @param subject the email subject
+     * @param template the email template
+     * @return a map with success status
+     */
+    public Map<String, Boolean> sendPasswordResetEmail(String email, String subject, String template) {
+        Map<String, Boolean> map = new HashMap<>();
+        try {
+            emailSender.sendAsync(email, subject, template);
+            map.put("success", true);
+        } catch (Exception e) {
+            log.error("Error sending password reset email: {}", e.getMessage());
+            map.put("success", false);
+        }
+        return map;
     }
 }
