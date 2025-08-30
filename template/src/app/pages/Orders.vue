@@ -179,7 +179,7 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <h5>Items</h5>
+                                    <h5>Barang</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
@@ -309,10 +309,10 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Create Order
+                                    Buat Pesanan
                                 </button>
                             </div>
                         </form>
@@ -326,7 +326,7 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="orderDetailsModalLabel">Order Details</h5>
+                        <h5 class="modal-title" id="orderDetailsModalLabel">Detail Pesanan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -334,29 +334,29 @@
                     <div class="modal-body" v-if="selectedOrder">
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <p><strong>Order #:</strong> {{ selectedOrder.order_number }}</p>
-                                <p><strong>Date:</strong> {{ formatDate(selectedOrder.order_date) }}</p>
-                                <p><strong>Due Date:</strong> {{ formatDate(selectedOrder.due_date) }}</p>
+                                <p><strong>Pesanan #:</strong> {{ selectedOrder.order_number }}</p>
+                                <p><strong>Tanggal:</strong> {{ formatDate(selectedOrder.order_date) }}</p>
+                                <p><strong>Tanggal Jatuh Tempo:</strong> {{ formatDate(selectedOrder.due_date) }}</p>
                                 <p><strong>Status:</strong> <span :class="getStatusClass(selectedOrder.order_status)">{{ selectedOrder.order_status }}</span></p>
-                                <p><strong>Payment Status:</strong> <span :class="getPaymentStatusClass(selectedOrder.payment_status)">{{ selectedOrder.payment_status }}</span></p>
+                                <p><strong>Status Pembayaran:</strong> <span :class="getPaymentStatusClass(selectedOrder.payment_status)">{{ selectedOrder.payment_status }}</span></p>
                             </div>
                             <div class="col-md-6">
-                                <p><strong>Customer:</strong> {{ selectedOrder.customer ? selectedOrder.customer.nama : '' }}</p>
+                                <p><strong>Pelanggan:</strong> {{ selectedOrder.customer ? selectedOrder.customer.nama : '' }}</p>
                                 <p><strong>Total:</strong> {{ formatCurrency(selectedOrder.total_amount) }}</p>
-                                <p><strong>Paid:</strong> {{ formatCurrency(selectedOrder.amount_paid) }}</p>
+                                <p><strong>Dibayar:</strong> {{ formatCurrency(selectedOrder.amount_paid) }}</p>
                                 <p><strong>Admin:</strong> {{ selectedOrder.admin ? selectedOrder.admin.full_name : '' }}</p>
                             </div>
                         </div>
 
-                        <h6>Items</h6>
+                        <h6>Barang</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Product</th>
-                                        <th>Size</th>
-                                        <th>Price</th>
-                                        <th>Quantity</th>
+                                        <th>Produk</th>
+                                        <th>Ukuran</th>
+                                        <th>Harga</th>
+                                        <th>Jumlah</th>
                                         <th>Subtotal</th>
                                     </tr>
                                 </thead>
@@ -378,16 +378,16 @@
                             </table>
                         </div>
 
-                        <h6 class="mt-4">Payments</h6>
+                        <h6 class="mt-4">Pembayaran</h6>
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Date</th>
-                                        <th>Amount</th>
-                                        <th>Method</th>
-                                        <th>Proof of Payment</th>
-                                        <th>Notes</th>
+                                        <th>Tanggal</th>
+                                        <th>Jumlah</th>
+                                        <th>Metode</th>
+                                        <th>Bukti Pembayaran</th>
+                                        <th>Catatan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -404,14 +404,14 @@
                                                 style="max-height: 50px; cursor: pointer;"
                                                 @click="viewPaymentImage(payment.image_url)"
                                             />
-                                            <span v-else>No image</span>
+                                            <span v-else>Tidak ada gambar</span>
                                         </td>
                                         <td>{{ payment.notes }}</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" class="text-right"><strong>Total Paid:</strong></td>
+                                        <td colspan="4" class="text-right"><strong>Total Dibayar:</strong></td>
                                         <td>{{ formatCurrency(selectedOrder.amount_paid) }}</td>
                                     </tr>
                                 </tfoot>
@@ -419,9 +419,9 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                         <button type="button" class="btn btn-primary" @click="printOrder(selectedOrder)">
-                            <i class="fas fa-print"></i> Print Order
+                            <i class="fas fa-print"></i> Cetak Pesanan
                         </button>
                     </div>
                 </div>
@@ -433,7 +433,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addPaymentModalLabel">Add Payment</h5>
+                        <h5 class="modal-title" id="addPaymentModalLabel">Tambah Pembayaran</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -441,11 +441,11 @@
                     <div class="modal-body">
                         <form @submit.prevent="savePayment">
                             <div class="form-group">
-                                <label for="paymentDate">Payment Date</label>
+                                <label for="paymentDate">Tanggal Pembayaran</label>
                                 <input type="datetime-local" class="form-control" id="paymentDate" v-model="newPayment.payment_date" required>
                             </div>
                             <div class="form-group">
-                                <label for="paymentAmount">Amount</label>
+                                <label for="paymentAmount">Jumlah</label>
                                 <div class="input-group">
                                     <div class="input-group-prepend">
                                         <span class="input-group-text">Rp</span>
@@ -454,11 +454,11 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="paymentMethod">Payment Method</label>
+                                <label for="paymentMethod">Metode Pembayaran</label>
                                 <select class="form-control" id="paymentMethod" v-model="newPayment.payment_method" required>
-                                    <option value="CASH">Cash</option>
+                                    <option value="CASH">Tunai</option>
                                     <option value="TRANSFER">Transfer</option>
-                                    <option value="CREDIT_CARD">Credit Card</option>
+                                    <option value="CREDIT_CARD">Kartu Kredit</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -473,14 +473,14 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="paymentNotes">Notes</label>
+                                <label for="paymentNotes">Catatan</label>
                                 <textarea class="form-control" id="paymentNotes" rows="3" v-model="newPayment.note"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Save Payment
+                                    Simpan Pembayaran
                                 </button>
                             </div>
                         </form>
@@ -494,7 +494,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="updateStatusModalLabel">Update Order Status</h5>
+                        <h5 class="modal-title" id="updateStatusModalLabel">Perbarui Status Pesanan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -504,17 +504,17 @@
                             <div class="form-group">
                                 <label for="orderStatus">Status</label>
                                 <select class="form-control" id="orderStatus" v-model="newStatus" required>
-                                    <option value="PENDING">Pending</option>
-                                    <option value="CONFIRMED">Confirmed</option>
-                                    <option value="COMPLETED">Completed</option>
-                                    <option value="CANCELLED">Cancelled</option>
+                                    <option value="PENDING">Tertunda</option>
+                                    <option value="CONFIRMED">Dikonfirmasi</option>
+                                    <option value="COMPLETED">Selesai</option>
+                                    <option value="CANCELLED">Dibatalkan</option>
                                 </select>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Update Status
+                                    Perbarui Status
                                 </button>
                             </div>
                         </form>
@@ -528,7 +528,7 @@
             <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editOrderModalLabel">Edit Order</h5>
+                        <h5 class="modal-title" id="editOrderModalLabel">Edit Pesanan</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -538,9 +538,9 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="edit-customer">Customer</label>
+                                        <label for="edit-customer">Pelanggan</label>
                                         <select class="form-control" id="edit-customer" v-model="editingOrder.customer_id" required>
-                                            <option value="">Select Customer</option>
+                                            <option value="">Pilih Pelanggan</option>
                                             <option v-for="customer in customers" :key="customer.id" :value="customer.id">
                                                 {{ customer.nama }}
                                             </option>
@@ -549,7 +549,7 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="edit-orderDate">Order Date</label>
+                                        <label for="edit-orderDate">Tanggal Pesanan</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -564,7 +564,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="edit-dueDate">Due Date</label>
+                                        <label for="edit-dueDate">Tanggal Jatuh Tempo</label>
                                         <div class="input-group">
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">
@@ -577,12 +577,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="edit-orderStatus">Order Status</label>
+                                        <label for="edit-orderStatus">Status Pesanan</label>
                                         <select class="form-control" id="edit-orderStatus" v-model="editingOrder.order_status" required>
-                                            <option value="PENDING">Pending</option>
-                                            <option value="CONFIRMED">Confirmed</option>
-                                            <option value="COMPLETED">Completed</option>
-                                            <option value="CANCELLED">Cancelled</option>
+                                            <option value="PENDING">Tertunda</option>
+                                            <option value="CONFIRMED">Dikonfirmasi</option>
+                                            <option value="COMPLETED">Selesai</option>
+                                            <option value="CANCELLED">Dibatalkan</option>
                                         </select>
                                     </div>
                                 </div>
@@ -590,22 +590,22 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <h5>Items</h5>
+                                    <h5>Barang</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Product</th>
-                                                    <th>Quantity</th>
+                                                    <th>Produk</th>
+                                                    <th>Jumlah</th>
                                                     <th>Subtotal</th>
-                                                    <th>Action</th>
+                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 <tr v-for="(item, index) in editingOrder.details" :key="index">
                                                     <td>
                                                         <select class="form-control" v-model="item.product_id" @change="updateEditItemPrice(index)">
-                                                            <option value="">Select Product</option>
+                                                            <option value="">Pilih Produk</option>
                                                             <option v-for="product in products" :key="product.id" :value="product.id">
                                                                 {{ product.name }} ({{ product.size }}) - {{ formatCurrency(product.selling_price) }}
                                                             </option>
@@ -626,7 +626,7 @@
                                                 <tr>
                                                     <td colspan="4">
                                                         <button type="button" class="btn btn-primary btn-sm" @click="addEditItem">
-                                                            <i class="fas fa-plus"></i> Add Item
+                                                            <i class="fas fa-plus"></i> Tambah Barang
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -638,16 +638,16 @@
 
                             <div class="row mb-3">
                                 <div class="col-12">
-                                    <h5>Payments</h5>
+                                    <h5>Pembayaran</h5>
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
                                                 <tr>
-                                                    <th>Payment Date</th>
-                                                    <th>Amount</th>
-                                                    <th>Payment Method</th>
-                                                    <th>Notes</th>
-                                                    <th>Action</th>
+                                                    <th>Tanggal Pembayaran</th>
+                                                    <th>Jumlah</th>
+                                                    <th>Metode Pembayaran</th>
+                                                    <th>Catatan</th>
+                                                    <th>Aksi</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -660,9 +660,9 @@
                                                     </td>
                                                     <td>
                                                         <select class="form-control" v-model="payment.payment_method">
-                                                            <option value="CASH">Cash</option>
+                                                            <option value="CASH">Tunai</option>
                                                             <option value="TRANSFER">Transfer</option>
-                                                            <option value="CREDIT_CARD">Credit Card</option>
+                                                            <option value="CREDIT_CARD">Kartu Kredit</option>
                                                         </select>
                                                     </td>
                                                     <td>
@@ -679,7 +679,7 @@
                                                 <tr>
                                                     <td colspan="5">
                                                         <button type="button" class="btn btn-primary btn-sm" @click="addEditPayment">
-                                                            <i class="fas fa-plus"></i> Add Payment
+                                                            <i class="fas fa-plus"></i> Tambah Pembayaran
                                                         </button>
                                                     </td>
                                                 </tr>
@@ -692,7 +692,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="edit-notes">Notes</label>
+                                        <label for="edit-notes">Catatan</label>
                                         <textarea class="form-control" id="edit-notes" rows="3" v-model="editingOrder.notes"></textarea>
                                     </div>
                                 </div>
@@ -709,10 +709,10 @@
                             </div>
 
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                                 <button type="submit" class="btn btn-primary" :disabled="loading">
                                     <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                    Update Order
+                                    Perbarui Pesanan
                                 </button>
                             </div>
                         </form>
@@ -726,20 +726,20 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="deleteOrderModalLabel">Confirm Delete</h5>
+                        <h5 class="modal-title" id="deleteOrderModalLabel">Konfirmasi Hapus</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body">
-                        <p>Are you sure you want to delete order #{{ orderToDelete ? orderToDelete.order_number : '' }}?</p>
-                        <p class="text-danger">This action cannot be undone.</p>
+                        <p>Apakah Anda yakin ingin menghapus pesanan #{{ orderToDelete ? orderToDelete.order_number : '' }}?</p>
+                        <p class="text-danger">Tindakan ini tidak dapat dibatalkan.</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
                         <button type="button" class="btn btn-danger" @click="deleteOrder" :disabled="loading">
                             <span v-if="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                            Delete
+                            Hapus
                         </button>
                     </div>
                 </div>
@@ -751,17 +751,17 @@
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="paymentImageModalLabel">Payment Proof</h5>
+                        <h5 class="modal-title" id="paymentImageModalLabel">Bukti Pembayaran</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div class="modal-body text-center">
-                        <img v-if="selectedPaymentImage" :src="selectedPaymentImage" alt="Payment Proof" class="img-fluid" />
-                        <p v-else>No image available</p>
+                        <img v-if="selectedPaymentImage" :src="selectedPaymentImage" alt="Bukti Pembayaran" class="img-fluid" />
+                        <p v-else>Tidak ada gambar tersedia</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
                     </div>
                 </div>
             </div>
