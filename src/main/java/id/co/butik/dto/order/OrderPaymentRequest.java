@@ -12,4 +12,5 @@ public class OrderPaymentRequest {
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private String note;
+    private String imageUrl;
 }

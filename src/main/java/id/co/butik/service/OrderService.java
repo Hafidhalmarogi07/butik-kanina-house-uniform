@@ -8,7 +8,10 @@ import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.OrderStatus;
 import id.co.butik.enums.PaymentStatus;
 import id.co.butik.repository.*;
+import id.co.butik.responseException.BadRequest;
+import id.co.butik.util.ImageUtils;
 import id.co.butik.util.NumberGenerator;
+import id.co.butik.util.PropertiesUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +51,13 @@ public class OrderService {
 
 
     public Page<Order> findAll(Specification<Order> spec, Pageable pageable) {
+
+        Page<Order> orders = orderRepository.findAll(spec, pageable);
+        for (Order order : orders){
+           for (OrderPayment orderPayment : order.getPayments()){
+               orderPayment.setImageUrl(PropertiesUtils.CDN_BASEURL+orderPayment.getImageUrl());
+           }
+        }
         return orderRepository.findAll(spec, pageable);
     }
 
@@ -115,6 +125,9 @@ public class OrderService {
                 payment.setAmount(payReq.getAmount());
                 payment.setPaymentMethod(payReq.getPaymentMethod());
                 payment.setNotes(payReq.getNote());
+                if(payReq.getImageUrl().isEmpty()) throw new BadRequest("bukti pembayaran dibutuhkan");
+                payment.setImageUrl(ImageUtils.fromBase64(payReq.getImageUrl(), PropertiesUtils.CDN_PATH+"/payment", "/payment"));
+
 
                 totalPaid = totalPaid.add(payment.getAmount());
                 payments.add(payment);
@@ -142,6 +155,11 @@ public class OrderService {
         payment.setPaymentDate(request.getPaymentDate());
         payment.setPaymentMethod(request.getPaymentMethod());
         payment.setNotes(request.getNote());
+        System.out.println("ini image request : "+request.getImageUrl());
+        if(request.getImageUrl().isEmpty()) throw new BadRequest("bukti pembayaran dibutuhkan");
+        payment.setImageUrl(ImageUtils.fromBase64(request.getImageUrl(), PropertiesUtils.CDN_PATH+"/payment", "/payment"));
+        System.out.println("ini image Payment : " +payment.getImageUrl());
+
 
         orderPaymentRepository.save(payment);
 

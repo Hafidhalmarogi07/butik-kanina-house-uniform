@@ -31,5 +31,7 @@ public class OrderPayment extends BaseEntity {
 
     private String notes;
 
+    private String imageUrl;
+
 
 }

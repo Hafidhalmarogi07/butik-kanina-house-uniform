@@ -235,6 +235,7 @@
                                                   <th>Tanggal Pembayaran</th>
                                                   <th>Jumlah</th>
                                                   <th>Metode Pembayaran</th>
+                                                  <th>Bukti Pembayaran</th>
                                                   <th>Catatan</th>
                                                   <th>Aksi</th>
                                                 </tr>
@@ -253,6 +254,16 @@
                                                             <option value="TRANSFER">Transfer</option>
                                                             <option value="CREDIT_CARD">Credit Card</option>
                                                         </select>
+                                                    </td>
+                                                    <td>
+                                                        <div class="input-group">
+                                                            <div class="custom-file">
+                                                                <input type="file" class="custom-file-input" @change="handlePaymentImageUpload($event, index)">
+                                                                <label class="custom-file-label">
+                                                                    {{ payment.image_url ? 'Gambar dipilih' : 'Pilih file' }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
                                                     </td>
                                                     <td>
                                                         <input type="text" class="form-control" v-model="payment.note">
@@ -375,6 +386,7 @@
                                         <th>Date</th>
                                         <th>Amount</th>
                                         <th>Method</th>
+                                        <th>Proof of Payment</th>
                                         <th>Notes</th>
                                     </tr>
                                 </thead>
@@ -383,12 +395,23 @@
                                         <td>{{ formatDate(payment.payment_date) }}</td>
                                         <td>{{ formatCurrency(payment.amount) }}</td>
                                         <td>{{ payment.payment_method }}</td>
+                                        <td>
+                                            <img 
+                                                v-if="payment.image_url" 
+                                                :src="payment.image_url" 
+                                                alt="Payment Proof" 
+                                                class="img-thumbnail" 
+                                                style="max-height: 50px; cursor: pointer;"
+                                                @click="viewPaymentImage(payment.image_url)"
+                                            />
+                                            <span v-else>No image</span>
+                                        </td>
                                         <td>{{ payment.notes }}</td>
                                     </tr>
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="3" class="text-right"><strong>Total Paid:</strong></td>
+                                        <td colspan="4" class="text-right"><strong>Total Paid:</strong></td>
                                         <td>{{ formatCurrency(selectedOrder.amount_paid) }}</td>
                                     </tr>
                                 </tfoot>
@@ -437,6 +460,17 @@
                                     <option value="TRANSFER">Transfer</option>
                                     <option value="CREDIT_CARD">Credit Card</option>
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="paymentProof">Bukti Pembayaran</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="paymentProof" @change="handlePaymentImageUpload($event)">
+                                        <label class="custom-file-label" for="paymentProof">
+                                            {{ newPayment.image_url ? 'Gambar dipilih' : 'Pilih file' }}
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="paymentNotes">Notes</label>
@@ -711,6 +745,27 @@
                 </div>
             </div>
         </div>
+
+        <!-- Payment Image Modal -->
+        <div class="modal fade" id="paymentImageModal" tabindex="-1" role="dialog" aria-labelledby="paymentImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="paymentImageModalLabel">Payment Proof</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img v-if="selectedPaymentImage" :src="selectedPaymentImage" alt="Payment Proof" class="img-fluid" />
+                        <p v-else>No image available</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -733,7 +788,8 @@ export default {
                 payment_date: new Date().toISOString().slice(0, 16),
                 amount: 0,
                 payment_method: 'CASH',
-                note: ''
+                note: '',
+                image_url: ''
             },
             orderToAddPayment: null,
             orderToUpdateStatus: null,
@@ -760,7 +816,8 @@ export default {
                 pageSize: 10
             },
             loading: false,
-            error: null
+            error: null,
+            selectedPaymentImage: null
         }
     },
     computed: {
@@ -1025,7 +1082,8 @@ export default {
                 payment_date: new Date().toISOString().slice(0, 16),
                 amount: 0,
                 payment_method: 'CASH',
-                note: ''
+                note: '',
+                image_url: ''
             };
             $('#addPaymentModal').modal('show');
         },
@@ -1051,7 +1109,8 @@ export default {
                 payment_date: new Date().toISOString().slice(0, 16), 
                 amount: 0, 
                 payment_method: 'CASH', 
-                note: '' 
+                note: '',
+                image_url: ''
             });
         },
 
@@ -1118,7 +1177,8 @@ export default {
                     payment_date: payment.payment_date,
                     amount: payment.amount,
                     payment_method: payment.payment_method,
-                    note: payment.note
+                    note: payment.note,
+                    image_url: payment.image_url
                 }))
             };
 
@@ -1159,7 +1219,8 @@ export default {
                 payment_date: this.newPayment.payment_date,
                 amount: this.newPayment.amount,
                 payment_method: this.newPayment.payment_method,
-                note: this.newPayment.note
+                note: this.newPayment.note,
+                image_url: this.newPayment.image_url
             };
 
             // Make the API call to add a payment
@@ -1236,6 +1297,28 @@ export default {
 
                     this.loading = false;
                 });
+        },
+
+        handlePaymentImageUpload(event, index) {
+            const file = event.target.files[0];
+            if (file) {
+                // Convert file to base64 for API
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    if (index !== undefined) {
+                        // For payments in the order form
+                        this.currentOrder.payments[index].image_url = e.target.result;
+                    } else {
+                        // For the add payment modal
+                        this.newPayment.image_url = e.target.result;
+                    }
+
+                    // Update the file input label
+                    const fileName = file.name;
+                    $(event.target).next('.custom-file-label').html(fileName);
+                };
+                reader.readAsDataURL(file);
+            }
         },
 
         printOrder(order) {
@@ -1451,6 +1534,11 @@ export default {
                 </body>
                 </html>
             `;
+        },
+
+        viewPaymentImage(imageUrl) {
+            this.selectedPaymentImage = imageUrl;
+            $('#paymentImageModal').modal('show');
         },
 
         // Edit Order Methods
