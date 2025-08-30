@@ -3,7 +3,9 @@ package id.co.butik.service;
 import id.co.butik.dto.ForgotRequest;
 import id.co.butik.entity.PasswordResetOtp;
 import id.co.butik.entity.users.User;
+import id.co.butik.entity.users.UserProfile;
 import id.co.butik.repository.PasswordResetOtpRepository;
+import id.co.butik.repository.UserProfileRepository;
 import id.co.butik.repository.UserRepository;
 import id.co.butik.responseException.BadRequest;
 import id.co.butik.service.email.EmailService;
@@ -26,20 +28,22 @@ public class PasswordResetService {
     private final EmailService emailService;
     private final EmailTemplate emailTemplate;
     private final PasswordEncoder passwordEncoder;
+    private final UserProfileRepository userProfileRepository;
 
     @Value("${otp.expiry.minutes:5}")
     private int otpExpiryMinutes;
 
-    public PasswordResetService(UserRepository userRepository, 
-                               PasswordResetOtpRepository passwordResetOtpRepository,
-                               EmailService emailService,
-                               EmailTemplate emailTemplate,
-                               PasswordEncoder passwordEncoder) {
+    public PasswordResetService(UserRepository userRepository,
+                                PasswordResetOtpRepository passwordResetOtpRepository,
+                                EmailService emailService,
+                                EmailTemplate emailTemplate,
+                                PasswordEncoder passwordEncoder, UserProfileRepository userProfileRepository) {
         this.userRepository = userRepository;
         this.passwordResetOtpRepository = passwordResetOtpRepository;
         this.emailService = emailService;
         this.emailTemplate = emailTemplate;
         this.passwordEncoder = passwordEncoder;
+        this.userProfileRepository = userProfileRepository;
     }
 
     /**
@@ -71,6 +75,9 @@ public class PasswordResetService {
         passwordResetOtp.setUsed(false);
         passwordResetOtpRepository.save(passwordResetOtp);
 
+        UserProfile userProfile = userProfileRepository.findFirstByEmail(user.getEmail());
+        user.setName(userProfile.getFullName());
+
         // Send OTP email
         sendOtpEmail(user, otp);
 
@@ -79,13 +86,7 @@ public class PasswordResetService {
         return response;
     }
 
-    /**
-     * Validate OTP and reset password
-     * @param email the email address
-     * @param otp the OTP code
-     * @param newPassword the new password
-     * @return a map with success status
-     */
+
     public Map<String, Object> validateOtpAndResetPassword(ForgotRequest request) {
         Map<String, Object> response = new HashMap<>();
 
@@ -141,8 +142,8 @@ public class PasswordResetService {
      */
     private void sendOtpEmail(User user, String otp) {
         String template = emailTemplate.getResetPassword();
-        template = template.replaceAll("\\{\\{NAME}}", user.getName() != null ? user.getName() : "User");
-        template = template.replaceAll("\\{\\{PASS_TOKEN}}", otp);
+        template = template.replaceAll("\\{\\{namaUser}}", user.getName() != null ? user.getName() : "User");
+        template = template.replaceAll("\\{\\{otpCode}}", otp);
 
         emailService.sendPasswordResetEmail(user.getEmail(), "Kode OTP Reset Password Anda", template);
     }

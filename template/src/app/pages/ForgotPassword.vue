@@ -21,7 +21,7 @@
                 </div>
                 <form @submit.prevent="submit" method="post">
                     <div class="input-group mb-3">
-                        <input type="email" class="form-control" autocomplete="off" v-model="form.email" placeholder="Surel" :disabled="loading" required>
+                        <input type="email" class="form-control" autocomplete="off" v-model="form.email" placeholder="Email" :disabled="loading" required>
                         <div class="input-group-append">
                             <div class="input-group-text">
                                 <span class="fas fa-envelope"></span>
