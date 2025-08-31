@@ -154,7 +154,7 @@
                                         <label for="userRole">Peran</label>
                                         <select class="form-control" id="userRole" v-model="currentUser.role">
                                             <option value="ROLE_SUPERADMIN">Super Admin</option>
-                                            <option value="ROLE_ADMIN_TOKO">Admin Toko</option>
+                                            <option value="ROLE_ADMIN_TOKO">Admin Butik</option>
                                             <option value="ROLE_ADMIN_GUDANG">Admin Gudang</option>
                                         </select>
                                     </div>
@@ -526,7 +526,7 @@ export default {
         formatRole(role) {
             switch(role) {
                 case 'ROLE_SUPERADMIN': return 'Super Admin';
-                case 'ROLE_ADMIN_TOKO': return 'Admin Toko';
+                case 'ROLE_ADMIN_TOKO': return 'Admin Butik';
                 case 'ROLE_ADMIN_GUDANG': return 'Admin Gudang';
                 default: return role;
             }
