@@ -6,6 +6,7 @@ import id.co.butik.dto.order.OrderRequest;
 import id.co.butik.entity.*;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.enums.OrderStatus;
+import id.co.butik.enums.PaymentMethod;
 import id.co.butik.enums.PaymentStatus;
 import id.co.butik.repository.*;
 import id.co.butik.responseException.BadRequest;
@@ -125,8 +126,10 @@ public class OrderService {
                 payment.setAmount(payReq.getAmount());
                 payment.setPaymentMethod(payReq.getPaymentMethod());
                 payment.setNotes(payReq.getNote());
-                if(payReq.getImageUrl().isEmpty()) throw new BadRequest("bukti pembayaran dibutuhkan");
-                payment.setImageUrl(ImageUtils.fromBase64(payReq.getImageUrl(), PropertiesUtils.CDN_PATH+"/payment", "/payment"));
+                if(payReq.getPaymentMethod().equals(PaymentMethod.TRANSFER)) {
+                    if (payReq.getImageUrl().isEmpty()) {throw new BadRequest("bukti pembayaran dibutuhkan");}
+                    payment.setImageUrl(ImageUtils.fromBase64(payReq.getImageUrl(), PropertiesUtils.CDN_PATH + "/payment", "/payment"));
+                }
 
 
                 totalPaid = totalPaid.add(payment.getAmount());
@@ -155,10 +158,12 @@ public class OrderService {
         payment.setPaymentDate(request.getPaymentDate());
         payment.setPaymentMethod(request.getPaymentMethod());
         payment.setNotes(request.getNote());
-        System.out.println("ini image request : "+request.getImageUrl());
-        if(request.getImageUrl().isEmpty()) throw new BadRequest("bukti pembayaran dibutuhkan");
+        if(request.getPaymentMethod().equals(PaymentMethod.TRANSFER)){
+            if(request.getImageUrl().isEmpty()){
+                throw new BadRequest("bukti pembayaran dibutuhkan");
+            }
         payment.setImageUrl(ImageUtils.fromBase64(request.getImageUrl(), PropertiesUtils.CDN_PATH+"/payment", "/payment"));
-        System.out.println("ini image Payment : " +payment.getImageUrl());
+        }
 
 
         orderPaymentRepository.save(payment);

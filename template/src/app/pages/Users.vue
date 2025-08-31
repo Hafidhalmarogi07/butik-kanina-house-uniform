@@ -69,11 +69,6 @@
                                                 <button type="button" class="btn btn-sm btn-primary" @click="editUser(user)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm" 
-                                                    :class="user.active ? 'btn-warning' : 'btn-success'"
-                                                    @click="toggleUserStatus(user)">
-                                                    <i :class="user.active ? 'fas fa-ban' : 'fas fa-check'"></i>
-                                                </button>
                                                 <button type="button" class="btn btn-sm btn-danger" @click="deleteUser(user)">
                                                     <i class="fas fa-trash"></i>
                                                 </button>

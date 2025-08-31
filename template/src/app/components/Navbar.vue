@@ -117,15 +117,15 @@
             <!-- user menu -->
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
-                    <img src="@assets/unknown.jpeg" class="user-image" alt="User Image" v-if="!user_image">
-                    <img :src="user_image" class="user-image" alt="User Image" v-if="user_image">
+                    <img src="@assets/admin-icon-png-18.jpg" class="user-image" alt="User Image" v-if="!user.photo_profile">
+                    <img :src="user.photo_profile" class="user-image" alt="User Image" v-if="user.photo_profile">
                     <span class="hidden-xs">{{ user.full_name }}</span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
                     <div class="dropdown-item dropdown-header">
-                        <img src="@assets/unknown.jpeg" class="user-image-nav img-circle" alt="User Image" v-if="!user_image">
-                        <img :src="user_image" class="user-image-nav img-circle" alt="User Image" v-if="user_image">
-                        <h4 class="ellipsis">{{ user.full_name }}</h4>
+                        <img src="@assets/admin-icon-png-18.jpg" class="user-image-nav img-circle" alt="User Image" v-if="!user.photo_profile">
+                        <img :src="user.photo_profile" class="user-image-nav img-circle" alt="User Image" v-if="user.photo_profile">
+                        <h4 class="ellipsis">{{ user.name }}</h4>
                         <small class="ellipsis" v-if="user.company">{{ user.company.name }}</small>
                     </div>
                     <div class="dropdown-divider"></div>

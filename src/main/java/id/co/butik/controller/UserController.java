@@ -1,5 +1,6 @@
 package id.co.butik.controller;
 
+import id.co.butik.dto.PasswordUpdateRequest;
 import id.co.butik.dto.UserProfileDto;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.entity.users.Role;
@@ -64,6 +65,18 @@ public class UserController {
     @GetMapping("/me")
     public User getUser(HttpServletRequest request){
         return userService.userMe(request);
+    }
 
+    /**
+     * Update user password
+     * 
+     * @param request PasswordUpdateRequest containing current password, new password, and confirmation
+     * @param httpRequest HttpServletRequest to get current user
+     * @return Updated User object
+     */
+    @PostMapping("/update_password")
+    public User updatePassword(@RequestBody PasswordUpdateRequest request, HttpServletRequest httpRequest) {
+        System.out.println("updatePassword ");
+        return userService.updatePassword(request, httpRequest);
     }
 }

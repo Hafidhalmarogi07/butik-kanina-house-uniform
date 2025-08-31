@@ -4,17 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +32,9 @@ public class User implements UserDetails, Serializable {
 
     @JsonIgnore
     private boolean enabled = true;
+
+    @Transient
+    private String phoneNumber;
 
     @JsonIgnore
     @Column(name = "not_expired")
@@ -164,5 +157,13 @@ public class User implements UserDetails, Serializable {
 
     public void setPhotoProfile(String photoProfile) {
         this.photoProfile = photoProfile;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }

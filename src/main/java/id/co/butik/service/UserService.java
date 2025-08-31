@@ -1,5 +1,6 @@
 package id.co.butik.service;
 
+import id.co.butik.dto.PasswordUpdateRequest;
 import id.co.butik.dto.UserProfileDto;
 import id.co.butik.entity.users.UserProfile;
 import id.co.butik.entity.users.Role;
@@ -91,6 +92,56 @@ public class UserService {
 
     public User userMe(HttpServletRequest request){
         String username = UsernameUtils.getUsername(request);
-        return userRepository.findOneByUsername(username);
+        User user = userRepository.findOneByUsername(username);
+        UserProfile userProfile = userProfileRepository.findFirstByEmail(user.getUsername());
+        user.setName(userProfile.getFullName());
+        user.setEmail(userProfile.getEmail());
+        user.setPhotoProfile(userProfile.getPhotoProfile());
+        user.setPhoneNumber(userProfile.getPhoneNumber());
+        return user;
+    }
+
+    /**
+     * Update user password
+     * 
+     * @param request PasswordUpdateRequest containing current password, new password, and confirmation
+     * @param httpRequest HttpServletRequest to get current user
+     * @return User object with updated password
+     */
+    public User updatePassword(PasswordUpdateRequest request, HttpServletRequest httpRequest) {
+        System.out.println("start updatePassword ");
+        // Validate request
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new BadRequest("Kata sandi saat ini diperlukan");
+        }
+
+        if (request.getNewPassword() == null || request.getNewPassword().isEmpty()) {
+            throw new BadRequest("Kata sandi baru diperlukan");
+        }
+
+        if (request.getReNewPassword() == null || request.getReNewPassword().isEmpty()) {
+            throw new BadRequest("Konfirmasi kata sandi diperlukan");
+        }
+
+        if (!request.getNewPassword().equals(request.getReNewPassword())) {
+            throw new BadRequest("Kata sandi baru dan konfirmasi tidak cocok");
+        }
+
+        // Get current user
+        String username = UsernameUtils.getUsername(httpRequest);
+        User user = userRepository.findOneByUsername(username);
+
+        if (user == null) {
+            throw new BadRequest("Pengguna tidak ditemukan");
+        }
+
+        // Verify current password
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadRequest("Kata sandi saat ini salah");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        return userRepository.save(user);
     }
 }
